@@ -223,6 +223,85 @@ class IsoImage(object):
             raise IsoFormatError("KCHISO0005E",
                                  {'filename': self.path})
 
+    def _scan_ppc(self, data, fd):
+        data = cStringIO.StringIO(data[:IsoImage.SECTOR_SIZE])
+        pvd = {}
+        ty =  struct.unpack('<B', data.read(struct.calcsize('<B')))[0]
+        type_code = data.read(5)
+        standard_identifier = struct.unpack('<B', data.read(struct.calcsize('<B')))[0]
+        data.read(1)
+        system_identifier = data.read(32).rstrip(' ')
+        volume_identifier = data.read(32).rstrip(' ')
+        data.read(8)
+        volume_space_size = struct.unpack('<i', data.read(struct.calcsize('<i')))[0]
+        data.read(4)
+        data.read(32)
+        volume_set_size = struct.unpack('<h', data.read(struct.calcsize('<h')))[0]
+        data.read(2)
+        volume_seq_num = struct.unpack('<h', data.read(struct.calcsize('<h')))[0]
+        data.read(2)
+        logical_block_size = struct.unpack('<h', data.read(struct.calcsize('<h')))[0]
+        data.read(2)
+        path_table_size = struct.unpack('<i', data.read(struct.calcsize('<i')))[0]
+        data.read(4)
+        path_table_l_loc = struct.unpack('<i', data.read(struct.calcsize('<i')))[0]
+        path_table_opt_l_loc = struct.unpack('<i', data.read(struct.calcsize('<i')))[0]
+        path_table_m_loc = struct.unpack('>i', data.read(struct.calcsize('>i')))[0]
+        path_table_opt_m_loc = struct.unpack('>i', data.read(struct.calcsize('>i')))[0]
+        fd.seek(path_table_l_loc*2048)
+        data = cStringIO.StringIO(fd.read(path_table_size))
+        counter = path_table_size
+        while counter > 0:
+            name_length = struct.unpack('<B', data.read(struct.calcsize('<B')))[0]
+            data.read(1)
+            dir_location = struct.unpack('<I', data.read(struct.calcsize('<I')))[0]
+            dir_parent = struct.unpack('<H', data.read(struct.calcsize('<H')))[0]
+            dir_name =  data.read(name_length).rstrip(' ')
+            if dir_name == 'ppc' and dir_parent == 1:
+                break
+
+            if name_length%2 == 1:
+                data.read(1)
+            counter -= 8 + name_length + (name_length % 2)
+        assert counter > 0
+        fd.seek(dir_location*2048)
+        data = cStringIO.StringIO(fd.read(2048))
+        counter = 0
+        while counter < 2048:
+            size = struct.unpack('<B', data.read(struct.calcsize('<B')))[0]
+            if size == 0:
+                size = 1
+            else:
+                data.read(1)
+                file_location = struct.unpack('<I', data.read(struct.calcsize('<I')))[0]
+                data.read(4)
+                file_size = struct.unpack('<I', data.read(struct.calcsize('<I')))[0]
+                data.read(4)
+                data.read(7)
+                data.read(1)
+                data.read(1)
+                data.read(1)
+                data.read(2)
+                data.read(2)
+                name_length = struct.unpack('<B', data.read(struct.calcsize('<B')))[0]
+                file_name = data.read(name_length).split(';')[0]
+
+                if file_name == "bootinfo.txt":
+                    break
+
+                if name_length%2 == 0:
+                    data.read(1)
+                pad = 34 + name_length - (name_length % 2)
+                pad = size - pad
+                if pad > 0:
+                    data.read(pad)
+            counter += size
+        assert counter < 2048
+
+        fd.seek(file_location*2048)
+        data = cStringIO.StringIO(fd.read(file_size))
+        self.bootable = True
+
     def _scan_primary_vol(self, data):
         """
         Scan one sector for a Primary Volume Descriptor and extract the
@@ -268,8 +347,10 @@ class IsoImage(object):
             return
 
         self._scan_primary_vol(data)
-        self._scan_el_torito(data)
-
+        if platform.machine().startswith('ppc'):
+            self._scan_ppc(data, fd)
+        else:
+            self._scan_el_torito(data, fd)
 
 class Matcher(object):
     """
