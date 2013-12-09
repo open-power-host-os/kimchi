@@ -23,7 +23,8 @@ import re
 import struct
 import sys
 import urllib2
-
+import platform
+import cStringIO
 
 from kimchi.exception import IsoFormatError
 from kimchi.utils import check_url_path, kimchi_log
