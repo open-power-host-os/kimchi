@@ -224,7 +224,7 @@ class IsoImage(object):
             raise IsoFormatError("KCHISO0005E",
                                  {'filename': self.path})
 
-    def _scan_ppc(self, data, fd):
+    def _scan_ppc(self, data):
         data = cStringIO.StringIO(data[:IsoImage.SECTOR_SIZE])
         pvd = {}
         ty =  struct.unpack('<B', data.read(struct.calcsize('<B')))[0]
@@ -249,8 +249,8 @@ class IsoImage(object):
         path_table_opt_l_loc = struct.unpack('<i', data.read(struct.calcsize('<i')))[0]
         path_table_m_loc = struct.unpack('>i', data.read(struct.calcsize('>i')))[0]
         path_table_opt_m_loc = struct.unpack('>i', data.read(struct.calcsize('>i')))[0]
-        fd.seek(path_table_l_loc*2048)
-        data = cStringIO.StringIO(fd.read(path_table_size))
+        offset = path_table_l_loc * 2048
+        data = cStringIO.StringIO(self._get_iso_data(offset,path_table_size))
         counter = path_table_size
         while counter > 0:
             name_length = struct.unpack('<B', data.read(struct.calcsize('<B')))[0]
@@ -265,8 +265,8 @@ class IsoImage(object):
                 data.read(1)
             counter -= 8 + name_length + (name_length % 2)
         assert counter > 0
-        fd.seek(dir_location*2048)
-        data = cStringIO.StringIO(fd.read(2048))
+        offset = dir_location * 2048
+        data = cStringIO.StringIO(self._get_iso_data(offset, 2048))
         counter = 0
         while counter < 2048:
             size = struct.unpack('<B', data.read(struct.calcsize('<B')))[0]
@@ -299,8 +299,8 @@ class IsoImage(object):
             counter += size
         assert counter < 2048
 
-        fd.seek(file_location*2048)
-        data = cStringIO.StringIO(fd.read(file_size))
+        offset = file_location * 2048
+        data = cStringIO.StringIO(self._get_iso_data(offset, file_size))
         self.bootable = True
 
     def _scan_primary_vol(self, data):
@@ -349,9 +349,9 @@ class IsoImage(object):
 
         self._scan_primary_vol(data)
         if platform.machine().startswith('ppc'):
-            self._scan_ppc(data, fd)
+            self._scan_ppc(data)
         else:
-            self._scan_el_torito(data, fd)
+            self._scan_el_torito(data)
 
 class Matcher(object):
     """
