@@ -264,7 +264,9 @@ class IsoImage(object):
             if name_length%2 == 1:
                 data.read(1)
             counter -= 8 + name_length + (name_length % 2)
-        assert counter > 0
+        if counter <= 0:
+            self.bootable = False
+            return
         offset = dir_location * 2048
         data = cStringIO.StringIO(self._get_iso_data(offset, 2048))
         counter = 0
@@ -297,7 +299,9 @@ class IsoImage(object):
                 if pad > 0:
                     data.read(pad)
             counter += size
-        assert counter < 2048
+        if counter > 2048:
+            self.bootable = False
+            return
 
         offset = file_location * 2048
         data = cStringIO.StringIO(self._get_iso_data(offset, file_size))
@@ -414,4 +418,3 @@ if __name__ == '__main__':
         iso_list.append(iso_info)
 
     probe_iso(None, dict(path=sys.argv[1], updater=updater))
-    print iso_list
