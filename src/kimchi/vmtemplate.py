@@ -361,6 +361,10 @@ drive=drive-%(bus)s0-1-0,id=%(bus)s0-1-0'/>
             %(graphics)s
             %(input_output)s
             <memballoon model='virtio' />
+            <console type='pty'>
+              <target type='serial' port='1'/>
+              <address type='spapr-vio' reg='0x30001000'/>
+            </console>
           </devices>
         </domain>
         """ % params
