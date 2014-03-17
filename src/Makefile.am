@@ -22,6 +22,7 @@ SUBDIRS = kimchi distros.d nginx
 EXTRA_DIST = kimchid.in \
 	kimchi.conf.in \
 	firewalld.xml \
+	kimchi-firewalld.sh \
 	$(NULL)
 
 bin_SCRIPTS = kimchid
