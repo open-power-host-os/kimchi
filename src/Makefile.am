@@ -23,6 +23,7 @@ EXTRA_DIST = kimchid.in \
 	kimchi.conf.in \
 	nginx.conf.in \
 	firewalld.xml \
+	kimchi-firewalld.sh \
 	$(NULL)
 
 bin_SCRIPTS = kimchid
