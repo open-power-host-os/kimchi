@@ -42,6 +42,8 @@ SERVICE="$3"
 # settings
 ZONES_DIR="/usr/lib/firewalld/zones"
 ZONE_FILE="${ZONES_DIR}/${ZONE}.xml"
+ETC_ZONES_DIR="/etc/firewalld/zones"
+ETC_ZONE_FILE="${ETC_ZONES_DIR}/${ZONE}.xml"
 TEMP_ZONE=$(mktemp)
 
 
@@ -63,6 +65,10 @@ function service_exists() {
 function add_service() {
 	service="$1"
 
+    if [ -e ${ETC_ZONE_FILE} ]; then
+        ZONE_FILE="${ETC_ZONE_FILE}"
+    fi
+
 	IFS="
 "
 	for LINE in $(<$ZONE_FILE); do
@@ -79,6 +85,10 @@ function add_service() {
 
 function del_service() {
 	service="$1"
+
+    if [ -e ${ETC_ZONE_FILE} ]; then
+        ZONE_FILE = ${ETC_ZONE_FILE}
+    fi
 
 	IFS="
 "
@@ -115,7 +125,7 @@ IFS="$OLDIFS"
 
 # override zone if changed
 if [ "$CHANGED" = "yes" ]; then
-	mv -f $TEMP_ZONE $ZONE_FILE
+	mv -f $TEMP_ZONE $ETC_ZONE_FILE
 fi
 
 
