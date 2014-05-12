@@ -19,9 +19,11 @@
 
 SUBDIRS = control model
 
-kimchi_PYTHON = $(filter-out config.py, $(wildcard *.py))
+kimchi_PYTHON = $(filter-out config.py sos.py, $(wildcard *.py))
 
 nodist_kimchi_PYTHON = config.py
+
+dist_noinst_PYTHON = sos.py
 
 EXTRA_DIST = \
 	API.json \
