@@ -154,7 +154,7 @@ drive=drive-%(bus)s0-1-0,id=%(bus)s0-1-0'/>
             src = os.path.join(storage_path, volume)
             dev = "%s%s" % (self._bus_to_dev[self.info['disk_bus']],
                             string.lowercase[index])
-            fmt = 'raw' if self._get_storage_type() in ['logical'] else 'qcow2'
+            fmt = 'raw'
             params = {'src': src, 'dev': dev, 'bus': self.info['disk_bus'],
                       'type': fmt}
             ret += """
@@ -238,7 +238,7 @@ drive=drive-%(bus)s0-1-0,id=%(bus)s0-1-0'/>
 
     def to_volume_list(self, vm_uuid):
         storage_path = self._get_storage_path()
-        fmt = 'raw' if self._get_storage_type() in ['logical'] else 'qcow2'
+        fmt = 'raw'
         ret = []
         for i, d in enumerate(self.info['disks']):
             index = d.get('index', i)
