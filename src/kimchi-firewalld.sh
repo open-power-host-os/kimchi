@@ -42,7 +42,8 @@ SERVICE="$3"
 # settings
 ZONES_DIR="/usr/lib/firewalld/zones"
 ZONE_FILE="${ZONES_DIR}/${ZONE}.xml"
-ETC_ZONES_DIR="/etc/firewalld/zones"
+ETC_FIREWALLD_DIR="/etc/firewalld"
+ETC_ZONES_DIR="${ETC_FIREWALLD_DIR}/zones"
 ETC_ZONE_FILE="${ETC_ZONES_DIR}/${ZONE}.xml"
 TEMP_ZONE=$(mktemp)
 
@@ -53,6 +54,10 @@ OLDIFS=$IFS
 
 function service_exists() {
 	service="$1"
+
+    if [ -e ${ETC_ZONE_FILE} ]; then
+        ZONE_FILE="${ETC_ZONE_FILE}"
+    fi
 
 	if grep -q "\"$service\"" $ZONE_FILE; then
 		return 0
@@ -87,7 +92,7 @@ function del_service() {
 	service="$1"
 
     if [ -e ${ETC_ZONE_FILE} ]; then
-        ZONE_FILE = ${ETC_ZONE_FILE}
+        ZONE_FILE="${ETC_ZONE_FILE}"
     fi
 
 	IFS="
@@ -126,6 +131,8 @@ IFS="$OLDIFS"
 # override zone if changed
 if [ "$CHANGED" = "yes" ]; then
 	mv -f $TEMP_ZONE $ETC_ZONE_FILE
+    semanage fcontext -a -t firewalld_etc_rw_t '${ETC_FIREWALLD_DIR}(/.*)?'
+    restorecon -Rv ${ETC_FIREWALLD_DIR}
 fi
 
 
