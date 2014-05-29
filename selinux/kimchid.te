@@ -1,0 +1,20 @@
+module kimchid 1.0.1;
+require {
+	type var_run_t;
+	type httpd_t;
+	type unreserved_port_t;
+	type soundd_port_t;
+	class tcp_socket { name_bind name_connect };
+	class file unlink;
+}
+
+#============= httpd_t ==============
+allow httpd_t soundd_port_t:tcp_socket name_bind;
+
+#!!!! This avc is allowed in the current policy
+allow httpd_t unreserved_port_t:tcp_socket name_bind;
+
+#!!!! This avc can be allowed using one of the these booleans:
+#     nis_enabled, httpd_can_network_connect
+allow httpd_t unreserved_port_t:tcp_socket name_connect;
+allow httpd_t var_run_t:file unlink;
