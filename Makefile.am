@@ -29,6 +29,7 @@ EXTRA_DIST = \
 	CONTRIBUTE.md \
 	VERSION \
 	build-aux/pkg-version \
+	selinux/kimchid.te \
 	$(NULL)
 
 
