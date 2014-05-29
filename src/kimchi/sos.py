@@ -14,7 +14,7 @@
 
 
 from sos.plugins import Plugin, RedHatPlugin, UbuntuPlugin, DebianPlugin
-
+from sos.utilities import sos_get_command_output
 
 class Kimchi(Plugin, RedHatPlugin, UbuntuPlugin, DebianPlugin):
     """kimchi-related information
@@ -28,7 +28,7 @@ class Kimchi(Plugin, RedHatPlugin, UbuntuPlugin, DebianPlugin):
             "/var/log/kimchi*"
         ])
         self.add_cmd_output("virsh pool-list --details")
-        rc, out, _ = self.get_command_output('virsh pool-list')
+        rc, out, _ = sos_get_command_output('virsh pool-list')
         if rc == 0:
             for pool in out.splitlines()[2:]:
                 if pool:
