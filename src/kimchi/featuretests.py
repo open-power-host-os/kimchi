@@ -20,6 +20,7 @@
 import cherrypy
 import libvirt
 import lxml.etree as ET
+import platform
 import socket
 import subprocess
 import threading
@@ -37,7 +38,7 @@ ISO_STREAM_XML = """
   <name>ISO_STREAMING</name>
   <memory unit='KiB'>1048576</memory>
   <os>
-    <type arch='x86_64' machine='pc-1.2'>hvm</type>
+    <type arch='%(arch)s' machine='%(machine)s'>hvm</type>
     <boot dev='cdrom'/>
   </os>
   <devices>
@@ -100,7 +101,14 @@ class FeatureTests(object):
 
     @staticmethod
     def libvirt_supports_iso_stream(protocol):
-        xml = ISO_STREAM_XML % {'protocol': protocol}
+        if platform.machine().startswith('ppc'):
+            arch = "ppc64"
+            machine = "pseries"
+        else:
+            arch = "x86_64"
+            machine = "pc-1.2"
+        xml = ISO_STREAM_XML % {'protocol': protocol, 'arch': arch,
+                                'machine': machine}
         conn = None
         try:
             FeatureTests.disable_screen_error_logging()
