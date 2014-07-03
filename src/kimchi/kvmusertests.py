@@ -16,6 +16,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+import platform
 import psutil
 import uuid
 
@@ -29,11 +30,11 @@ from kimchi.rollbackcontext import RollbackContext
 class UserTests(object):
     SIMPLE_VM_XML = """
     <domain type='kvm'>
-      <name>%s</name>
-      <uuid>%s</uuid>
-      <memory unit='KiB'>10240</memory>
+      <name>%(name)s</name>
+      <uuid>%(uuid)s</uuid>
+      <memory unit='KiB'>%(memory)s</memory>
       <os>
-        <type arch='x86_64' machine='pc'>hvm</type>
+        <type arch='%(arch)s' machine='%(machine)s'>hvm</type>
         <boot dev='hd'/>
       </os>
     </domain>"""
@@ -47,7 +48,19 @@ class UserTests(object):
         vm_uuid = uuid.uuid1()
         vm_name = "kimchi_test_%s" % vm_uuid
 
-        xml = cls.SIMPLE_VM_XML % (vm_name, vm_uuid)
+        if platform.machine().startswith('ppc'):
+            arch = "ppc64"
+            machine = "pseries"
+            memory = "262144"
+        else:
+            arch = "x86_64"
+            machine = "pc"
+            memory = "10240"
+
+        xml = cls.SIMPLE_VM_XML % {'name': vm_name, 'uuid': vm_uuid,
+                                   'memory': memory, 'arch': arch,
+                                   'machine': machine}
+
         with RollbackContext() as rollback:
             conn = libvirt.open('qemu:///system')
             rollback.prependDefer(conn.close)
