@@ -239,7 +239,8 @@ class Collection(object):
     def filter_data(self, resources, fields_filter):
         data = []
         for res in resources:
-            if all(key in res.data and res.data[key] == val
+            if all(key in res.data and (res.data[key] == val or
+                                        res.data[key] in val)
                    for key, val in fields_filter.iteritems()):
                 data.append(res.data)
         return data
