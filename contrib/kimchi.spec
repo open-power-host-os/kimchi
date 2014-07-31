@@ -4,7 +4,7 @@
 %endif
 
 %define frobisher_release 20
-%define release .3
+%define release .6
 Name:		kimchi
 Version:	1.2.1
 Release:	%{?frobisher_release}%{?release}%{?dist}
@@ -218,6 +218,14 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Jul 31 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.6
+- Update spec file to PowerKVM 2.1.1 (build 6)
+- Disable vhost feature in Ubuntu and SLES (PPC64 LE) - Bugzilla #113883
+- Change modern distro versions for PPC - Bugzilla #113883
+- Add SUSE's products - Bugzilla #113883
+- fix test case for volume filtering - Bugzilla #113755
+- Filter directory in storage volume listing - Bugzilla #113755
+
 * Mon Jul 14 2014 Paulo Vital  <pvital@linux.vnet.ibm.com> 1.2.1-20.3
 - Update spec file to PowerKVM 2.1.1 (20.3)
 
