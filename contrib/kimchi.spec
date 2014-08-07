@@ -4,7 +4,7 @@
 %endif
 
 %define frobisher_release 20
-%define release .6
+%define release .7
 Name:		kimchi
 Version:	1.2.1
 Release:	%{?frobisher_release}%{?release}%{?dist}
@@ -218,6 +218,13 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Aug 07 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.7
+- Update spec file to PowerKVM 2.1.1 (build 7)
+- Let frontend redirect user after logging - Bugzila #114339
+- Remove special console rules from nginx configuration - Bugzila #114339
+- Remove former login design files - Bugzila #114339
+- Update test case to reflect new login design - Bugzila #114339
+
 * Thu Jul 31 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.6
 - Update spec file to PowerKVM 2.1.1 (build 6)
 - Disable vhost feature in Ubuntu and SLES (PPC64 LE) - Bugzilla #113883
