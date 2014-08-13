@@ -27,8 +27,10 @@ import re
 import subprocess
 import traceback
 import urllib2
+from httplib import HTTPConnection, HTTPException
 from multiprocessing import Process, Queue
 from threading import Timer
+from urlparse import urlparse
 
 from cherrypy.lib.reprconf import Parser
 
@@ -124,12 +126,25 @@ def import_module(module_name):
 
 def check_url_path(path):
     try:
-        code = urllib2.urlopen(path).getcode()
+        code = ''
+        parse_result = urlparse(path)
+        server_name = parse_result.netloc
+        urlpath = parse_result.path
+        if not urlpath:
+            # Just a server, as with a repo.
+            code = urllib2.urlopen(path).getcode()
+        else:
+            # socket.gaierror could be raised,
+            #   which is a child class of IOError
+            conn = HTTPConnection(server_name, timeout=15)
+            # Don't try to get the whole file:
+            conn.request('HEAD', path)
+            code = conn.getresponse().status
+            conn.close()
         if code != 200:
             return False
-    except (urllib2.URLError, ValueError):
+    except (urllib2.URLError, HTTPException, IOError, ValueError):
         return False
-
     return True
 
 
