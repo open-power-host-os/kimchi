@@ -103,9 +103,16 @@ class Devices(Collection):
         self.resource = Device
 
 
+class VMHolders(SimpleCollection):
+    def __init__(self, model, device_id):
+        super(VMHolders, self).__init__(model)
+        self.model_args = (device_id, )
+
+
 class Device(Resource):
     def __init__(self, model, id):
         super(Device, self).__init__(model, id)
+        self.vm_holders = VMHolders(self.model, id)
 
     @property
     def data(self):

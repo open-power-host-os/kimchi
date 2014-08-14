@@ -118,6 +118,11 @@ class VMHostDevsModel(object):
             DevicesModel(conn=self.conn).get_list(_passthrough='true')
         if dev_name not in eligible_dev_names:
             raise InvalidParameter('KCHVMHDEV0002E', {'dev_name': dev_name})
+        holders = VMHoldersModel(conn=self.conn).get_list(dev_name)
+        if holders:
+            names = ', '.join([holder['name'] for holder in holders])
+            raise InvalidOperation('KCHVMHDEV0004E', {'dev_name': dev_name,
+                                                      'names': names})
 
     def create(self, vmid, params):
         dev_name = params['name']
@@ -298,3 +303,22 @@ class VMHostDevModel(object):
                 xmlstr = etree.tostring(e)
                 dom.detachDeviceFlags(
                     xmlstr, get_vm_config_flag(dom, mode='all'))
+
+
+class VMHoldersModel(object):
+    def __init__(self, **kargs):
+        self.conn = kargs['conn']
+
+    def get_list(self, device_id):
+        devsmodel = VMHostDevsModel(conn=self.conn)
+
+        conn = self.conn.get()
+        doms = conn.listAllDomains(0)
+
+        res = []
+        for dom in doms:
+            dom_name = dom.name()
+            if device_id in devsmodel.get_list(dom_name):
+                state = DOM_STATE_MAP[dom.info()[0]]
+                res.append({"name": dom_name, "state": state})
+        return res

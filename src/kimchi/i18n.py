@@ -96,6 +96,8 @@ messages = {
                         "Please enable Intel VT-d or AMD IOMMU in your BIOS, then verify the Kernel is compiled with IOMMU support. "
                         "For Intel CPU, add intel_iommu=on to your Kernel parameter in /boot/grub2/grub.conf. "
                         "For AMD CPU, add iommu=pt iommu=1."),
+    "KCHVMHDEV0004E": _("The host device %(dev_name)s should be assigned to just one VM. "
+                        "Currently the following VM(s) are holding the device: %(names)s."),
 
     "KCHVMIF0001E": _("Interface %(iface)s does not exist in virtual machine %(name)s"),
     "KCHVMIF0002E": _("Network %(network)s specified for virtual machine %(name)s does not exist"),
