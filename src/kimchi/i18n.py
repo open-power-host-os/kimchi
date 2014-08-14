@@ -90,6 +90,13 @@ messages = {
     "KCHVM0029E": _("Unable to shutdown virtual machine %(name)s. Details: %(err)s"),
     "KCHVM0030E": _("Unable to get access metadata of virtual machine %(name)s. Details: %(err)s"),
 
+    "KCHVMHDEV0001E": _("VM %(vmid)s does not contain directly assigned host device %(dev_name)s."),
+    "KCHVMHDEV0002E": _("The host device %(dev_name)s is not allowed to directly assign to VM."),
+    "KCHVMHDEV0003E": _("No IOMMU groups found. Host PCI pass through needs IOMMU group to function correctly. "
+                        "Please enable Intel VT-d or AMD IOMMU in your BIOS, then verify the Kernel is compiled with IOMMU support. "
+                        "For Intel CPU, add intel_iommu=on to your Kernel parameter in /boot/grub2/grub.conf. "
+                        "For AMD CPU, add iommu=pt iommu=1."),
+
     "KCHVMIF0001E": _("Interface %(iface)s does not exist in virtual machine %(name)s"),
     "KCHVMIF0002E": _("Network %(network)s specified for virtual machine %(name)s does not exist"),
     "KCHVMIF0003E": _("Do not support guest interface hot plug attachment"),
