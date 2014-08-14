@@ -236,6 +236,71 @@ kimchi.guest_edit_main = function() {
         });
     };
 
+    var setupPCIDevice = function(){
+        kimchi.getHostPCIDevices(function(hostPCIs){
+            kimchi.getVMPCIDevices(kimchi.selectedGuest, function(vmPCIs){
+                for(var i=0; i<hostPCIs.length; i++){
+                    var itemNode = $.parseHTML(kimchi.substitute($('#pci-tmpl').html(),{
+                        name: hostPCIs[i].name,
+                        product: hostPCIs[i].product.description,
+                        vendor: hostPCIs[i].vendor.description
+                    }));
+                    $(".body", "#form-guest-edit-pci").append(itemNode);
+                    var iconClass = "ui-icon-plus";
+                    for(var j=0; j<vmPCIs.length; j++){
+                        if(hostPCIs[i].name==vmPCIs[j].name){
+                            iconClass = "ui-icon-minus";
+                            break;
+                        }
+                    }
+                    $("button", itemNode).button({
+                        icons: { primary: iconClass },
+                        text: false
+                    }).click(function(){
+                        var obj = $(this);
+                        if(obj.button("option", "icons").primary == "ui-icon-minus"){
+                            kimchi.removeVMPCIDevice(kimchi.selectedGuest, obj.parent().prop("id"), function(){
+                                obj.button("option", "icons", { primary: "ui-icon-plus" });
+                                filterNodes($("select", "#form-guest-edit-pci").val(), $("input", "#form-guest-edit-pci").val());
+                            });
+                        }else{
+                            kimchi.addVMPCIDevice(kimchi.selectedGuest, { name: obj.parent().prop("id") }, function(){
+                                obj.button("option", "icons", { primary: "ui-icon-minus" });
+                                filterNodes($("select", "#form-guest-edit-pci").val(), $("input", "#form-guest-edit-pci").val());
+                            });
+                        }
+                    });
+                }
+            });
+        });
+        var filterNodes = function(group, text){
+            text = text.toLowerCase();
+            $(".body", "#form-guest-edit-pci").children().each(function(){
+                var textFilter = $(".name", this).text().toLowerCase().indexOf(text)!=-1;
+                textFilter = textFilter || $(".product", this).text().toLowerCase().indexOf(text)!=-1;
+                textFilter = textFilter || $(".vendor", this).text().toLowerCase().indexOf(text)!=-1;
+                var display = "none";
+                var itemGroup = $("button", this).button("option", "icons").primary;
+                if(textFilter){
+                    if(group == "all"){
+                        display = "";
+                    }else if(group=="toAdd" && itemGroup=="ui-icon-plus"){
+                        display = ""
+                    }else if(group == "added" && itemGroup=="ui-icon-minus"){
+                        display = ""
+                    }
+                }
+                $(this).css("display", display);
+            });
+        };
+        $("select", "#form-guest-edit-pci").change(function(){
+            filterNodes($(this).val(), $("input", "#form-guest-edit-pci").val());
+        });
+        $("input", "#form-guest-edit-pci").on("keyup", function() {
+            filterNodes($("select", "#form-guest-edit-pci").val(), $(this).val());
+        });
+    };
+
     var initContent = function(guest) {
         guest['icon'] = guest['icon'] || 'images/icon-vm.png';
         $('#form-guest-edit-general').fillWithObject(guest);
@@ -265,6 +330,7 @@ kimchi.guest_edit_main = function() {
         initStorageListeners();
 
         setupInterface();
+        setupPCIDevice();
 
         kimchi.topic('kimchi/vmCDROMAttached').subscribe(onAttached);
         kimchi.topic('kimchi/vmCDROMReplaced').subscribe(onReplaced);

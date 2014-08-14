@@ -1044,5 +1044,60 @@ var kimchi = {
                 kimchi.message.error(data.responseJSON.reason);
             }
         });
+    },
+
+    getHostPCIDevices : function(suc, err) {
+        kimchi.requestJSON({
+            url : kimchi.url + 'host/devices?_passthrough=true&_cap=pci',
+            type : 'GET',
+            contentType : 'application/json',
+            dataType : 'json',
+            resend : true,
+            success : suc,
+            error : err ? err : function(data) {
+                kimchi.message.error(data.responseJSON.reason);
+            }
+        });
+    },
+
+    getVMPCIDevices : function(id, suc, err) {
+        kimchi.requestJSON({
+            url : kimchi.url + 'vms/'+encodeURIComponent(id)+'/hostdevs',
+            type : 'GET',
+            contentType : 'application/json',
+            dataType : 'json',
+            resend : true,
+            success : suc,
+            error : err ? err : function(data) {
+                kimchi.message.error(data.responseJSON.reason);
+            }
+        });
+    },
+
+    addVMPCIDevice : function(vm, device, suc, err) {
+        kimchi.requestJSON({
+            url : kimchi.url + 'vms/'+ encodeURIComponent(vm) +'/hostdevs',
+            type : 'POST',
+            contentType : 'application/json',
+            dataType : 'json',
+            data : JSON.stringify(device),
+            success : suc,
+            error : err ? err : function(data) {
+                kimchi.message.error(data.responseJSON.reason);
+            }
+        });
+    },
+
+    removeVMPCIDevice : function(vm, device, suc, err) {
+        kimchi.requestJSON({
+            url : kimchi.url + 'vms/'+ encodeURIComponent(vm) +'/hostdevs/' + encodeURIComponent(device),
+            type : 'DELETE',
+            contentType : 'application/json',
+            dataType : 'json',
+            success : suc,
+            error : err ? err : function(data) {
+                kimchi.message.error(data.responseJSON.reason);
+            }
+        });
     }
 };
