@@ -31,8 +31,9 @@ from kimchi import disks
 from kimchi import netinfo
 from kimchi import xmlutils
 from kimchi.basemodel import Singleton
-from kimchi.exception import InvalidOperation, NotFoundError, OperationFailed
 from kimchi.model import hostdev
+from kimchi.exception import InvalidOperation, InvalidParameter
+from kimchi.exception import NotFoundError, OperationFailed
 from kimchi.model.config import CapabilitiesModel
 from kimchi.model.tasks import TaskModel
 from kimchi.model.vms import DOM_STATE_MAP
@@ -279,8 +280,16 @@ class DevicesModel(object):
     def __init__(self, **kargs):
         self.conn = kargs['conn']
 
-    def get_list(self, _cap=None):
+    def get_list(self, _cap=None, _passthrough=None,
+                 _passthrough_group_by=None):
         conn = self.conn.get()
+
+        if _passthrough_group_by is not None:
+            # _passthrough_group_by conflicts with _cap and _passthrough
+            if (_cap, _passthrough) != (None, None):
+                raise InvalidParameter("KCHHOST0004E")
+            return self._get_passthrough_affected_devs(_passthrough_group_by)
+
         if _cap is None:
             dev_names = [name.name() for name in conn.listAllDevices(0)]
         elif _cap == 'fc_host':
@@ -288,7 +297,18 @@ class DevicesModel(object):
         else:
             # Get devices with required capability
             dev_names = conn.listDevices(_cap, 0)
+
+        if _passthrough is not None and _passthrough.lower() == 'true':
+            passthrough_names = [
+                dev['name'] for dev in hostdev.get_passthrough_dev_infos(conn)]
+            dev_names = list(set(dev_names) & set(passthrough_names))
         return dev_names
+
+    def _get_passthrough_affected_devs(self, dev_name):
+        conn = self.conn.get()
+        info = DeviceModel(conn=self.conn).lookup(dev_name)
+        affected = hostdev.get_affected_passthrough_devices(conn, info)
+        return [dev_info['name'] for dev_info in affected]
 
     def _get_devices_fc_host(self):
         conn = self.conn.get()

@@ -17,7 +17,9 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 
+import os
 from pprint import pformat
+from pprint import pprint
 
 from kimchi.model.libvirtconnection import LibvirtConnection
 from kimchi.utils import kimchi_log
@@ -45,6 +47,111 @@ def _get_dev_info_tree(dev_infos):
         else:
             children.append(dev_info)
     return root
+
+
+def _strip_parents(devs, dev):
+    parent = dev['parent']
+    while parent is not None:
+        try:
+            parent_dev = devs.pop(parent)
+        except KeyError:
+            break
+
+        if (parent_dev['device_type'],
+                dev['device_type']) == ('usb_device', 'scsi'):
+            # For USB device containing mass storage, passthrough the
+            # USB device itself, not the SCSI unit.
+            devs.pop(dev['name'])
+            break
+
+        parent = parent_dev['parent']
+
+
+def _is_pci_qualified(pci_dev):
+    # PCI class such as bridge and storage controller are not suitable to
+    # passthrough to VM, so we make a whitelist and only passthrough PCI
+    # class in the list.
+
+    whitelist_pci_classes = {
+        # Refer to Linux Kernel code include/linux/pci_ids.h
+        0x000000: {  # Old PCI devices
+            0x000100: None},  # Old VGA devices
+        0x020000: None,  # Network controller
+        0x030000: None,  # Display controller
+        0x040000: None,  # Multimedia device
+        0x080000: {  # System Peripheral
+            0x088000: None},  # Misc Peripheral, such as SDXC/MMC Controller
+        0x090000: None,  # Inupt device
+        0x0d0000: None,  # Wireless controller
+        0x0f0000: None,  # Satellite communication controller
+        0x100000: None,  # Cryption controller
+        0x110000: None,  # Signal Processing controller
+        }
+
+    with open(os.path.join(pci_dev['path'], 'class')) as f:
+        pci_class = int(f.readline().strip(), 16)
+
+    try:
+        subclasses = whitelist_pci_classes[pci_class & 0xff0000]
+    except KeyError:
+        return False
+
+    if subclasses is None:
+        return True
+
+    if pci_class & 0xffff00 in subclasses:
+        return True
+
+    return False
+
+
+def get_passthrough_dev_infos(libvirt_conn):
+    ''' Get devices eligible to be passed through to VM. '''
+
+    dev_infos = _get_all_host_dev_infos(libvirt_conn)
+    devs = dict([(dev_info['name'], dev_info) for dev_info in dev_infos])
+
+    for dev in dev_infos:
+        if dev['device_type'] in ('pci', 'usb_device', 'scsi'):
+            _strip_parents(devs, dev)
+
+    def is_eligible(dev):
+        return dev['device_type'] in ('usb_device', 'scsi') or \
+            (dev['device_type'] == 'pci' and _is_pci_qualified(dev))
+
+    return [dev for dev in devs.itervalues() if is_eligible(dev)]
+
+
+def get_affected_passthrough_devices(libvirt_conn, passthrough_dev):
+    devs = dict([(dev['name'], dev) for dev in
+                 _get_all_host_dev_infos(libvirt_conn)])
+
+    def get_iommu_group(dev_info):
+        try:
+            return dev_info['iommuGroup']
+        except KeyError:
+            pass
+
+        parent = dev_info['parent']
+        while parent is not None:
+            try:
+                iommuGroup = devs[parent]['iommuGroup']
+            except KeyError:
+                pass
+            else:
+                return iommuGroup
+            parent = devs[parent]['parent']
+
+        return -1
+
+    iommu_group = get_iommu_group(passthrough_dev)
+
+    if iommu_group == -1:
+        return []
+
+    return [dev for dev in get_passthrough_dev_infos(libvirt_conn)
+            if dev['name'] != passthrough_dev['name'] and
+            get_iommu_group(dev) == iommu_group]
 
 
 def get_dev_info(node_dev):
@@ -187,8 +294,7 @@ def _get_usb_device_dev_info(info):
 
 
 # For test and debug
-def _print_host_dev_tree():
-    libvirt_conn = LibvirtConnection('qemu:///system').get()
+def _print_host_dev_tree(libvirt_conn):
     dev_infos = _get_all_host_dev_infos(libvirt_conn)
     root = _get_dev_info_tree(dev_infos)
     if root is None:
@@ -226,4 +332,7 @@ def _format_dev_node(node):
 
 
 if __name__ == '__main__':
-    _print_host_dev_tree()
+    libvirt_conn = LibvirtConnection('qemu:///system').get()
+    _print_host_dev_tree(libvirt_conn)
+    print 'Eligible passthrough devices:'
+    pprint(get_passthrough_dev_infos(libvirt_conn))
