@@ -46,6 +46,7 @@ from kimchi.config import config as kconfig
 from kimchi.distroloader import DistroLoader
 from kimchi.exception import InvalidOperation, InvalidParameter
 from kimchi.exception import MissingParameter, NotFoundError, OperationFailed
+from kimchi.model import hostdev
 from kimchi.model.storagepools import ISO_POOL_NAME
 from kimchi.model.storageservers import STORAGE_SERVERS
 from kimchi.model.utils import get_vm_name
@@ -83,6 +84,7 @@ class MockModel(object):
         self.next_taskid = 1
         self.storagepool_activate('default')
         self._mock_host_repositories = MockRepositories()
+        self._mock_devices = MockDevices()
 
     def _static_vm_update(self, dom, params):
         state = dom.info['state']
@@ -487,16 +489,15 @@ class MockModel(object):
             raise InvalidOperation("KCHVOL0006E", {'pool': pool})
         return res._volumes.keys()
 
-    def devices_get_list(self, _cap=None):
-        return ['scsi_host3', 'scsi_host4', 'scsi_host5']
+    def devices_get_list(self, _cap=None, _passthrough=None,
+                         _passthrough_group_by=None):
+        if _cap is None:
+            return self._mock_devices.devices.keys()
+        return [dev['name'] for dev in self._mock_devices.devices.values()
+                if dev['device_type'] == _cap]
 
-    def device_lookup(self, nodedev_name):
-        return {
-            'name': nodedev_name,
-            'adapter': {
-                'type': 'fc_host',
-                'wwnn': uuid.uuid4().hex[:16],
-                'wwpn': uuid.uuid4().hex[:16]}}
+    def device_lookup(self, dev_name):
+        return self._mock_devices.devices[dev_name]
 
     def isopool_lookup(self, name):
         return {'state': 'active',
@@ -1264,6 +1265,115 @@ class MockRepositories(object):
             raise NotFoundError("KCHREPOS0012E", {'repo_id': repo_id})
 
         del self._repos[repo_id]
+
+
+class MockNodeDevice(object):
+    dev_xmls = {
+        "computer": """
+<device>
+  <name>computer</name>
+  <capability type='system'>
+    <product>4180XXX</product>
+    <hardware>
+      <vendor>LENOVO</vendor>
+      <version>ThinkPad T420</version>
+      <serial>PXXXXX</serial>
+      <uuid>9d660370-820f-4241-8731-5a60c97e8aa6</uuid>
+    </hardware>
+    <firmware>
+      <vendor>LENOVO</vendor>
+      <version>XXXXX (X.XX )</version>
+      <release_date>01/01/2012</release_date>
+    </firmware>
+  </capability>
+</device>""",
+        "pci_0000_03_00_0": """
+<device>
+  <name>pci_0000_03_00_0</name>
+  <path>/sys/devices/pci0000:00/0000:03:00.0</path>
+  <parent>computer</parent>
+  <driver>
+    <name>iwlwifi</name>
+  </driver>
+  <capability type='pci'>
+    <domain>0</domain>
+    <bus>3</bus>
+    <slot>0</slot>
+    <function>0</function>
+    <product id='0x0085'>Centrino Advanced-N 6205 [Taylor Peak]</product>
+    <vendor id='0x8086'>Intel Corporation</vendor>
+    <iommuGroup number='7'>
+      <address domain='0x0000' bus='0x00' slot='0x1c' function='0x0'/>
+      <address domain='0x0000' bus='0x00' slot='0x1c' function='0x1'/>
+      <address domain='0x0000' bus='0x00' slot='0x1c' function='0x3'/>
+      <address domain='0x0000' bus='0x00' slot='0x1c' function='0x4'/>
+      <address domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
+      <address domain='0x0000' bus='0x0d' slot='0x00' function='0x0'/>
+    </iommuGroup>
+  </capability>
+</device>""",
+        "pci_0000_0d_00_0": """
+<device>
+  <name>pci_0000_0d_00_0</name>
+  <path>/sys/devices/pci0000:00/0000:0d:00.0</path>
+  <parent>computer</parent>
+  <driver>
+    <name>sdhci-pci</name>
+  </driver>
+  <capability type='pci'>
+    <domain>0</domain>
+    <bus>13</bus>
+    <slot>0</slot>
+    <function>0</function>
+    <product id='0xe823'>PCIe SDXC/MMC Host Controller</product>
+    <vendor id='0x1180'>Ricoh Co Ltd</vendor>
+    <iommuGroup number='7'>
+      <address domain='0x0000' bus='0x00' slot='0x1c' function='0x0'/>
+      <address domain='0x0000' bus='0x00' slot='0x1c' function='0x1'/>
+      <address domain='0x0000' bus='0x00' slot='0x1c' function='0x3'/>
+      <address domain='0x0000' bus='0x00' slot='0x1c' function='0x4'/>
+      <address domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
+      <address domain='0x0000' bus='0x0d' slot='0x00' function='0x0'/>
+    </iommuGroup>
+  </capability>
+</device>""",
+    }
+    for i in range(3):
+        dev_xmls['scsi_host%s' % i] = """
+<device>
+  <name>scsi_host%(ind)s</name>
+  <path>/sys/devices/pci0000:00/0000:40:00.0/%(ind)s</path>
+  <parent>computer</parent>
+  <capability type='scsi_host'>
+    <host>0</host>
+    <capability type='fc_host'>
+      <wwnn>%(wwnn)s</wwnn>
+      <wwpn>%(wwpn)s</wwpn>
+      <fabric_wwn>%(fabric_wwn)s</fabric_wwn>
+    </capability>
+  </capability>
+</device>""" % {"ind": i,
+                "wwnn": uuid.uuid4().hex[:16],
+                "wwpn": uuid.uuid4().hex[:16],
+                "fabric_wwn": uuid.uuid4().hex[:16]}
+
+    def __init__(self, dev_name):
+        self._dev_name = dev_name
+
+    def XMLDesc(self, flag=0):
+        return MockNodeDevice.dev_xmls[self._dev_name]
+
+    def parent(self):
+        return None if self._dev_name == 'computer' else 'computer'
+
+
+class MockDevices(object):
+    def __init__(self):
+        self.devices = {}
+        dev_xmls = MockNodeDevice.dev_xmls
+        for dev_name, dev_xml in dev_xmls.items():
+            self.devices[dev_name] = \
+                hostdev.get_dev_info(MockNodeDevice(dev_name))
 
 
 def get_mock_environment():
