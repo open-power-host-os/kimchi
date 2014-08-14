@@ -1809,3 +1809,18 @@ msgstr "No templates found."
 
 msgid "Clone"
 msgstr "Clone"
+
+msgid "PCI Device"
+msgstr "PCI Device"
+
+msgid "filter"
+msgstr "filter"
+
+msgid "To Add"
+msgstr "To Add"
+
+msgid "Added"
+msgstr "Added"
+
+msgid "Product"
+msgstr "Product"

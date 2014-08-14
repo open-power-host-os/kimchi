@@ -1743,3 +1743,18 @@ msgstr "没有发现模板"
 
 msgid "Clone"
 msgstr "制作副本"
+
+msgid "PCI Device"
+msgstr "PCI设备"
+
+msgid "filter"
+msgstr "过滤"
+
+msgid "To Add"
+msgstr "待添加"
+
+msgid "Added"
+msgstr "已添加"
+
+msgid "Product"
+msgstr "产品"

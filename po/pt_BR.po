@@ -1874,3 +1874,18 @@ msgstr "Nenhum modelo encontrado."
 
 msgid "Clone"
 msgstr "Clonar"
+
+msgid "PCI Device"
+msgstr ""
+
+msgid "filter"
+msgstr ""
+
+msgid "To Add"
+msgstr ""
+
+msgid "Added"
+msgstr ""
+
+msgid "Product"
+msgstr ""
