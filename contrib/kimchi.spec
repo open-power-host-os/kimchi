@@ -4,7 +4,7 @@
 %endif
 
 %define frobisher_release 20
-%define release .7
+%define release .8
 Name:		kimchi
 Version:	1.2.1
 Release:	%{?frobisher_release}%{?release}%{?dist}
@@ -218,6 +218,23 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Aug 15 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.8
+- Update spec file to PowerKVM 2.1.1 (build 8)
+- Increasing nginx proxy timeout - Bugzilla #114166
+- Change default environment configuration to production mode - Bugzilla #114301
+- update po files - Bugzilla #114427
+- Passthrough: Add PCI Devices to VM - Bugzilla #114427
+- Host device passthrough: Add unit tests and documents - Bugzilla #114426
+- Host device passthrough: List VMs that are holding a host device - Bugzilla #114426
+- Host device passthrough: Directly assign and dissmis host device from VM - Bugzilla #114426
+- Host device passthrough: List eligible device to passthrough - Bugzilla #114426
+- Host device passthrough: List all types of host devices - Bugzilla #114426
+- Fix UI: Show proper message when detaching a guest storage - Bugzilla #113754
+- Add unit tests for remote-backed CD ROM updates. - Bugzilla #114461
+- Fix verification of remote ISO - Bugzilla #114461
+- Fix Key Error when editing CD ROM path - Bugzilla #114461
+- Remote ISO attachment: fix UI to accept remote ISO link for cdrom attachment - Bugzilla #113761
+
 * Thu Aug 07 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.7
 - Update spec file to PowerKVM 2.1.1 (build 7)
 - Let frontend redirect user after logging - Bugzila #114339
