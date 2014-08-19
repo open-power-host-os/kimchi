@@ -218,7 +218,7 @@ kimchi.main = function() {
         // Perform logging out via Ajax request.
         $('#btn-logout').on('click', function() {
             kimchi.logout(function() {
-                updatePage();
+                document.location.href = "login.html";
             }, function(err) {
                 kimchi.message.error(err.responseJSON.reason);
             });
