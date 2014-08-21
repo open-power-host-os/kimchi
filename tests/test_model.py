@@ -64,7 +64,8 @@ class ModelTests(unittest.TestCase):
         self.assertEquals('test', vms[0])
 
         keys = set(('name', 'state', 'stats', 'uuid', 'memory', 'cpus',
-                    'screenshot', 'icon', 'graphics', 'users', 'groups'))
+                    'screenshot', 'icon', 'graphics', 'users', 'groups',
+                    'persistent'))
 
         stats_keys = set(('cpu_utilization',
                           'net_throughput', 'net_throughput_peak',
@@ -80,6 +81,7 @@ class ModelTests(unittest.TestCase):
         self.assertRaises(NotFoundError, inst.vm_lookup, 'nosuchvm')
         self.assertEquals([], info['users'])
         self.assertEquals([], info['groups'])
+        self.assertTrue(info['persistent'])
 
     @unittest.skipUnless(utils.running_as_root(), 'Must be run as root')
     def test_vm_lifecycle(self):
