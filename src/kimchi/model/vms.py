@@ -395,7 +395,8 @@ class VMModel(object):
                              "listen": graphics_listen,
                              "port": graphics_port},
                 'users': users,
-                'groups': groups
+                'groups': groups,
+                'persistent': True if dom.isPersistent() else False
                 }
 
     def _vm_get_disk_paths(self, dom):
