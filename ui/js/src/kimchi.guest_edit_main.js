@@ -86,6 +86,7 @@ kimchi.guest_edit_main = function() {
             var pathBox = $('.path input', rowNode)
                 .prop('readonly', !toEdit);
             toEdit && pathBox.select();
+            pathBox.val(pathBox.attr('value'));
         };
 
         var replaceCDROM = function(event) {
