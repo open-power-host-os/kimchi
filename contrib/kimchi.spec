@@ -4,7 +4,7 @@
 %endif
 
 %define frobisher_release 20
-%define release .8
+%define release .9
 Name:		kimchi
 Version:	1.2.1
 Release:	%{?frobisher_release}%{?release}%{?dist}
@@ -218,6 +218,15 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Aug 22 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.9
+- Update spec file to PowerKVM 2.1.1 (build 9) 
+- Refactor vmstorage name generation - BZ #114093, BZ #113768
+- Update testcases for bus type decision making - BZ #114093, BZ #113768
+- Delete 'bus' selection from UI - BZ #114093, BZ #113768
+- Delete 'bus' param from backend - BZ #114093, BZ #113768
+- Bugfix UI: Change button text to indicate user network is generating - BZ #113748
+- Bugfix: Log out from Administrator tab raises popup errors - BZ #114203
+
 * Thu Aug 15 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.8
 - Update spec file to PowerKVM 2.1.1 (build 8)
 - Increasing nginx proxy timeout - Bugzilla #114166
