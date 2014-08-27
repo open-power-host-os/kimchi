@@ -4,7 +4,7 @@
 %endif
 
 %define frobisher_release 20
-%define release .9
+%define release .10
 Name:		kimchi
 Version:	1.2.1
 Release:	%{?frobisher_release}%{?release}%{?dist}
@@ -218,6 +218,17 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Aug 22 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.10
+- Issue #405 - Fix cancel button in edit guest storage tab - Bugzilla #114814
+- Issue #405 - Fix enter hit in storage tab under guest edit window - Bugzilla #114814
+- bug fix: Allow kimchi runs in multiple platforms - Bugzilla #115320
+- Add persistent flag to VM info - Bugzilla #114466
+- Add a check in the UI for the new 'persistent' flag of a VM. - Bugzilla #114466
+- Add unit tests for new vm 'persistent' property. - Bugzilla #114466
+- Change function that verifies network interface status - Bugzilla #115042
+- storagepool-add: showing Fibre Channel devices - Bugzilla #115271
+- Update SPEC file to PKVM-2.1.1 BUILD 10
+
 * Thu Aug 22 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.9
 - Update spec file to PowerKVM 2.1.1 (build 9) 
 - Refactor vmstorage name generation - BZ #114093, BZ #113768
