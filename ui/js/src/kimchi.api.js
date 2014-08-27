@@ -977,7 +977,7 @@ var kimchi = {
         });
     },
 
-    getHostPCIDevices: function(suc, err) {
+    getHostFCDevices: function(suc, err) {
         var url = kimchi.url+'host/devices?_cap=fc_host';
         kimchi.requestJSON({
             url : url,
