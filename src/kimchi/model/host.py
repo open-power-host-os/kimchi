@@ -18,6 +18,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 
 import grp
+import libvirt
 import os
 import time
 import platform
@@ -279,30 +280,46 @@ class PartitionModel(object):
 class DevicesModel(object):
     def __init__(self, **kargs):
         self.conn = kargs['conn']
+        self.cap_map = \
+            {'fc_host': libvirt.VIR_CONNECT_LIST_NODE_DEVICES_CAP_FC_HOST,
+             'net': libvirt.VIR_CONNECT_LIST_NODE_DEVICES_CAP_NET,
+             'pci': libvirt.VIR_CONNECT_LIST_NODE_DEVICES_CAP_PCI_DEV,
+             'scsi': libvirt.VIR_CONNECT_LIST_NODE_DEVICES_CAP_SCSI,
+             'scsi_host': libvirt.VIR_CONNECT_LIST_NODE_DEVICES_CAP_SCSI_HOST,
+             'storage': libvirt.VIR_CONNECT_LIST_NODE_DEVICES_CAP_STORAGE,
+             'usb_device': libvirt.VIR_CONNECT_LIST_NODE_DEVICES_CAP_USB_DEV,
+             'usb':
+             libvirt.VIR_CONNECT_LIST_NODE_DEVICES_CAP_USB_INTERFACE}
 
     def get_list(self, _cap=None, _passthrough=None,
                  _passthrough_group_by=None):
         conn = self.conn.get()
-
         if _passthrough_group_by is not None:
             # _passthrough_group_by conflicts with _cap and _passthrough
             if (_cap, _passthrough) != (None, None):
                 raise InvalidParameter("KCHHOST0004E")
             return self._get_passthrough_affected_devs(_passthrough_group_by)
 
-        if _cap is None:
-            dev_names = [name.name() for name in conn.listAllDevices(0)]
-        elif _cap == 'fc_host':
+        if _cap == 'fc_host':
             dev_names = self._get_devices_fc_host()
         else:
-            # Get devices with required capability
-            dev_names = conn.listDevices(_cap, 0)
+            dev_names = self._get_devices_with_capability(_cap)
 
         if _passthrough is not None and _passthrough.lower() == 'true':
             passthrough_names = [
                 dev['name'] for dev in hostdev.get_passthrough_dev_infos(conn)]
             dev_names = list(set(dev_names) & set(passthrough_names))
         return dev_names
+
+    def _get_devices_with_capability(self, cap):
+        conn = self.conn.get()
+        if cap is None:
+            cap_flag = 0
+        else:
+            cap_flag = self.cap_map.get(cap)
+            if cap_flag is None:
+                return []
+        return [name.name() for name in conn.listAllDevices(cap_flag)]
 
     def _get_passthrough_affected_devs(self, dev_name):
         conn = self.conn.get()
@@ -315,14 +332,14 @@ class DevicesModel(object):
         # Libvirt < 1.0.5 does not support fc_host capability
         if not CapabilitiesModel().fc_host_support:
             ret = []
-            scsi_hosts = conn.listDevices('scsi_host', 0)
+            scsi_hosts = self._get_devices_with_capability('scsi_host')
             for host in scsi_hosts:
                 xml = conn.nodeDeviceLookupByName(host).XMLDesc(0)
                 path = '/device/capability/capability/@type'
                 if 'fc_host' in xmlutils.xpath_get_text(xml, path):
                     ret.append(host)
             return ret
-        return conn.listDevices('fc_host', 0)
+        return self._get_devices_with_capability('fc_host')
 
 
 class DeviceModel(object):
