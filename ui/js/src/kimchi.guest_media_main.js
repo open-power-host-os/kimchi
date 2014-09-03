@@ -31,14 +31,25 @@ kimchi.guest_media_main = function() {
                 var templated = kimchi.substitute(rowHTML, storage);
                 container.append(templated);
             });
+            $('.guest-edit-cdrom-button').button();
 
             var replaceCDROM = function(event) {
                 event.preventDefault();
                 kimchi.selectedGuestStorage = $(this).data('dev');
-                kimchi.window.open("guest-cdrom-edit.html");
+                var path = $('#cdrom-' + kimchi.selectedGuestStorage).val();
+                settings = {
+                    vm : kimchi.selectedGuest,
+                    dev : kimchi.selectedGuestStorage,
+                    path : path
+                }
+                kimchi.replaceVMStorage(settings, function(result) {
+                    kimchi.topic('kimchi/vmCDROMReplaced').publish ({
+                        result : result
+                    });
+                    kimchi.window.close();
+                });
             };
 
-            $('input[type="text"][name="cdrom"]', container).on('click', replaceCDROM);
             $('.replace', container).on('click', replaceCDROM);
         });
     };
