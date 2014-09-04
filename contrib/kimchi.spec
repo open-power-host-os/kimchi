@@ -4,7 +4,7 @@
 %endif
 
 %define frobisher_release 20
-%define release .10
+%define release .11
 Name:		kimchi
 Version:	1.2.1
 Release:	%{?frobisher_release}%{?release}%{?dist}
@@ -218,7 +218,14 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
-* Thu Aug 22 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.10
+* Thu Sep 04 2014 Paulo Vital <pvital@linux.vnet.ibm.com> 1.2.1-20.11
+- Update iSCSI volume XML when creating a VM from an iSCSI pool - Bugzilla #114109
+- model.host: changing listDevices() to listAllDevices() - Bugzilla #115271
+- model.host: considering older libvirt versions - Bugzilla #115271
+- Editing manage media freezes screen - Bugzilla #114098
+- Update spec file to PowerKVM 2.1.1 (20.11)
+
+* Fri Aug 29 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.10
 - Issue #405 - Fix cancel button in edit guest storage tab - Bugzilla #114814
 - Issue #405 - Fix enter hit in storage tab under guest edit window - Bugzilla #114814
 - bug fix: Allow kimchi runs in multiple platforms - Bugzilla #115320
@@ -229,7 +236,7 @@ rm -rf $RPM_BUILD_ROOT
 - storagepool-add: showing Fibre Channel devices - Bugzilla #115271
 - Update SPEC file to PKVM-2.1.1 BUILD 10
 
-* Thu Aug 22 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.9
+* Fri Aug 22 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.9
 - Update spec file to PowerKVM 2.1.1 (build 9) 
 - Refactor vmstorage name generation - BZ #114093, BZ #113768
 - Update testcases for bus type decision making - BZ #114093, BZ #113768
@@ -238,7 +245,7 @@ rm -rf $RPM_BUILD_ROOT
 - Bugfix UI: Change button text to indicate user network is generating - BZ #113748
 - Bugfix: Log out from Administrator tab raises popup errors - BZ #114203
 
-* Thu Aug 15 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.8
+* Fri Aug 15 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.8
 - Update spec file to PowerKVM 2.1.1 (build 8)
 - Increasing nginx proxy timeout - Bugzilla #114166
 - Change default environment configuration to production mode - Bugzilla #114301
