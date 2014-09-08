@@ -20,13 +20,13 @@ kimchi.lang = {
         return {
           'en_US': 'English (US)',
           'zh_CN': '中文（简体）',
-          'pt_BR': 'Português (Brasil)',
           'de_DE': 'Deutsch (Deutschland)',
           'es_ES': 'Español (España)',
           'fr_FR': 'Français (France)',
           'it_IT': 'Italiano (Italia)',
           'ja_JP': '日本語 (日本)',
           'ko_KR': '한국어 (대한민국)',
+          'pt_BR': 'Português (Brasil)',
           'ru_RU': 'Русский (Россия)',
           'zh_TW': '中文 (台湾)'
         };
