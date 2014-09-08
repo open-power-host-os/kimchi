@@ -14,22 +14,10 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 
-SUBDIRS = en_US pt_BR zh_CN de_DE es_ES fr_FR it_IT
+it_IT_helpdir = $(datadir)/kimchi/ui/pages/help/it_IT
 
-DITA_HTML_FILES = $(patsubst %.dita,%.html,$(wildcard */*.dita))
-HTML_FILES = $(if $(DITA_HTML_FILES), $(DITA_HTML_FILES), $(wildcard */*.html))
-DITA_XSL_FILE = dita-help.xsl
+dist_it_IT_help_DATA = $(wildcard *.html) $(NULL)
 
-EXTRA_DIST = gen-index.py\
-			 $(DITA_XSL_FILE)
-helpdir = $(datadir)/kimchi/ui/pages/help
+EXTRA_DIST = $(wildcard *.dita)
 
-dist_help_DATA = kimchi.css
-
-all: $(HTML_FILES) $(wildcard */*.dita)
-	@$(foreach dir, $(dir $(wildcard */)), $(shell pwd)/gen-index.py $(wildcard $(dir)*.dita) > $(dir)/index.html;)
-
-%.html: %.dita $(DITA_XSL_FILE)
-	xsltproc -o $@ $(DITA_XSL_FILE) $<
-
-CLEANFILES = $(HTML_FILES)
+CLEANFILES = $(wildcard *.html)
