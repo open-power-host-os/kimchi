@@ -19,7 +19,6 @@ kimchi.lang = {
     all: function() {
         return {
           'en_US': 'English (US)',
-          'zh_CN': '中文（简体）',
           'de_DE': 'Deutsch (Deutschland)',
           'es_ES': 'Español (España)',
           'fr_FR': 'Français (France)',
@@ -28,6 +27,7 @@ kimchi.lang = {
           'ko_KR': '한국어 (대한민국)',
           'pt_BR': 'Português (Brasil)',
           'ru_RU': 'Русский (Россия)',
+          'zh_CN': '中文（简体）',
           'zh_TW': '中文 (台湾)'
         };
     },
