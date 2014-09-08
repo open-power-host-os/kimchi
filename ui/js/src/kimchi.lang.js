@@ -22,7 +22,8 @@ kimchi.lang = {
           'zh_CN': '中文（简体）',
           'pt_BR': 'Português (Brasil)',
           'de_DE': 'Deutsch (Deutschland)',
-          'es_ES': 'Español (España)'
+          'es_ES': 'Español (España)',
+          'fr_FR': 'Français (France)'
         };
     },
 
