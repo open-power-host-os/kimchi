@@ -20,7 +20,8 @@ kimchi.lang = {
         return {
           'en_US': 'English (US)',
           'zh_CN': '中文（简体）',
-          'pt_BR': 'Português (Brasil)'
+          'pt_BR': 'Português (Brasil)',
+          'de_DE': 'Deutsch (Deutschland)'
         };
     },
 
