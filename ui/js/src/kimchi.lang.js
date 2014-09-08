@@ -25,7 +25,8 @@ kimchi.lang = {
           'es_ES': 'Español (España)',
           'fr_FR': 'Français (France)',
           'it_IT': 'Italiano (Italia)',
-          'ja_JP': '日本語 (日本)'
+          'ja_JP': '日本語 (日本)',
+          'ko_KR': '한국어 (대한민국)'
         };
     },
 
