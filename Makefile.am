@@ -159,5 +159,3 @@ VERSION:
 
 clean-local:
 	rm -rf mo rpm
-
-CLEANFILES = kimchi.spec

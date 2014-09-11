@@ -34,4 +34,4 @@ make-deb.sh: make-deb.sh.in $(top_builddir)/config.status
 	    mv $@-t $@
 BUILT_SOURCES = make-deb.sh
 
-CLEANFILES = kimchi.spec.fedora kimchi.spec.suse kimchi.spec make-deb.sh
+CLEANFILES = kimchi.spec.fedora kimchi.spec.suse make-deb.sh
