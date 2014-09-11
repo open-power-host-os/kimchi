@@ -49,60 +49,18 @@ def _get_dev_info_tree(dev_infos):
     return root
 
 
-def _strip_parents(devs, dev):
-    parent = dev['parent']
-    while parent is not None:
-        try:
-            parent_dev = devs.pop(parent)
-        except KeyError:
-            break
-
-        if (parent_dev['device_type'],
-                dev['device_type']) == ('usb_device', 'scsi'):
-            # For USB device containing mass storage, passthrough the
-            # USB device itself, not the SCSI unit.
-            devs.pop(dev['name'])
-            break
-
-        parent = parent_dev['parent']
-
-
 def _is_pci_qualified(pci_dev):
-    # PCI class such as bridge and storage controller are not suitable to
-    # passthrough to VM, so we make a whitelist and only passthrough PCI
-    # class in the list.
-
-    whitelist_pci_classes = {
-        # Refer to Linux Kernel code include/linux/pci_ids.h
-        0x000000: {  # Old PCI devices
-            0x000100: None},  # Old VGA devices
-        0x020000: None,  # Network controller
-        0x030000: None,  # Display controller
-        0x040000: None,  # Multimedia device
-        0x080000: {  # System Peripheral
-            0x088000: None},  # Misc Peripheral, such as SDXC/MMC Controller
-        0x090000: None,  # Inupt device
-        0x0d0000: None,  # Wireless controller
-        0x0f0000: None,  # Satellite communication controller
-        0x100000: None,  # Cryption controller
-        0x110000: None,  # Signal Processing controller
-        }
+    # PCI bridge is not suitable to passthrough
+    # KVM does not support passthrough graphic card now
+    blacklist_classes = (0x030000, 0x060000)
 
     with open(os.path.join(pci_dev['path'], 'class')) as f:
         pci_class = int(f.readline().strip(), 16)
 
-    try:
-        subclasses = whitelist_pci_classes[pci_class & 0xff0000]
-    except KeyError:
+    if pci_class & 0xff0000 in blacklist_classes:
         return False
 
-    if subclasses is None:
-        return True
-
-    if pci_class & 0xffff00 in subclasses:
-        return True
-
-    return False
+    return True
 
 
 def get_passthrough_dev_infos(libvirt_conn):
@@ -110,10 +68,6 @@ def get_passthrough_dev_infos(libvirt_conn):
 
     dev_infos = _get_all_host_dev_infos(libvirt_conn)
     devs = dict([(dev_info['name'], dev_info) for dev_info in dev_infos])
-
-    for dev in dev_infos:
-        if dev['device_type'] in ('pci', 'usb_device', 'scsi'):
-            _strip_parents(devs, dev)
 
     def is_eligible(dev):
         return dev['device_type'] in ('usb_device', 'scsi') or \
