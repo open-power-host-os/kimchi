@@ -4,7 +4,7 @@
 %endif
 
 %define frobisher_release 20
-%define release .11
+%define release .12
 Name:		kimchi
 Version:	1.2.1
 Release:	%{?frobisher_release}%{?release}%{?dist}
@@ -218,6 +218,27 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Sep 11 2014 Paulo Vital <pvital@linux.vnet.ibm.com> 1.2.1-20.12
+- i18n support: Changed the file type of plugins/sample/po/LINGUAS - Bugzilla #115731
+- i18n support: Add German translation - Bugzilla #115731
+- i18n support: Add Spanish translation - Bugzilla #115731
+- i18n support: Add French translation - Bugzilla #115731
+- i18n support: Add Italian translation - Bugzilla #115731
+- i18n support: Add Japanese translation - Bugzilla #115731
+- i18n support: Add Korean translation - Bugzilla #115731
+- i18n support: Add Russian translation - Bugzilla #115731
+- i18n support: Add Traditional Chinese translation - Bugzilla #115731
+- i18n support: Update Portuguese translation - Bugzilla #115731
+- i18n support: Update Simplified Chinese translation - Bugzilla #115731
+- Fix duplicated message string in en_US.po file. - Bugzilla #115731
+- Log out from Administrator tab raises popup errors - Bugzilla #114203
+- Unable to extend logical pool in kimchi - Bugzilla #115633
+- PCI Passthru: Adjust the passthrough filter rules - Bugzilla #115608
+- PCI Passthru: Allow Guests to Share a Host PCI Device - Bugzilla #115608
+- Update Makefile.am to not remove kimchi.spec
+- Update VERSION file with correct version of Kimchi
+- Update spec file to PowerKVM 2.1.1 (20.12)
+
 * Thu Sep 04 2014 Paulo Vital <pvital@linux.vnet.ibm.com> 1.2.1-20.11
 - Update iSCSI volume XML when creating a VM from an iSCSI pool - Bugzilla #114109
 - model.host: changing listDevices() to listAllDevices() - Bugzilla #115271
