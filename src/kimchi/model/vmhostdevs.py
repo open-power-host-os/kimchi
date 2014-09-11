@@ -118,11 +118,6 @@ class VMHostDevsModel(object):
             DevicesModel(conn=self.conn).get_list(_passthrough='true')
         if dev_name not in eligible_dev_names:
             raise InvalidParameter('KCHVMHDEV0002E', {'dev_name': dev_name})
-        holders = VMHoldersModel(conn=self.conn).get_list(dev_name)
-        if holders:
-            names = ', '.join([holder['name'] for holder in holders])
-            raise InvalidOperation('KCHVMHDEV0004E', {'dev_name': dev_name,
-                                                      'names': names})
 
     def create(self, vmid, params):
         dev_name = params['name']
