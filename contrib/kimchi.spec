@@ -218,6 +218,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Fri Sep 12 2014 Paulo Vital <pvital@linux.vnet.ibm.com> 1.2.1-20.12.1
+- PCI Passthru: Sort the devices list - Bugzilla #115608
+- Improve device (and PCI) passthrough - Bugzilla #114833
+- Changed kimchi pkvm spec file for PKVM 2.1.1  Build 12.1
+
 * Thu Sep 11 2014 Paulo Vital <pvital@linux.vnet.ibm.com> 1.2.1-20.12
 - i18n support: Changed the file type of plugins/sample/po/LINGUAS - Bugzilla #115731
 - i18n support: Add German translation - Bugzilla #115731
