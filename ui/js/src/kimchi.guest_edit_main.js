@@ -263,12 +263,23 @@ kimchi.guest_edit_main = function() {
                         var obj = $(this);
                         if(obj.button("option", "icons").primary == "ui-icon-minus"){
                             kimchi.removeVMPCIDevice(kimchi.selectedGuest, obj.parent().prop("id"), function(){
-                                obj.button("option", "icons", { primary: "ui-icon-plus" });
+                                kimchi.getVMPCIDevices(kimchi.selectedGuest, function(vmPCIs1){
+                                    for(var k=0; k<hostPCIs.length; k++) {
+                                        $("button", "#" + hostPCIs[k].name).button("option", "icons", {primary: "ui-icon-plus"});
+                                    }
+                                    for(var k=0; k<vmPCIs1.length; k++) {
+                                        $("button", "#" + vmPCIs1[k].name).button("option", "icons", {primary: "ui-icon-minus"});
+                                    }
+                                });
                                 filterNodes($("select", "#form-guest-edit-pci").val(), $("input", "#form-guest-edit-pci").val());
                             });
                         }else{
                             kimchi.addVMPCIDevice(kimchi.selectedGuest, { name: obj.parent().prop("id") }, function(){
-                                obj.button("option", "icons", { primary: "ui-icon-minus" });
+                                kimchi.getVMPCIDevices(kimchi.selectedGuest, function(vmPCIs1){
+                                    for(var k=0; k<vmPCIs1.length; k++) {
+                                        $("button", "#" + vmPCIs1[k].name).button("option", "icons", {primary: "ui-icon-minus"});
+                                    }
+                                });
                                 filterNodes($("select", "#form-guest-edit-pci").val(), $("input", "#form-guest-edit-pci").val());
                             });
                         }
