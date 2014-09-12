@@ -306,7 +306,8 @@ class DevicesModel(object):
             # _passthrough_group_by conflicts with _cap and _passthrough
             if (_cap, _passthrough) != (None, None):
                 raise InvalidParameter("KCHHOST0004E")
-            return self._get_passthrough_affected_devs(_passthrough_group_by)
+            return sorted(
+                self._get_passthrough_affected_devs(_passthrough_group_by))
 
         if _cap == 'fc_host':
             dev_names = self._get_devices_fc_host()
@@ -317,6 +318,7 @@ class DevicesModel(object):
             passthrough_names = [
                 dev['name'] for dev in hostdev.get_passthrough_dev_infos(conn)]
             dev_names = list(set(dev_names) & set(passthrough_names))
+        dev_names.sort()
         return dev_names
 
     def _get_devices_with_capability(self, cap):
