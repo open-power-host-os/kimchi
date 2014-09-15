@@ -15,33 +15,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#guest-media-window {
+#form-guest-media-window {
     font-size: 14px;
     height: 320px;
-    width: 570px;
+    width: 670px;
 }
 
 #form-guest-media {
     padding: 1em;
 }
 
-#guest-media-window .content {
+#form-guest-media-window .content {
     margin-bottom: 0;
 }
 
-#guest-media-window .guest-media-fieldset {
+#form-guest-media-window .guest-media-fieldset {
     padding-right: 0;
 }
 
 #form-guest-media .guest-edit-wrapper-label {
     width: 30px;
-    margin-top: 50px;
+    margin-top: 30px;
     margin-left: 15px;
 }
 
 #form-guest-media .guest-edit-wrapper-controls {
-    width: 440px;
-    margin-top: 50px;
+    width: 540px;
+    margin-top: 30px;
     margin-left: 10px;
 }
 
@@ -50,9 +50,7 @@
 }
 
 #form-guest-media .guest-edit-cdrom-row-container .replace {
-    float: right;
-    margin-right: 27px;
-    margin-top: 100px;
+    margin: 2px 0 0 10px;
 }
 
 #form-guest-media #guest-edit-cdrom-row-container {

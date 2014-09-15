@@ -817,7 +817,9 @@ var kimchi = {
             }),
             dataType : 'json',
             success : suc,
-            error : err
+            error : err ? err : function(data) {
+                kimchi.message.error(data.responseJSON.reason);
+            }
         });
     },
 

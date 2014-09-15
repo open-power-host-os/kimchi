@@ -33,6 +33,11 @@ kimchi.guest_media_main = function() {
             });
             $('.guest-edit-cdrom-button').button();
 
+            if (storages.length === 0) {
+                var noCDROMHTML = $('#cdrom-empty').html();
+                container.append(noCDROMHTML);
+            }
+
             var replaceCDROM = function(event) {
                 event.preventDefault();
                 kimchi.selectedGuestStorage = $(this).data('dev');

@@ -21,7 +21,7 @@
 #silent _ = t.gettext
 #silent _t = t.gettext
 
-<div id="guest-media-window" class="window">
+<div id="form-guest-media-window" class="window">
     <header>
         <h1 class="title">$_("Manage Media")</h1>
         <div class="close">X</div>
@@ -49,6 +49,11 @@
                 <span class="text">$_("Save")</span>
             </button>
         </div>
+    </div>
+</script>
+<script id="cdrom-empty" type="text/html">
+    <div>
+        <label>$_("No CDROM found.")</label>
     </div>
 </script>
 
