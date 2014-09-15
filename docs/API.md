@@ -159,8 +159,6 @@ Represents a snapshot of the Virtual Machine's primary monitor.
 
 **Actions (POST):**
 
-* eject: Eject cdrom from device.
-
 
 ### Sub-collection: Virtual Machine Passthrough Devices
 **URI:** /vms/*:name*/hostdevs
