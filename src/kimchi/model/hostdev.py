@@ -201,7 +201,16 @@ def _get_scsi_host_dev_info(info):
         # info['adapter']['type'] always exists.
         info['adapter'] = {'type': ''}
         return info
-    info['adapter'] = cap_info
+    if isinstance(cap_info, list):
+        info['adapter'] = {}
+        for cap in cap_info:
+            if cap['type'] == 'vport_ops':
+                del cap['type']
+                info['adapter']['vport_ops'] = cap
+            else:
+                info['adapter'].update(cap)
+    else:
+        info['adapter'] = cap_info
     return info
 
 
