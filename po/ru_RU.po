@@ -1,11 +1,11 @@
 # Russian translations for kimchi package.
-# Copyright (C) 2014 ORGANIZATION
+# Copyright (C) 2013 ORGANIZATION
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: kimchi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-08 17:45-0300\n"
+"POT-Creation-Date: 2014-09-18 10:18-0300\n"
 "PO-Revision-Date: 2013-07-11 17:32-0400\n"
 "Last-Translator: Crístian Viana <vianac@linux.vnet.ibm.com>\n"
 "Language-Team: English\n"
@@ -259,7 +259,7 @@ msgstr ""
 
 #, python-format
 msgid "The host device %(dev_name)s is not allowed to directly assign to VM."
-msgstr ""
+msgstr "Прямое назначение ВМ недопустимо для хоста %(dev_name)s."
 
 msgid ""
 "No IOMMU groups found. Host PCI pass through needs IOMMU group to function "
@@ -270,18 +270,9 @@ msgid ""
 msgstr ""
 "Не найдены группы IOMMU. Для правильного функционирования сквозной передачи "
 "PCI хоста требуется группа IOMMU. В своем BIOS включите Intel VT-d или AMD "
-"IOMMU и проверьте компиллированность Kernel с поддержкой IOMMU. Для "
+"IOMMU и проверьте компилированность Kernel с поддержкой IOMMU. Для "
 "процессора Intel, добавьте intel_iommu=on в файле /boot/grub2/grub.conf "
 "параметра Kernel. Для процессора AMD, добавьте iommu=pt iommu=1."
-
-#, python-format
-msgid ""
-"The host device %(dev_name)s should be assigned to just one VM. Currently "
-"the following VM(s) are holding the device: %(names)s."
-msgstr ""
-"Устройство хоста %(dev_name)s следует присваивать только одной виртуальной "
-"машине. На данный момент следующая VM(s) включает такие устройства: "
-"%(names)s."
 
 #, python-format
 msgid "Interface %(iface)s does not exist in virtual machine %(name)s"
@@ -1229,7 +1220,7 @@ msgid "Warning"
 msgstr "Предупреждение"
 
 msgid "Creating..."
-msgstr ""
+msgstr "Создание..."
 
 msgid "Loading..."
 msgstr "Загружается..."
@@ -1454,7 +1445,7 @@ msgstr "Успешно отключен!"
 msgid ""
 "This disk will be detached permanently and you can re-attach it. Continue to "
 "detach it?"
-msgstr ""
+msgstr "Этот диск будет отключен. Его можно будет снова подключить. Отключить?"
 
 msgid "The VLAN id must be between 1 and 4094."
 msgstr "ИД VLAN должен быть от 1 до 4094."
@@ -1874,6 +1865,14 @@ msgstr "Не найдены шаблоны."
 
 msgid "Clone"
 msgstr "Клонировать"
+
+#~ msgid ""
+#~ "The host device %(dev_name)s should be assigned to just one VM. Currently "
+#~ "the following VM(s) are holding the device: %(names)s."
+#~ msgstr ""
+#~ "Устройство хоста %(dev_name)s следует присваивать только одной "
+#~ "виртуальной машине. На данный момент следующая VM(s) включает такие "
+#~ "устройства: %(names)s."
 
 #~ msgid ""
 #~ "Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"

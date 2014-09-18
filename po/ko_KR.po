@@ -1,11 +1,11 @@
 # Korean translations for kimchi package.
-# Copyright (C) 2014 ORGANIZATION
+# Copyright (C) 2013 ORGANIZATION
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: kimchi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-08 17:32-0300\n"
+"POT-Creation-Date: 2014-09-18 10:18-0300\n"
 "PO-Revision-Date: 2013-07-11 17:32-0400\n"
 "Last-Translator: Crístian Viana <vianac@linux.vnet.ibm.com>\n"
 "Language-Team: English\n"
@@ -258,7 +258,7 @@ msgstr ""
 
 #, python-format
 msgid "The host device %(dev_name)s is not allowed to directly assign to VM."
-msgstr ""
+msgstr "호스트 장치 %(dev_name)s이(가) VM으로 직접 지정이 허용되지 않습니다."
 
 msgid ""
 "No IOMMU groups found. Host PCI pass through needs IOMMU group to function "
@@ -272,14 +272,6 @@ msgstr ""
 "설정한 후 커널이 IOMMU 지원으로 컴파일되었는지 확인하십시오. Intel CPU의 경"
 "우, /boot/grub2/grub.conf에 있는 커널 매개변수에 intel_iommu=on을 추가하십시"
 "오. AMD CPU의 경우,iommu=pt iommu=1을 추가하십시오."
-
-#, python-format
-msgid ""
-"The host device %(dev_name)s should be assigned to just one VM. Currently "
-"the following VM(s) are holding the device: %(names)s."
-msgstr ""
-"호스트 장치 %(dev_name)s은(는) 하나의 VM에만 지정되어야 합니다. 현재 다음 VM"
-"이 장치를 보유 중입니다. %(names)s"
 
 #, python-format
 msgid "Interface %(iface)s does not exist in virtual machine %(name)s"
@@ -497,7 +489,7 @@ msgid ""
 "%(disk)s is not a valid disk/partition. Could not add it to the pool "
 "%(pool)s."
 msgstr ""
-"%(disk)s이(가) 올바른 디스크/파티션이 아닙니다. 이를 풀 %(pool)s에 추가할 수 "
+"%(disk)s이(가) 올바른 디스크/파티션이 아닙니다. 이를 %(pool)s 풀에 추가할 수 "
 "없습니다."
 
 #, python-format
@@ -1228,7 +1220,7 @@ msgid "Warning"
 msgstr "경고"
 
 msgid "Creating..."
-msgstr ""
+msgstr "작성 중..."
 
 msgid "Loading..."
 msgstr "로드 중..."
@@ -1451,6 +1443,8 @@ msgid ""
 "This disk will be detached permanently and you can re-attach it. Continue to "
 "detach it?"
 msgstr ""
+"이 디스크는 영구적으로 분리되며 다시 연결할 수 없습니다. 분리를 계속하시겠습"
+"니까?"
 
 msgid "The VLAN id must be between 1 and 4094."
 msgstr "VLAN ID는 1과 4094 사이여야 합니다."
@@ -1866,6 +1860,13 @@ msgstr "템플리트가 없습니다."
 
 msgid "Clone"
 msgstr "복제"
+
+#~ msgid ""
+#~ "The host device %(dev_name)s should be assigned to just one VM. Currently "
+#~ "the following VM(s) are holding the device: %(names)s."
+#~ msgstr ""
+#~ "호스트 장치 %(dev_name)s은(는) 하나의 VM에만 지정되어야 합니다. 현재 다음 "
+#~ "VM이 장치를 보유 중입니다. %(names)s"
 
 #~ msgid ""
 #~ "Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"

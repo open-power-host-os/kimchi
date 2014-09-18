@@ -1,11 +1,11 @@
-# Portuguese (Brazil) translations for kimchi package.
+# Brazilian Portuguese translations for kimchi package.
 # Copyright (C) 2013 ORGANIZATION
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: kimchi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-08 17:51-0300\n"
+"POT-Creation-Date: 2014-09-18 10:18-0300\n"
 "PO-Revision-Date: 2013-07-11 17:32-0400\n"
 "Last-Translator: Crístian Viana <vianac@linux.vnet.ibm.com>\n"
 "Language-Team: English\n"
@@ -265,6 +265,7 @@ msgstr ""
 #, python-format
 msgid "The host device %(dev_name)s is not allowed to directly assign to VM."
 msgstr ""
+"O dispositivo host %(dev_name)s não pode designar diretamente para a VM."
 
 msgid ""
 "No IOMMU groups found. Host PCI pass through needs IOMMU group to function "
@@ -279,15 +280,6 @@ msgstr ""
 "com suporte a IOMMU. Para a CPU (unidade central de processamento) Intel, "
 "inclua intel_iommu=on em seu parâmetro do Kernel em /boot/grub2/grub.conf. "
 "Para a CPU (unidade central de processamento) AMD, inclua iommu=pt iommu=1."
-
-#, python-format
-msgid ""
-"The host device %(dev_name)s should be assigned to just one VM. Currently "
-"the following VM(s) are holding the device: %(names)s."
-msgstr ""
-"O dispositivo host %(dev_name)s deve ser designado a apenas uma VM (máquina "
-"virtual). Atualmente a(s) VM(s) a seguir estão retendo o dispositivo: "
-"%(names)s."
 
 #, python-format
 msgid "Interface %(iface)s does not exist in virtual machine %(name)s"
@@ -882,7 +874,7 @@ msgstr "Suportar apenas atualização de caminho cdrom"
 #, python-format
 msgid "The storage device %(dev_name)s does not exist in the guest %(vm_name)s"
 msgstr ""
-"O dispositivo de armazenamento %(dev_name)s não existe no convidado "
+"O dispositivo de armazenamento %(dev_name)s não existe na máquina virtual "
 "%(vm_name)s"
 
 #, python-format
@@ -905,7 +897,7 @@ msgid ""
 "disk"
 msgstr ""
 "Especificar tipo e caminho ou tipo e conjunto/volume para incluir um novo "
-"disco de máquinavirtual"
+"disco de máquina virtual"
 
 msgid "Specify path to update virtual machine disk"
 msgstr "Especifique o caminho para atualizar o disco de máquina virtual"
@@ -929,7 +921,7 @@ msgid ""
 "machine disk"
 msgstr ""
 "Especificar tipo e caminho ou tipo e conjunto/volume para incluir um novo "
-"disco de máquinavirtual"
+"disco de máquina virtual"
 
 msgid "YUM Repository ID must be one word only string."
 msgstr "O ID do Repositório YUM deve ser um texto de apenas uma palavra."
@@ -1092,7 +1084,7 @@ msgid "Create"
 msgstr "Criar"
 
 msgid "Edit Guest"
-msgstr "Editar convidado"
+msgstr "Editar Máquina Virtual"
 
 msgid "General"
 msgstr "Geral"
@@ -1467,7 +1459,7 @@ msgid ""
 "cache in the guest. Would you like to continue?"
 msgstr ""
 "Essa ação pode produzir resultados indesejáveis, por exemplo, cache de disco "
-"não alinhadono convidado. Deseja continuar?"
+"não alinhado na máquina virtual. Deseja continuar?"
 
 msgid "Reset Confirmation"
 msgstr "Confirmação de Reconfiguração"
@@ -1477,7 +1469,7 @@ msgid ""
 "Would you like to continue?"
 msgstr ""
 "Há um risco de perda de dados causado por reconfigurar sem o encerramento do "
-"sistema operacional guest.  Deseja continuar?"
+"sistema operacional guest. Deseja continuar?"
 
 msgid "Shut Down Confirmation"
 msgstr "Confirmação de Encerramento"
@@ -1485,7 +1477,7 @@ msgstr "Confirmação de Encerramento"
 msgid "Note the guest OS may ignore this request. Would you like to continue?"
 msgstr ""
 "Note que o sistema operacional guest pode ignorar essa solicitação. Deseja "
-"continuar? "
+"continuar?"
 
 msgid "VM Delete Confirmation"
 msgstr "Confirmação de Exclusão de VM (Máquina Virtual)"
@@ -1520,7 +1512,7 @@ msgid ""
 "detach it?"
 msgstr ""
 "Este disco será removido permanentemente e é possível reconectá-lo. "
-"Continuar a removê-lo?"
+"Continuar a remoção?"
 
 msgid "The VLAN id must be between 1 and 4094."
 msgstr "O ID de VLAN deve ser entre 1 e 4094."
@@ -1846,7 +1838,7 @@ msgid "Livetile"
 msgstr "Livetile"
 
 msgid "No guests found."
-msgstr "Nenhum convidado localizado."
+msgstr "Nenhuma máquina virtual localizada."
 
 msgid "Shut down"
 msgstr "Encerrar"
@@ -1946,6 +1938,14 @@ msgstr "Nenhum modelo localizado."
 
 msgid "Clone"
 msgstr "Clonar"
+
+#~ msgid ""
+#~ "The host device %(dev_name)s should be assigned to just one VM. Currently "
+#~ "the following VM(s) are holding the device: %(names)s."
+#~ msgstr ""
+#~ "O dispositivo host %(dev_name)s deve ser designado a apenas uma VM "
+#~ "(máquina virtual). Atualmente a(s) VM(s) a seguir estão retendo o "
+#~ "dispositivo: %(names)s."
 
 #~ msgid ""
 #~ "Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"

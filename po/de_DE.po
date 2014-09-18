@@ -1,12 +1,11 @@
-# English translations for kimchi package.
+# German translations for kimchi package.
 # Copyright (C) 2013 ORGANIZATION
-# Adam Litke <agl@us.ibm.com>, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: kimchi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-08 16:42-0300\n"
+"POT-Creation-Date: 2014-09-18 10:18-0300\n"
 "PO-Revision-Date: 2013-07-11 17:32-0400\n"
 "Last-Translator: Crístian Viana <vianac@linux.vnet.ibm.com>\n"
 "Language-Team: English\n"
@@ -276,6 +275,7 @@ msgstr ""
 #, python-format
 msgid "The host device %(dev_name)s is not allowed to directly assign to VM."
 msgstr ""
+"Die Hosteinheit %(dev_name)s darf nicht direkt einer VM zugewiesen werden."
 
 msgid ""
 "No IOMMU groups found. Host PCI pass through needs IOMMU group to function "
@@ -290,14 +290,6 @@ msgstr ""
 "kompiliert wurde. Fügen Sie Ihrem Kernelparameter für die Intel-CPU "
 "intel_iommu=on in /boot/grub2/grub.conf hinzu. Für AMD-CPU müssen Sie "
 "iommu=pt iommu=1 hinzufügen."
-
-#, python-format
-msgid ""
-"The host device %(dev_name)s should be assigned to just one VM. Currently "
-"the following VM(s) are holding the device: %(names)s."
-msgstr ""
-"Die Hosteinheit %(dev_name)s darf nur einer VM zugewiesen werden. Derzeit "
-"ist die Einheit den folgenden VMs zugeordnet: %(names)s."
 
 #, python-format
 msgid "Interface %(iface)s does not exist in virtual machine %(name)s"
@@ -820,7 +812,7 @@ msgid ""
 "another one."
 msgstr ""
 "Der Debugbericht mit dem Namen \"%(name)s\" ist bereits vorhanden. Verwenden "
-"Sie einen anderen Namen. "
+"Sie einen anderen Namen."
 
 #, python-format
 msgid "Storage server %(server)s was not used by Kimchi"
@@ -1310,7 +1302,7 @@ msgid "Warning"
 msgstr "Warnung"
 
 msgid "Creating..."
-msgstr "Wird generiert..."
+msgstr "Wird erstellt..."
 
 msgid "Loading..."
 msgstr "Wird geladen..."
@@ -1975,6 +1967,13 @@ msgstr "Keine Vorlagen gefunden."
 
 msgid "Clone"
 msgstr "Klonen"
+
+#~ msgid ""
+#~ "The host device %(dev_name)s should be assigned to just one VM. Currently "
+#~ "the following VM(s) are holding the device: %(names)s."
+#~ msgstr ""
+#~ "Die Hosteinheit %(dev_name)s darf nur einer VM zugewiesen werden. Derzeit "
+#~ "ist die Einheit den folgenden VMs zugeordnet: %(names)s."
 
 #~ msgid ""
 #~ "Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"

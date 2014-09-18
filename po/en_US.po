@@ -1,12 +1,11 @@
 # English translations for kimchi package.
 # Copyright (C) 2013 ORGANIZATION
-# Adam Litke <agl@us.ibm.com>, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: kimchi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-27 13:27-0300\n"
+"POT-Creation-Date: 2014-09-18 10:18-0300\n"
 "PO-Revision-Date: 2013-07-11 17:32-0400\n"
 "Last-Translator: Crístian Viana <vianac@linux.vnet.ibm.com>\n"
 "Language-Team: English\n"
@@ -241,6 +240,23 @@ msgid ""
 "Unable to get access metadata of virtual machine %(name)s. Details: %(err)s"
 msgstr ""
 "Unable to get access metadata of virtual machine %(name)s. Details: %(err)s"
+
+#, python-format
+msgid ""
+"VM %(vmid)s does not contain directly assigned host device %(dev_name)s."
+msgstr ""
+
+#, python-format
+msgid "The host device %(dev_name)s is not allowed to directly assign to VM."
+msgstr "The host device %(dev_name)s is not allowed to directly assign to VM."
+
+msgid ""
+"No IOMMU groups found. Host PCI pass through needs IOMMU group to function "
+"correctly. Please enable Intel VT-d or AMD IOMMU in your BIOS, then verify "
+"the Kernel is compiled with IOMMU support. For Intel CPU, add intel_iommu=on "
+"to your Kernel parameter in /boot/grub2/grub.conf. For AMD CPU, add iommu=pt "
+"iommu=1."
+msgstr ""
 
 #, python-format
 msgid "Interface %(iface)s does not exist in virtual machine %(name)s"
@@ -737,6 +753,9 @@ msgstr "Unable to reboot host machine as there are running virtual machines"
 msgid "Node device '%(name)s' not found"
 msgstr "Node device '%(name)s' not found"
 
+msgid "Conflicting flag filters specified."
+msgstr ""
+
 msgid "No packages marked for update"
 msgstr "No packages marked for update"
 
@@ -779,10 +798,6 @@ msgstr "The path '%(value)s' is not valid local/remote path for the device"
 #, python-format
 msgid "Device name %(dev_name)s already exists in vm %(vm_name)s"
 msgstr "Device name %(dev_name)s already exists in vm %(vm_name)s"
-
-msgid "Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"
-msgstr ""
-"Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"
 
 msgid "Just support cdrom path update"
 msgstr "Just support cdrom path update"
@@ -1000,6 +1015,9 @@ msgstr "Storage"
 msgid "Interface"
 msgstr "Interface"
 
+msgid "PCI Device"
+msgstr "PCI Device"
+
 msgid "Name"
 msgstr "Name"
 
@@ -1024,6 +1042,24 @@ msgstr "Network"
 msgid "Type"
 msgstr "Type"
 
+msgid "All"
+msgstr "All"
+
+msgid "To Add"
+msgstr "To Add"
+
+msgid "Added"
+msgstr "Added"
+
+msgid "filter"
+msgstr "filter"
+
+msgid "Product"
+msgstr "Product"
+
+msgid "Vendor"
+msgstr "Vendor"
+
 msgid "Save"
 msgstr "Save"
 
@@ -1036,8 +1072,32 @@ msgstr "Detach"
 msgid "Cancel"
 msgstr "Cancel"
 
+msgid "Start"
+msgstr "Start"
+
+msgid "Reset"
+msgstr "Reset"
+
+msgid "Power Off"
+msgstr "Power Off"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "Connect"
+msgstr "Connect"
+
 msgid "Manage Media"
 msgstr "Manage Media"
+
+msgid "Edit"
+msgstr "Edit"
+
+msgid "Shut Down"
+msgstr "Shut Down"
+
+msgid "Delete"
+msgstr "Delete"
 
 msgid "Add a Storage Device to VM"
 msgstr "Add a Storage Device to VM"
@@ -1057,9 +1117,6 @@ msgstr "Device Type"
 
 msgid "The device type. Currently,  \"cdrom\" and \"disk\" are supported."
 msgstr "The device type. Currently,  \"cdrom\" and \"disk\" are supported."
-
-msgid "Device Bus"
-msgstr "Device Bus"
 
 msgid "Storage Pool"
 msgstr "Storage Pool"
@@ -1081,30 +1138,6 @@ msgstr "The ISO file path in the server for CDROM."
 
 msgid "Attach"
 msgstr "Attach"
-
-msgid "Start"
-msgstr "Start"
-
-msgid "Reset"
-msgstr "Reset"
-
-msgid "Power Off"
-msgstr "Power Off"
-
-msgid "Actions"
-msgstr "Actions"
-
-msgid "Connect"
-msgstr "Connect"
-
-msgid "Edit"
-msgstr "Edit"
-
-msgid "Shut Down"
-msgstr "Shut Down"
-
-msgid "Delete"
-msgstr "Delete"
 
 msgid "The username or password you entered is incorrect. Please try again."
 msgstr "The username or password you entered is incorrect. Please try again."
@@ -1163,6 +1196,9 @@ msgstr "Confirm"
 
 msgid "Warning"
 msgstr "Warning"
+
+msgid "Creating..."
+msgstr "Creating..."
 
 msgid "Loading..."
 msgstr "Loading..."
@@ -1340,9 +1376,6 @@ msgstr ""
 "This action may produce undesirable results, for example unflushed disk "
 "cache in the guest. Would you like to continue?"
 
-msgid "This VM is not persistent. Power Off will delete it. Continue?"
-msgstr "This VM is not persistent. Power Off will delete it. Continue?"
-
 msgid "Reset Confirmation"
 msgstr "Reset Confirmation"
 
@@ -1361,6 +1394,9 @@ msgstr "Note the guest OS may ignore this request. Would you like to continue?"
 
 msgid "VM Delete Confirmation"
 msgstr "VM Delete Confirmation"
+
+msgid "This VM is not persistent. Power Off will delete it. Continue?"
+msgstr "This VM is not persistent. Power Off will delete it. Continue?"
 
 msgid ""
 "This CDROM will be detached permanently and you can re-attach it. Continue "
@@ -1383,6 +1419,13 @@ msgstr "Successfully replaced!"
 
 msgid "Successfully detached!"
 msgstr "Successfully detached!"
+
+msgid ""
+"This disk will be detached permanently and you can re-attach it. Continue to "
+"detach it?"
+msgstr ""
+"This disk will be detached permanently and you can re-attach it. Continue to "
+"detach it?"
 
 msgid "The VLAN id must be between 1 and 4094."
 msgstr "The VLAN id must be between 1 and 4094."
@@ -1486,17 +1529,14 @@ msgstr "Log out"
 msgid "Version:"
 msgstr "Version:"
 
-msgid "Log In"
-msgstr "Log In"
+msgid "Session timeout, please re-login."
+msgstr "Session timeout, please re-login."
 
 msgid "User Name"
 msgstr "User Name"
 
 msgid "Password"
 msgstr "Password"
-
-msgid "Session timeout, please re-login."
-msgstr "Session timeout, please re-login."
 
 msgid "Generate a New Debug Report"
 msgstr "Generate a New Debug Report"
@@ -1651,9 +1691,6 @@ msgstr "Search ISOs"
 msgid "The following ISOs are available:"
 msgstr "The following ISOs are available:"
 
-msgid "All"
-msgstr "All"
-
 msgid "OS: "
 msgstr "OS: "
 
@@ -1683,9 +1720,6 @@ msgstr "I want to use a custom URL"
 
 msgid "Edit Template"
 msgstr "Edit Template"
-
-msgid "Vendor"
-msgstr "Vendor"
 
 msgid "CPU Number"
 msgstr "CPU Number"
@@ -1813,17 +1847,13 @@ msgstr "No templates found."
 msgid "Clone"
 msgstr "Clone"
 
-msgid "PCI Device"
-msgstr "PCI Device"
+#~ msgid ""
+#~ "Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"
+#~ msgstr ""
+#~ "Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"
 
-msgid "filter"
-msgstr "filter"
+#~ msgid "Device Bus"
+#~ msgstr "Device Bus"
 
-msgid "To Add"
-msgstr "To Add"
-
-msgid "Added"
-msgstr "Added"
-
-msgid "Product"
-msgstr "Product"
+#~ msgid "Log In"
+#~ msgstr "Log In"

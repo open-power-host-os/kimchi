@@ -1,12 +1,11 @@
-# English translations for kimchi package.
+# French translations for kimchi package.
 # Copyright (C) 2013 ORGANIZATION
-# Adam Litke <agl@us.ibm.com>, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: kimchi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-08 17:11-0300\n"
+"POT-Creation-Date: 2014-09-18 10:18-0300\n"
 "PO-Revision-Date: 2013-07-11 17:32-0400\n"
 "Last-Translator: Crístian Viana <vianac@linux.vnet.ibm.com>\n"
 "Language-Team: English\n"
@@ -146,7 +145,7 @@ msgstr ""
 "L'hyperviseur ne dispose pas des droits pour utiliser ce fichier ISO "
 "%(filename)s. placez-le dans /var/lib/libvirt, ou définissez le droit de "
 "recherche sur les listes de contrôle d'accès aux fichiers pour l'utilisateur "
-"%(user)s', si possible, ou ajoutez l'utilisateur '%(user)s' au groupe de "
+"%(user)s', si possible, ou ajoutez l'utilisateur'%(user)s' au groupe de "
 "chemins ISO, ou (non recommandé) 'chmod -R o+x 'path_to_iso'. Détails : "
 "%(err)s"
 
@@ -285,6 +284,8 @@ msgstr ""
 #, python-format
 msgid "The host device %(dev_name)s is not allowed to directly assign to VM."
 msgstr ""
+"L'unité hôte %(dev_name)s n'est pas autorisée à être affectée directement à "
+"la machine virtuelle."
 
 msgid ""
 "No IOMMU groups found. Host PCI pass through needs IOMMU group to function "
@@ -298,15 +299,6 @@ msgstr ""
 "votre BIOS, puis vérifiez que le noyau est compilé avec le support IOMMU. "
 "Pour l'UC Intel, ajoutez intel_iommu=on pour le paramètre de noyau dans /"
 "boot/grub2/grub.conf. Pour l'UC AMD, ajoutez iommu=pt iommu=1."
-
-#, python-format
-msgid ""
-"The host device %(dev_name)s should be assigned to just one VM. Currently "
-"the following VM(s) are holding the device: %(names)s."
-msgstr ""
-"L'unité hôte %(dev_name)s doit être affectée à une seule machine virtuelle. "
-"Actuellement, la ou les machines virtuelles suivantes contiennent l'unité : "
-"%(names)s."
 
 #, python-format
 msgid "Interface %(iface)s does not exist in virtual machine %(name)s"
@@ -1334,7 +1326,7 @@ msgid "Warning"
 msgstr "Avertissement"
 
 msgid "Creating..."
-msgstr "Génération en cours..."
+msgstr "Création..."
 
 msgid "Loading..."
 msgstr "Chargement en cours..."
@@ -1569,6 +1561,8 @@ msgid ""
 "This disk will be detached permanently and you can re-attach it. Continue to "
 "detach it?"
 msgstr ""
+"Ce disque va être détaché définitivement et ne pourra pas être attaché à "
+"nouveau. Continuer le détachement ?"
 
 msgid "The VLAN id must be between 1 and 4094."
 msgstr "L'ID réseau local virtuel doit être compris entre 1 et 4094."
@@ -1998,6 +1992,14 @@ msgstr "Aucun modèle trouvé."
 
 msgid "Clone"
 msgstr "Clone"
+
+#~ msgid ""
+#~ "The host device %(dev_name)s should be assigned to just one VM. Currently "
+#~ "the following VM(s) are holding the device: %(names)s."
+#~ msgstr ""
+#~ "L'unité hôte %(dev_name)s doit être affectée à une seule machine "
+#~ "virtuelle. Actuellement, la ou les machines virtuelles suivantes "
+#~ "contiennent l'unité : %(names)s."
 
 #~ msgid ""
 #~ "Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"

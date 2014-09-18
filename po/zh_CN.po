@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kimchi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-08 17:51-0300\n"
+"POT-Creation-Date: 2014-09-18 10:18-0300\n"
 "PO-Revision-Date: 2013-07-11 17:32-0400\n"
 "Last-Translator: Crístian Viana <vianac@linux.vnet.ibm.com>\n"
 "Language-Team: English\n"
@@ -245,7 +245,7 @@ msgstr "VM %(vmid)s 不包含直接指定的主机设备 %(dev_name)s。"
 
 #, python-format
 msgid "The host device %(dev_name)s is not allowed to directly assign to VM."
-msgstr ""
+msgstr "不允许将主机设备 %(dev_name)s 直接分配给 VM。"
 
 msgid ""
 "No IOMMU groups found. Host PCI pass through needs IOMMU group to function "
@@ -258,14 +258,6 @@ msgstr ""
 "用 Intel VT-d 或 AMD IOMMU，然后验证“内核”是否已使用 IOMMU 支持编译。对于 "
 "Intel CPU，请将 intel_iommu=on 添加至 /boot/grub2/grub.conf 中的内核参数。对"
 "于 AMD CPU，请添加 iommu=pt iommu=1。"
-
-#, python-format
-msgid ""
-"The host device %(dev_name)s should be assigned to just one VM. Currently "
-"the following VM(s) are holding the device: %(names)s."
-msgstr ""
-"只应该将主机设备 %(dev_name)s 分配给一个 VM。当前 下列 VM 拥有该设备："
-"%(names)s。"
 
 #, python-format
 msgid "Interface %(iface)s does not exist in virtual machine %(name)s"
@@ -1157,7 +1149,7 @@ msgid "Warning"
 msgstr "警告"
 
 msgid "Creating..."
-msgstr ""
+msgstr "正在创建..."
 
 msgid "Loading..."
 msgstr "正在装入..."
@@ -1369,7 +1361,7 @@ msgstr "已成功拆离！"
 msgid ""
 "This disk will be detached permanently and you can re-attach it. Continue to "
 "detach it?"
-msgstr ""
+msgstr "此磁盘将被永久拆离但您可以对其进行重新连接。要继续拆离吗？"
 
 msgid "The VLAN id must be between 1 and 4094."
 msgstr "VLAN 标识必须介于 1 到 4094 之间。"
@@ -1444,7 +1436,7 @@ msgstr "找不到任何可用分区。"
 msgid ""
 "This storage pool is not persistent. Instead of deactivate, this action will "
 "permanently delete it. Would you like to continue?"
-msgstr "此存储池不是持久的。与取消激活不同，此操作会将其永久删除。要继续吗？"
+msgstr "此存储池不是持久的。此操作会将其永久删除而不是对其取消激活。要继续吗？"
 
 msgid "CDROM path need to be a valid local path and cannot be blank."
 msgstr "CDROM 路径必须是有效的本地路径，不能为空白。"
@@ -1777,6 +1769,13 @@ msgstr "找不到任何模板。"
 
 msgid "Clone"
 msgstr "克隆"
+
+#~ msgid ""
+#~ "The host device %(dev_name)s should be assigned to just one VM. Currently "
+#~ "the following VM(s) are holding the device: %(names)s."
+#~ msgstr ""
+#~ "只应该将主机设备 %(dev_name)s 分配给一个 VM。当前 下列 VM 拥有该设备："
+#~ "%(names)s。"
 
 #~ msgid ""
 #~ "Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"

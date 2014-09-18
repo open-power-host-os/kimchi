@@ -1,12 +1,11 @@
-# English translations for kimchi package.
+# Spanish translations for kimchi package.
 # Copyright (C) 2013 ORGANIZATION
-# Adam Litke <agl@us.ibm.com>, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: kimchi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-08 17:02-0300\n"
+"POT-Creation-Date: 2014-09-18 10:18-0300\n"
 "PO-Revision-Date: 2013-07-11 17:32-0400\n"
 "Last-Translator: Crístian Viana <vianac@linux.vnet.ibm.com>\n"
 "Language-Team: English\n"
@@ -277,6 +276,8 @@ msgstr ""
 #, python-format
 msgid "The host device %(dev_name)s is not allowed to directly assign to VM."
 msgstr ""
+"El dispositivo host %(dev_name)s no tiene permitido asignar directamente a "
+"VM."
 
 msgid ""
 "No IOMMU groups found. Host PCI pass through needs IOMMU group to function "
@@ -290,14 +291,6 @@ msgstr ""
 "en el BIOS y, a continuación, verifiqueque el Kernel se ha compilado con "
 "soporte IOMMU. Para Intel CPU, añada intel_iommu=on al parámetro de Kernel "
 "en /boot/grub2/grub.conf. Para AMD CPU, añada iommu=pt iommu=1."
-
-#, python-format
-msgid ""
-"The host device %(dev_name)s should be assigned to just one VM. Currently "
-"the following VM(s) are holding the device: %(names)s."
-msgstr ""
-"El dispositivo de host %(dev_name)s debe asignarse a sólo una VM. "
-"Actualmente las siguientes VM están reteniendo el dispositivo: %(names)s."
 
 #, python-format
 msgid "Interface %(iface)s does not exist in virtual machine %(name)s"
@@ -955,8 +948,8 @@ msgid ""
 "Specify type and path or type and pool/volume to add a new virtual machine "
 "disk"
 msgstr ""
-"Especifique el tipo y la vía de acceso o escriba una agrupación/volumen para "
-"añadir a un nuevo discode máquina virtual"
+"Especifique el tipo y la vía de acceso y la agrupación/volumen para añadir "
+"un nuevo disco de máquina virtual"
 
 msgid "Specify path to update virtual machine disk"
 msgstr ""
@@ -1340,7 +1333,7 @@ msgid "Warning"
 msgstr "Aviso"
 
 msgid "Creating..."
-msgstr "Generando..."
+msgstr "Creando..."
 
 msgid "Loading..."
 msgstr "Cargando..."
@@ -1572,7 +1565,7 @@ msgid ""
 "detach it?"
 msgstr ""
 "Este disco se desconectará de forma permanente pero puede volver a "
-"conectarlo. ¿Desea continuar para desconectarlo?"
+"conectarlo. ¿Continuar para desconectarlo?"
 
 msgid "The VLAN id must be between 1 and 4094."
 msgstr "El ID de VLAN debe estar entre 1 y 4094."
@@ -2004,6 +1997,13 @@ msgstr "No se han encontrado plantillas."
 
 msgid "Clone"
 msgstr "Clonar"
+
+#~ msgid ""
+#~ "The host device %(dev_name)s should be assigned to just one VM. Currently "
+#~ "the following VM(s) are holding the device: %(names)s."
+#~ msgstr ""
+#~ "El dispositivo de host %(dev_name)s debe asignarse a sólo una VM. "
+#~ "Actualmente las siguientes VM están reteniendo el dispositivo: %(names)s."
 
 #~ msgid ""
 #~ "Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"

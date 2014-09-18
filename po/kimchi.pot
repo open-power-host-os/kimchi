@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-27 13:27-0300\n"
+"POT-Creation-Date: 2014-09-18 10:18-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -231,6 +231,23 @@ msgstr ""
 #, python-format
 msgid ""
 "Unable to get access metadata of virtual machine %(name)s. Details: %(err)s"
+msgstr ""
+
+#, python-format
+msgid ""
+"VM %(vmid)s does not contain directly assigned host device %(dev_name)s."
+msgstr ""
+
+#, python-format
+msgid "The host device %(dev_name)s is not allowed to directly assign to VM."
+msgstr ""
+
+msgid ""
+"No IOMMU groups found. Host PCI pass through needs IOMMU group to function "
+"correctly. Please enable Intel VT-d or AMD IOMMU in your BIOS, then verify "
+"the Kernel is compiled with IOMMU support. For Intel CPU, add intel_iommu=on "
+"to your Kernel parameter in /boot/grub2/grub.conf. For AMD CPU, add iommu=pt "
+"iommu=1."
 msgstr ""
 
 #, python-format
@@ -691,6 +708,9 @@ msgstr ""
 msgid "Node device '%(name)s' not found"
 msgstr ""
 
+msgid "Conflicting flag filters specified."
+msgstr ""
+
 msgid "No packages marked for update"
 msgstr ""
 
@@ -732,9 +752,6 @@ msgstr ""
 
 #, python-format
 msgid "Device name %(dev_name)s already exists in vm %(vm_name)s"
-msgstr ""
-
-msgid "Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"
 msgstr ""
 
 msgid "Just support cdrom path update"
@@ -942,6 +959,9 @@ msgstr ""
 msgid "Interface"
 msgstr ""
 
+msgid "PCI Device"
+msgstr ""
+
 msgid "Name"
 msgstr ""
 
@@ -966,6 +986,24 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
+msgid "All"
+msgstr ""
+
+msgid "To Add"
+msgstr ""
+
+msgid "Added"
+msgstr ""
+
+msgid "filter"
+msgstr ""
+
+msgid "Product"
+msgstr ""
+
+msgid "Vendor"
+msgstr ""
+
 msgid "Save"
 msgstr ""
 
@@ -978,7 +1016,31 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+msgid "Start"
+msgstr ""
+
+msgid "Reset"
+msgstr ""
+
+msgid "Power Off"
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+msgid "Connect"
+msgstr ""
+
 msgid "Manage Media"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Shut Down"
+msgstr ""
+
+msgid "Delete"
 msgstr ""
 
 msgid "Add a Storage Device to VM"
@@ -996,9 +1058,6 @@ msgid "Device Type"
 msgstr ""
 
 msgid "The device type. Currently,  \"cdrom\" and \"disk\" are supported."
-msgstr ""
-
-msgid "Device Bus"
 msgstr ""
 
 msgid "Storage Pool"
@@ -1020,30 +1079,6 @@ msgid "The ISO file path in the server for CDROM."
 msgstr ""
 
 msgid "Attach"
-msgstr ""
-
-msgid "Start"
-msgstr ""
-
-msgid "Reset"
-msgstr ""
-
-msgid "Power Off"
-msgstr ""
-
-msgid "Actions"
-msgstr ""
-
-msgid "Connect"
-msgstr ""
-
-msgid "Edit"
-msgstr ""
-
-msgid "Shut Down"
-msgstr ""
-
-msgid "Delete"
 msgstr ""
 
 msgid "The username or password you entered is incorrect. Please try again."
@@ -1100,6 +1135,9 @@ msgid "Confirm"
 msgstr ""
 
 msgid "Warning"
+msgstr ""
+
+msgid "Creating..."
 msgstr ""
 
 msgid "Loading..."
@@ -1285,6 +1323,9 @@ msgstr ""
 msgid "VM Delete Confirmation"
 msgstr ""
 
+msgid "This VM is not persistent. Power Off will delete it. Continue?"
+msgstr ""
+
 msgid ""
 "This CDROM will be detached permanently and you can re-attach it. Continue "
 "to detach it?"
@@ -1303,6 +1344,11 @@ msgid "Successfully replaced!"
 msgstr ""
 
 msgid "Successfully detached!"
+msgstr ""
+
+msgid ""
+"This disk will be detached permanently and you can re-attach it. Continue to "
+"detach it?"
 msgstr ""
 
 msgid "The VLAN id must be between 1 and 4094."
@@ -1398,16 +1444,13 @@ msgstr ""
 msgid "Version:"
 msgstr ""
 
-msgid "Log In"
+msgid "Session timeout, please re-login."
 msgstr ""
 
 msgid "User Name"
 msgstr ""
 
 msgid "Password"
-msgstr ""
-
-msgid "Session timeout, please re-login."
 msgstr ""
 
 msgid "Generate a New Debug Report"
@@ -1557,9 +1600,6 @@ msgstr ""
 msgid "The following ISOs are available:"
 msgstr ""
 
-msgid "All"
-msgstr ""
-
 msgid "OS: "
 msgstr ""
 
@@ -1588,9 +1628,6 @@ msgid "I want to use a custom URL"
 msgstr ""
 
 msgid "Edit Template"
-msgstr ""
-
-msgid "Vendor"
 msgstr ""
 
 msgid "CPU Number"
@@ -1717,19 +1754,4 @@ msgid "No templates found."
 msgstr ""
 
 msgid "Clone"
-msgstr ""
-
-msgid "PCI Device"
-msgstr ""
-
-msgid "filter"
-msgstr ""
-
-msgid "To Add"
-msgstr ""
-
-msgid "Added"
-msgstr ""
-
-msgid "Product"
 msgstr ""

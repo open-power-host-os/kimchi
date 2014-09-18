@@ -1,11 +1,11 @@
 # Traditional Chinese translations for kimchi package.
-# Copyright (C) 2014 ORGANIZATION
+# Copyright (C) 2013 ORGANIZATION
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: kimchi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-08 17:51-0300\n"
+"POT-Creation-Date: 2014-09-18 10:18-0300\n"
 "PO-Revision-Date: 2013-07-11 17:32-0400\n"
 "Last-Translator: Crístian Viana <vianac@linux.vnet.ibm.com>\n"
 "Language-Team: English\n"
@@ -245,7 +245,7 @@ msgstr "VM %(vmid)s 不包含直接指派的主機裝置 %(dev_name)s。"
 
 #, python-format
 msgid "The host device %(dev_name)s is not allowed to directly assign to VM."
-msgstr ""
+msgstr "不允許將主機裝置 %(dev_name)s 直接指派給 VM。"
 
 msgid ""
 "No IOMMU groups found. Host PCI pass through needs IOMMU group to function "
@@ -258,14 +258,6 @@ msgstr ""
 "用 Intel VT-d 或 AMD IOMMU，然後驗證是否使用 IOMMU 支援編譯了核心。若為 "
 "Intel CPU，請將 intel_iommu=on 新增至 /boot/grub2/grub.conf 中的核心參數。若"
 "為 AMD CPU，請新增 iommu=pt iommu=1。"
-
-#, python-format
-msgid ""
-"The host device %(dev_name)s should be assigned to just one VM. Currently "
-"the following VM(s) are holding the device: %(names)s."
-msgstr ""
-"應該只將主機裝置 %(dev_name)s 指派給一個 VM。目前，下列 VM 正在保存該裝置："
-"%(names)s。"
 
 #, python-format
 msgid "Interface %(iface)s does not exist in virtual machine %(name)s"
@@ -1157,7 +1149,7 @@ msgid "Warning"
 msgstr "警告"
 
 msgid "Creating..."
-msgstr ""
+msgstr "正在建立..."
 
 msgid "Loading..."
 msgstr "正在載入..."
@@ -1370,7 +1362,7 @@ msgstr "已順利分離！"
 msgid ""
 "This disk will be detached permanently and you can re-attach it. Continue to "
 "detach it?"
-msgstr ""
+msgstr "將會永久地分離此磁碟，但是您可以將其重新連接。要繼續分離操作嗎？"
 
 msgid "The VLAN id must be between 1 and 4094."
 msgstr "VLAN ID 必須介於 1 和 4094 之間。"
@@ -1780,6 +1772,13 @@ msgstr "找不到範本。"
 
 msgid "Clone"
 msgstr "複製"
+
+#~ msgid ""
+#~ "The host device %(dev_name)s should be assigned to just one VM. Currently "
+#~ "the following VM(s) are holding the device: %(names)s."
+#~ msgstr ""
+#~ "應該只將主機裝置 %(dev_name)s 指派給一個 VM。目前，下列 VM 正在保存該裝"
+#~ "置：%(names)s。"
 
 #~ msgid ""
 #~ "Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"

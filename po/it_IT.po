@@ -1,11 +1,11 @@
 # Italian translations for kimchi package.
-# Copyright (C) 2014 ORGANIZATION
+# Copyright (C) 2013 ORGANIZATION
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: kimchi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-08 17:19-0300\n"
+"POT-Creation-Date: 2014-09-18 10:18-0300\n"
 "PO-Revision-Date: 2013-07-11 17:32-0400\n"
 "Last-Translator: Crístian Viana <vianac@linux.vnet.ibm.com>\n"
 "Language-Team: English\n"
@@ -139,8 +139,8 @@ msgstr ""
 "L'hypervisor non dispone dell'autorizzazione per utilizzare questo ISO "
 "%(filename)s. Spostarlo in /var/lib/libvirt o impostare l'autorizzazione di "
 "ricerca sugli elenchi di controllo di accesso file per l'utente '%(user)s' "
-"se possibile, oppure aggiungere '%(user)s' al gruppo percorso ISO oppure "
-"(non consigliato) 'chmod -R o+x 'path_to_iso'. Dettagli: %(err)s"
+"se possibile, oppure aggiungere'%(user)s' al gruppo percorso ISO oppure (non "
+"consigliato) 'chmod -R o+x 'path_to_iso'. Dettagli: %(err)s"
 
 #, python-format
 msgid "Virtual machine %(name)s already exists"
@@ -269,6 +269,8 @@ msgstr ""
 #, python-format
 msgid "The host device %(dev_name)s is not allowed to directly assign to VM."
 msgstr ""
+"Il dispositivo host %(dev_name)s non consente di assegnare direttamente al "
+"VM."
 
 msgid ""
 "No IOMMU groups found. Host PCI pass through needs IOMMU group to function "
@@ -282,14 +284,6 @@ msgstr ""
 "IOMMU nel BIOS e verificare quindi che il Kernel sia compilato con il "
 "supporto IOMMU. per la CPU Intel, aggiungere intel_iommu=on al parametro "
 "Kernel in /boot/grub2/grub.conf. Per la CPU AMD, aggiungere iommu=pt iommu=1."
-
-#, python-format
-msgid ""
-"The host device %(dev_name)s should be assigned to just one VM. Currently "
-"the following VM(s) are holding the device: %(names)s."
-msgstr ""
-"Il dispositivo host %(dev_name)s deve essere assegnato a una sola VM. "
-"Attualmente, le seguenti VM detengono il dispositivo: %(names)s."
 
 #, python-format
 msgid "Interface %(iface)s does not exist in virtual machine %(name)s"
@@ -720,7 +714,7 @@ msgid "Network name must be a string"
 msgstr "Il nome della rete deve essere una stringa"
 
 msgid "Supported network types are isolated, NAT and bridge"
-msgstr "I tipi di rete supportati sono isolata, NAT e bridge"
+msgstr "I tipi di rete supportati sono isolata, NAT e   bridge"
 
 msgid "Network subnet must be a string with IP address and prefix or netmask"
 msgstr ""
@@ -1305,7 +1299,7 @@ msgid "Warning"
 msgstr "Avvertenza"
 
 msgid "Creating..."
-msgstr "Creazione in corso..."
+msgstr "Creazione..."
 
 msgid "Loading..."
 msgstr "Caricamento in corso..."
@@ -1539,6 +1533,8 @@ msgid ""
 "This disk will be detached permanently and you can re-attach it. Continue to "
 "detach it?"
 msgstr ""
+"Il disco verrà scollegato permanentemente e sarà possibile ricollegarlo. "
+"Continuare con lo scollegamento?"
 
 msgid "The VLAN id must be between 1 and 4094."
 msgstr "L'ID VLAN deve essere compreso tra 1 e 4094."
@@ -1560,8 +1556,8 @@ msgid ""
 "This network is not persistent. Instead of stop, this action will "
 "permanently delete it. Would you like to continue?"
 msgstr ""
-"Questa rete non è permanente. Invece di arrestarla, questa azione la "
-"eliminerà permanentemente. Continuare?"
+"Questa rete non è permanente. Invece di arrestarla, questa azione la lo "
+"eliminerà permanentemente. Si desidera continuare?"
 
 msgid ""
 "This will permanently delete the storage pool. Would you like to continue?"
@@ -1968,6 +1964,13 @@ msgstr "Nessun modello trovato."
 
 msgid "Clone"
 msgstr "Clona"
+
+#~ msgid ""
+#~ "The host device %(dev_name)s should be assigned to just one VM. Currently "
+#~ "the following VM(s) are holding the device: %(names)s."
+#~ msgstr ""
+#~ "Il dispositivo host %(dev_name)s deve essere assegnato a una sola VM. "
+#~ "Attualmente, le seguenti VM detengono il dispositivo: %(names)s."
 
 #~ msgid ""
 #~ "Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"

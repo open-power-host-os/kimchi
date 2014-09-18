@@ -1,11 +1,11 @@
 # Japanese translations for kimchi package.
-# Copyright (C) 2014 ORGANIZATION
+# Copyright (C) 2013 ORGANIZATION
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: kimchi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-08 17:24-0300\n"
+"POT-Creation-Date: 2014-09-18 10:18-0300\n"
 "PO-Revision-Date: 2013-07-11 17:32-0400\n"
 "Last-Translator: Crístian Viana <vianac@linux.vnet.ibm.com>\n"
 "Language-Team: English\n"
@@ -262,6 +262,8 @@ msgstr ""
 #, python-format
 msgid "The host device %(dev_name)s is not allowed to directly assign to VM."
 msgstr ""
+"ホスト・デバイス %(dev_name)s が直接 VM に割り当てられることは許可されませ"
+"ん。"
 
 msgid ""
 "No IOMMU groups found. Host PCI pass through needs IOMMU group to function "
@@ -276,14 +278,6 @@ msgstr ""
 "さい。Intel CPU の場合は、/boot/grub2/grub.conf においてカーネル・パラメー"
 "ターに intel_iommu=on を追加します。AMD CPU の場合は、iommu=pt iommu=1 を追加"
 "します。"
-
-#, python-format
-msgid ""
-"The host device %(dev_name)s should be assigned to just one VM. Currently "
-"the following VM(s) are holding the device: %(names)s."
-msgstr ""
-"ホスト・デバイス %(dev_name)s は 1 つの VM にのみ割り当てなければなりません。"
-"現在、次の VM でこのデバイスが保持されます: %(names)s。"
 
 #, python-format
 msgid "Interface %(iface)s does not exist in virtual machine %(name)s"
@@ -945,8 +939,8 @@ msgid ""
 "Only one of path or pool/volume can be specified to add a new virtual "
 "machine disk"
 msgstr ""
-"新規仮想マシン・ディスクを追加するには、タイプとパス、またはタイプと プール/"
-"ボリュームを指定してください"
+"新規仮想マシン・ディスクを追加するには、タイプとパス、またはタイプとプール/ボ"
+"リュームを指定してください"
 
 msgid "YUM Repository ID must be one word only string."
 msgstr "YUM リポジトリー ID は、1 ワードのみのストリングでなければなりません"
@@ -1304,7 +1298,7 @@ msgid "Warning"
 msgstr "警告"
 
 msgid "Creating..."
-msgstr ""
+msgstr "作成しています..."
 
 msgid "Loading..."
 msgstr "ロードしています..."
@@ -1530,6 +1524,7 @@ msgid ""
 "This disk will be detached permanently and you can re-attach it. Continue to "
 "detach it?"
 msgstr ""
+"このディスクは完全に切り離されますが、再接続できます。切り離しを続行しますか?"
 
 msgid "The VLAN id must be between 1 and 4094."
 msgstr "VLAN ID は、1 から 4094 まででなければなりません。"
@@ -1954,6 +1949,13 @@ msgstr "テンプレートが見つかりません。"
 
 msgid "Clone"
 msgstr "クローン"
+
+#~ msgid ""
+#~ "The host device %(dev_name)s should be assigned to just one VM. Currently "
+#~ "the following VM(s) are holding the device: %(names)s."
+#~ msgstr ""
+#~ "ホスト・デバイス %(dev_name)s は 1 つの VM にのみ割り当てなければなりませ"
+#~ "ん。現在、次の VM でこのデバイスが保持されます: %(names)s。"
 
 #~ msgid ""
 #~ "Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"
