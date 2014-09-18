@@ -12,7 +12,7 @@ https://w3.opensource.ibm.com/projects/dita-cshelp/-->
 <shortdesc>A página <wintitle>Máquinas Virtuais</wintitle> lista as máquinas virtuais
 KVM definidas.</shortdesc>
 <csbody>
-<p>Para cada convidado, as informações a seguir são exibidas:<dl><dlentry>
+<p>Para cada máquina virtual, as informações a seguir são exibidas:<dl><dlentry>
 <dt>Nome</dt>
 <dd>Nome da máquina virtual.</dd>
 </dlentry><dlentry>
@@ -26,28 +26,27 @@ KVM definidas.</shortdesc>
 <dd>Taxa de transmissão de entrada/saída de disco em KB por segundo.</dd>
 </dlentry><dlentry>
 <dt>Livetile</dt>
-<dd>Estado do console do sistema operacional guest ou um ícone que representa
+<dd>Estado do console do sistema operacional da máquina virtual ou um ícone que representa
 a distribuição <tm tmtype="tm" trademark="Linux">Linux</tm> se o
-convidado não estiver ativo.</dd>
+a máquina virtual não estiver ativa.</dd>
 </dlentry></dl></p>
-<p>Os ícones de ações a seguir são exibidos para cada convidado:<dl>
+<p>Os ícones de ações a seguir são exibidos para cada máquina virtual:<dl>
 <dlentry>
 <dt>Reiniciar</dt>
-<dd>Clique para Reiniciar o convidado. </dd>
+<dd>Clique para Reiniciar a máquina virtual. </dd>
 </dlentry><dlentry>
 <dt>Energia (iniciar ou parar)</dt>
-<dd>Clique para ligar ou desligar o convidado. Se o ícone estiver vermelho,
+<dd>Clique para ligar ou desligar a máquina virtual. Se o ícone estiver vermelho,
 a energia está desligada; se o ícone estiver verde, a energia está ligada.</dd>
 </dlentry></dl> </p>
-<p>As ações a seguir podem ser selecionadas para cada convidado:<ul>
+<p>As ações a seguir podem ser selecionadas para cada máquina virtual:<ul>
 <li>Selecione <uicontrol>Conectar</uicontrol> para conectar-se ao console
-remoto para o sistema operacional guest.</li>
+remoto para o sistema operacional da máquina virtual.</li>
 <li>Selecione <uicontrol>Gerenciar mídia</uicontrol> para alterar o caminho
 para a mídia de instalação.</li>
-<li>Selecione <uicontrol>Reiniciar</uicontrol> para Reiniciar o convidado.</li>
-<li>Selecione <uicontrol>Editar</uicontrol> para editar as propriedades de um
-convidado existente. Os Máquinas Virtuais podem ser editados somente quando interrompidos.</li>
-<li>Selecione <uicontrol>Excluir</uicontrol> para excluir o convidado.</li>
+<li>Selecione <uicontrol>Reiniciar</uicontrol> para reiniciar a máquina virtual.</li>
+<li>Selecione <uicontrol>Editar</uicontrol> para editar as propriedades de uma máquina virtual existente. As Máquinas Virtuais podem ser editadas somente quando interrompidas.</li>
+<li>Selecione <uicontrol>Excluir</uicontrol> para excluir a máquina virtual.</li>
 </ul>Para criar um convidado, ou máquina virtual, clique no ícone <uicontrol>mais
 (+)</uicontrol> na parte superior direita da página.</p>
 </csbody>
@@ -67,24 +66,24 @@ criar um modelo.</li>
 </csbody>
 </cshelp>
 <cshelp id="kimhvirtmedit" xml:lang="en-us">
-<title>Editar convidado</title>
-<shortdesc>Edite as propriedades de uma máquina virtual existente. Algumas propriedades podem ser editadas enquanto o convidado está interrompido. Outras entrarão em vigor na próxima inicialização.</shortdesc>
+<title>Editar máquina virtual</title>
+<shortdesc>Edite as propriedades de uma máquina virtual existente. Algumas propriedades podem ser editadas enquanto a máquina virtual está interrompida. Outras entrarão em vigor na próxima inicialização.</shortdesc>
 <csprolog><csmetadata></csmetadata></csprolog>
 <csbody>
-<p>Para cada convidado, as informações a seguir são exibidas na guia <wintitle>Geral</wintitle>:<dl>
+<p>Para cada máquina virtual, as informações a seguir são exibidas na guia <wintitle>Geral</wintitle>:<dl>
 <dlentry>
 <dt>Nome</dt>
-<dd>Nome da máquina virtual. (somente pode ser editado enquanto o convidado está interrompido)</dd>
+<dd>Nome da máquina virtual. (somente pode ser editado enquanto a máquina virtual está interrompida)</dd>
 </dlentry><dlentry>
 <dt>CPUs</dt>
-<dd>Número de processadores. (se o convidado estiver em execução, uma nova quantia entrará em vigor na próxima inicialização)</dd>
+<dd>Número de processadores. (se a máquina virtual estiver em execução, uma nova quantia entrará em vigor na próxima inicialização)</dd>
 </dlentry><dlentry>
 <dt>Memória</dt>
-<dd>Quantia de memória em MB. (se o convidado estiver em execução, uma nova quantia entrará em vigor na próxima inicialização)</dd>
+<dd>Quantia de memória em MB. (se a máquina virtual estiver em execução, uma nova quantia entrará em vigor na próxima inicialização)</dd>
 </dlentry><dlentry>
 <dt>Ícone</dt>
 <dd>Imagem gráfica representando a distribuição Linux a ser exibida
-no lugar do status atual (Livetile) quando o convidado não está ativo.</dd>
+no lugar do status atual (Livetile) quando a máquina virtual não está ativa.</dd>
 </dlentry></dl></p>
 <p>As informações a seguir são exibidas na guia <wintitle>Armazenamento</wintitle>.</p>
 <dl><dlentry>
@@ -102,7 +101,7 @@ para sua máquina virtual. O único dispositivo suportado é CD-ROM. Para editar
 seus dispositivos de armazenamento, siga estas etapas:</shortdesc>
 <csbody>
 <ol>
-<li>Na janela <wintitle>Editar convidado</wintitle>, selecione <wintitle>Armazenamento</wintitle>.</li>
+<li>Na janela <wintitle>Editar máquina virtual</wintitle>, selecione <wintitle>Armazenamento</wintitle>.</li>
 <li>Para substituir um dispositivo de armazenamento, clique no primeiro ícone com a <uicontrol>barra
 laranja (/)</uicontrol>. Insira o caminho do arquivo ISO e clique em <uicontrol>Substituir</uicontrol>.</li>
 <li>Para remover um dispositivo de armazenamento, clique no segundo ícone com o <uicontrol>traço

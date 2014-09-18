@@ -59,14 +59,13 @@ está configurado para usar.</dd>
 <dd>O tamanho do disco em GB.</dd>
 </dlentry><dlentry>
 <dt>CD-ROM</dt>
-<dd>O  caminho do arquivo para o local do arquivo ISO usado para instalar o
-convidado do KVM.</dd>
+<dd>O caminho do arquivo para o local do arquivo ISO usado para instalar a máquina virtual do KVM.</dd>
 </dlentry><dlentry>
 <dt>storage pool</dt>
 <dd>storage pool específico ou storage pool padrão.</dd>
 </dlentry><dlentry>
 <dt>Rede</dt>
-<dd>As interfaces de rede padrão disponíveis para o convidado do KVM. É possível
+<dd>As interfaces de rede padrão disponíveis para a máquina virtual do KVM. É possível
 selecionar diversas redes.</dd>
 </dlentry></dl> Os campos que não estão desativados podem ser editados. Depois
 de editar um campo, clique em <uicontrol>Salvar</uicontrol>. </p>
