@@ -1055,14 +1055,6 @@ msgstr "删除"
 msgid "Add a Storage Device to VM"
 msgstr "将存储设备添加至 VM"
 
-msgid "Device Name"
-msgstr "设备名"
-
-msgid ""
-"The name used to identify the device. If omitted, a name will be chosen "
-"automatically."
-msgstr "用于标识设备的名称。如果省略，将会自动选取名称。"
-
 msgid "Device Type"
 msgstr "设备类型"
 
