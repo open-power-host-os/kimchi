@@ -4,7 +4,7 @@
 %endif
 
 %define frobisher_release 20
-%define release .12
+%define release .13
 Name:		kimchi
 Version:	1.2.1
 Release:	%{?frobisher_release}%{?release}%{?dist}
@@ -218,6 +218,16 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Sep 18 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.13
+- Fix cdrom eject BZ#116077
+- Bugfix: Make manage media work with multiple cdrom and no cdrom - BZ#115975 BZ#115977
+- i18n support: Update Brazilian Portuguese help pages - BZ#115731
+- i18n support: Update translation files - BZ#115731
+- Bugfix: 116136 Remove edit button from interface tab of guest edit - BZ#116136
+- PCI Passthru: Properly Parse NPIV Capable HBA Card Information - BZ#115818
+- Bugfix: 116138 Disk and cdrom addition window numeric marking is wrong - BZ#116138
+- Changed kimchi pkvm spec file for PKVM 2.1.1  Build 13
+
 * Fri Sep 12 2014 Paulo Vital <pvital@linux.vnet.ibm.com> 1.2.1-20.12.1
 - PCI Passthru: Sort the devices list - Bugzilla #115608
 - Improve device (and PCI) passthrough - Bugzilla #114833
