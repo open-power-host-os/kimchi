@@ -38,7 +38,13 @@ def _get_dev_info_tree(dev_infos):
         if dev_info['parent'] is None:
             root = dev_info
             continue
-        parent = devs[dev_info['parent']]
+
+        try:
+            parent = devs[dev_info['parent']]
+        except KeyError:
+            kimchi_log.error('Parent %s of device %s does not exist.',
+                             dev_info['parent'], dev_info['name'])
+            continue
 
         try:
             children = parent['children']
@@ -89,12 +95,20 @@ def get_affected_passthrough_devices(libvirt_conn, passthrough_dev):
         parent = dev_info['parent']
         while parent is not None:
             try:
-                iommuGroup = devs[parent]['iommuGroup']
+                parent_info = devs[parent]
+            except KeyError:
+                kimchi_log.error("Parent %s of device %s does not exist",
+                                 parent, dev_info['name'])
+                break
+
+            try:
+                iommuGroup = parent_info['iommuGroup']
             except KeyError:
                 pass
             else:
                 return iommuGroup
-            parent = devs[parent]['parent']
+
+            parent = parent_info['parent']
 
         return -1
 
