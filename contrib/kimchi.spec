@@ -4,7 +4,7 @@
 %endif
 
 %define frobisher_release 20
-%define release .13
+%define release .14
 Name:		kimchi
 Version:	1.2.1
 Release:	%{?frobisher_release}%{?release}%{?dist}
@@ -218,6 +218,15 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Sep 25 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.14
+- Bugfix: Overlap issue occurs on the Power Off confirmation dialog - BZ#116206
+- Bugfix#: Prevent overlap issue occurs under General tab on Edit - BZ#116198
+- PCI Passthru: Properly Deal with Invalid Node Device Parent Information - BZ#116305
+- guest-storage-add: removing "Storage Name" backend support - BZ#115976 / BZ#116135
+- guest-storage-add: removing "Storage Name" field - BZ#115976 / BZ#116135
+- Guest storage: Fix attaching type judgement - BZ#116712
+- i18n support: Update translation files
+
 * Thu Sep 18 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.13
 - Fix cdrom eject BZ#116077
 - Bugfix: Make manage media work with multiple cdrom and no cdrom - BZ#115975 BZ#115977
