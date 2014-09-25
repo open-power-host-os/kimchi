@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kimchi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-18 10:18-0300\n"
+"POT-Creation-Date: 2014-09-25 14:49-0300\n"
 "PO-Revision-Date: 2013-07-11 17:32-0400\n"
 "Last-Translator: Crístian Viana <vianac@linux.vnet.ibm.com>\n"
 "Language-Team: English\n"
@@ -1120,6 +1120,9 @@ msgstr "종료"
 
 msgid "Delete"
 msgstr "삭제"
+
+msgid "No CDROM found."
+msgstr ""
 
 msgid "Add a Storage Device to VM"
 msgstr "스토리지 장치를 VM에 추가"
