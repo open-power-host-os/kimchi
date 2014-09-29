@@ -1268,9 +1268,6 @@ msgstr "有効な URL ではありません。"
 msgid "No such data available."
 msgstr "そのようなデータはありません。"
 
-msgid "options needed."
-msgstr "オプションが必要です。"
-
 msgid ""
 "Can not contact the host system. Verify the host system is up and that you "
 "have network connectivity to it. HTTP request response %1. "

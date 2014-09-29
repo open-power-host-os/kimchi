@@ -1121,9 +1121,6 @@ msgstr "這是無效的 URL。"
 msgid "No such data available."
 msgstr "沒有此類可用資料。"
 
-msgid "options needed."
-msgstr "需要選項。"
-
 msgid ""
 "Can not contact the host system. Verify the host system is up and that you "
 "have network connectivity to it. HTTP request response %1. "

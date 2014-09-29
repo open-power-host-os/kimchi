@@ -1302,9 +1302,6 @@ msgstr "No es un URL válido."
 msgid "No such data available."
 msgstr "No hay datos de ese tipo disponibles."
 
-msgid "options needed."
-msgstr "opciones necesarias."
-
 msgid ""
 "Can not contact the host system. Verify the host system is up and that you "
 "have network connectivity to it. HTTP request response %1. "

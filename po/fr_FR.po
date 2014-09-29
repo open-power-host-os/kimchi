@@ -1295,9 +1295,6 @@ msgstr "Cette URL n'est pas valide."
 msgid "No such data available."
 msgstr "Aucune donnée de ce type disponible."
 
-msgid "options needed."
-msgstr "options requises."
-
 msgid ""
 "Can not contact the host system. Verify the host system is up and that you "
 "have network connectivity to it. HTTP request response %1. "

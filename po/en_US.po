@@ -1168,9 +1168,6 @@ msgstr "This is not a valid URL."
 msgid "No such data available."
 msgstr "No such data available."
 
-msgid "options needed."
-msgstr "options needed."
-
 msgid ""
 "Can not contact the host system. Verify the host system is up and that you "
 "have network connectivity to it. HTTP request response %1. "
