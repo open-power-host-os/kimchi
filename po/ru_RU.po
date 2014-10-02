@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kimchi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-25 14:49-0300\n"
+"POT-Creation-Date: 2014-10-02 18:38-0300\n"
 "PO-Revision-Date: 2013-07-11 17:32-0400\n"
 "Last-Translator: Crístian Viana <vianac@linux.vnet.ibm.com>\n"
 "Language-Team: English\n"
@@ -800,9 +800,6 @@ msgstr "Истек тайм-аут выполнения команды %(cmd)s (
 msgid "Unable to choose a virutal machine name"
 msgstr "Не удалось выбрать имя виртуальной машины"
 
-msgid "Invalid vm storage device name"
-msgstr "Недопустимое имя устройства хранения виртуальной машины"
-
 msgid "Invalid storage type. Types supported: 'cdrom', 'disk'"
 msgstr "Недопустимый тип памяти. Поддерживаемые типы: 'cdrom', 'disk'"
 
@@ -811,11 +808,6 @@ msgid "The path '%(value)s' is not valid local/remote path for the device"
 msgstr ""
 "Путь %(value)s не является допустимым локальным/удаленным путем для "
 "устройства"
-
-#, python-format
-msgid "Device name %(dev_name)s already exists in vm %(vm_name)s"
-msgstr ""
-"Имя устройства %(dev_name)s уже существует в виртуальной машине %(vm_name)s"
 
 msgid "Just support cdrom path update"
 msgstr "Только поддерживает обновление пути cdrom"
@@ -866,8 +858,8 @@ msgid ""
 "Only one of path or pool/volume can be specified to add a new virtual "
 "machine disk"
 msgstr ""
-"Укажите тип и путь, либо тип и пул/том для добавления нового диска "
-"виртуальной машины"
+"При добавлении нового диска виртуальной машины укажите либо путь, либо пул и "
+"том"
 
 msgid "YUM Repository ID must be one word only string."
 msgstr ""
@@ -1122,7 +1114,7 @@ msgid "Delete"
 msgstr "Удалить"
 
 msgid "No CDROM found."
-msgstr ""
+msgstr "Диск CDROM не найден"
 
 msgid "Add a Storage Device to VM"
 msgstr "Добавить устройство хранения в VM"
@@ -1409,7 +1401,7 @@ msgid "VM Delete Confirmation"
 msgstr "Подтверждение удаления виртуальной машины"
 
 msgid "This VM is not persistent. Power Off will delete it. Continue?"
-msgstr ""
+msgstr "Это не постоянная ВМ. При выключении она будет удалена. Продолжить?"
 
 msgid ""
 "This CDROM will be detached permanently and you can re-attach it. Continue "
@@ -1856,13 +1848,11 @@ msgstr "Не найдены шаблоны."
 msgid "Clone"
 msgstr "Создать копию"
 
-#~ msgid ""
-#~ "The host device %(dev_name)s should be assigned to just one VM. Currently "
-#~ "the following VM(s) are holding the device: %(names)s."
-#~ msgstr ""
-#~ "Устройство хоста %(dev_name)s следует присваивать только одной "
-#~ "виртуальной машине. На данный момент следующая VM(s) включает такие "
-#~ "устройства: %(names)s."
+#~ msgid "Invalid vm storage device name"
+#~ msgstr "Invalid vm storage device name"
+
+#~ msgid "Device name %(dev_name)s already exists in vm %(vm_name)s"
+#~ msgstr "Device name %(dev_name)s already exists in vm %(vm_name)s"
 
 #~ msgid ""
 #~ "Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"

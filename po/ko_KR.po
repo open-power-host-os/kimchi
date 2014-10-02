@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kimchi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-25 14:49-0300\n"
+"POT-Creation-Date: 2014-10-02 18:38-0300\n"
 "PO-Revision-Date: 2013-07-11 17:32-0400\n"
 "Last-Translator: Crístian Viana <vianac@linux.vnet.ibm.com>\n"
 "Language-Team: English\n"
@@ -258,7 +258,7 @@ msgstr ""
 
 #, python-format
 msgid "The host device %(dev_name)s is not allowed to directly assign to VM."
-msgstr "호스트 장치 %(dev_name)s이(가) VM으로 직접 지정이 허용되지 않습니다."
+msgstr "호스트 장치 %(dev_name)s을(를) 직접 VM에 지정할 수 없습니다."
 
 msgid ""
 "No IOMMU groups found. Host PCI pass through needs IOMMU group to function "
@@ -489,7 +489,7 @@ msgid ""
 "%(disk)s is not a valid disk/partition. Could not add it to the pool "
 "%(pool)s."
 msgstr ""
-"%(disk)s이(가) 올바른 디스크/파티션이 아닙니다. 이를 %(pool)s 풀에 추가할 수 "
+"%(disk)s이(가) 올바른 디스크/파티션이 아닙니다. 이를 풀 %(pool)s에 추가할 수 "
 "없습니다."
 
 #, python-format
@@ -812,19 +812,12 @@ msgstr "%(seconds)s초 후에 '%(cmd)s' 명령 실행 중 제한시간이 초과
 msgid "Unable to choose a virutal machine name"
 msgstr "가상 머신 이름을 선택할 수 없습니다."
 
-msgid "Invalid vm storage device name"
-msgstr "올바르지 않은 VM 장치 이름입니다."
-
 msgid "Invalid storage type. Types supported: 'cdrom', 'disk'"
 msgstr "올바르지 않은 스토리지 유형입니다. 지원되는 유형: 'cdrom', 'disk'"
 
 #, python-format
 msgid "The path '%(value)s' is not valid local/remote path for the device"
 msgstr "'%(value)s' 경로는 장치의 유효한 로컬/원격 경로가 아닙니다."
-
-#, python-format
-msgid "Device name %(dev_name)s already exists in vm %(vm_name)s"
-msgstr "장치 이름 %(dev_name)s이(가) vm %(vm_name)s에 이미 존재합니다."
 
 msgid "Just support cdrom path update"
 msgstr "cdrom 경로 업데이트만 지원합니다."
@@ -873,8 +866,7 @@ msgid ""
 "Only one of path or pool/volume can be specified to add a new virtual "
 "machine disk"
 msgstr ""
-"새 가상 머신 디스크를 추가할 유형 및 경로 또는 유형 및 풀/볼륨을 지정하십시"
-"오."
+"경로 또는 풀/볼륨 중 하나만 새로운 가상 머신 디스크에 지정할 수 있습니다."
 
 msgid "YUM Repository ID must be one word only string."
 msgstr "YUM 저장소 ID는 단일 단어의 문자열이어야 합니다."
@@ -1122,7 +1114,7 @@ msgid "Delete"
 msgstr "삭제"
 
 msgid "No CDROM found."
-msgstr ""
+msgstr "CDROM이 없음"
 
 msgid "Add a Storage Device to VM"
 msgstr "스토리지 장치를 VM에 추가"
@@ -1407,6 +1399,7 @@ msgstr "VM 삭제 확인"
 
 msgid "This VM is not persistent. Power Off will delete it. Continue?"
 msgstr ""
+"VM은 지속적이지 않습니다. 전원을 끄면 VM이 삭제됩니다. 계속하시겠습니까?"
 
 msgid ""
 "This CDROM will be detached permanently and you can re-attach it. Continue "
@@ -1434,7 +1427,7 @@ msgid ""
 "This disk will be detached permanently and you can re-attach it. Continue to "
 "detach it?"
 msgstr ""
-"이 디스크는 영구적으로 분리되며 다시 연결할 수 없습니다. 분리를 계속하시겠습"
+"이 디스크는 영구적으로 분리되고 다시 연결할 수 있습니다. 분리를 계속하시겠습"
 "니까?"
 
 msgid "The VLAN id must be between 1 and 4094."
@@ -1852,12 +1845,11 @@ msgstr "템플리트가 없습니다."
 msgid "Clone"
 msgstr "복제"
 
-#~ msgid ""
-#~ "The host device %(dev_name)s should be assigned to just one VM. Currently "
-#~ "the following VM(s) are holding the device: %(names)s."
-#~ msgstr ""
-#~ "호스트 장치 %(dev_name)s은(는) 하나의 VM에만 지정되어야 합니다. 현재 다음 "
-#~ "VM이 장치를 보유 중입니다. %(names)s"
+#~ msgid "Invalid vm storage device name"
+#~ msgstr "Invalid vm storage device name"
+
+#~ msgid "Device name %(dev_name)s already exists in vm %(vm_name)s"
+#~ msgstr "Device name %(dev_name)s already exists in vm %(vm_name)s"
 
 #~ msgid ""
 #~ "Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"

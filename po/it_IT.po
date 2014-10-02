@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kimchi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-25 14:49-0300\n"
+"POT-Creation-Date: 2014-10-02 18:38-0300\n"
 "PO-Revision-Date: 2013-07-11 17:32-0400\n"
 "Last-Translator: Crístian Viana <vianac@linux.vnet.ibm.com>\n"
 "Language-Team: English\n"
@@ -864,9 +864,6 @@ msgstr ""
 msgid "Unable to choose a virutal machine name"
 msgstr "Impossibile scegliere un nome di macchina virtuale"
 
-msgid "Invalid vm storage device name"
-msgstr "Nome dispositivo di memoria vm non valido"
-
 msgid "Invalid storage type. Types supported: 'cdrom', 'disk'"
 msgstr "Tipo di memoria non valido. Tipi supportati: 'cdrom', 'disk'"
 
@@ -875,12 +872,6 @@ msgid "The path '%(value)s' is not valid local/remote path for the device"
 msgstr ""
 "Il percorso '%(value)s' non è un percorso locale/remoto valido per il "
 "dispositivo"
-
-#, python-format
-msgid "Device name %(dev_name)s already exists in vm %(vm_name)s"
-msgstr ""
-"Il nome dispositivo %(dev_name)s esiste già nella macchina virtuale "
-"%(vm_name)s"
 
 msgid "Just support cdrom path update"
 msgstr "Supporta solo aggiornamento percorso cdrom"
@@ -1197,7 +1188,7 @@ msgid "Delete"
 msgstr "Elimina"
 
 msgid "No CDROM found."
-msgstr ""
+msgstr "Nessun CDROM trovato"
 
 msgid "Add a Storage Device to VM"
 msgstr "Aggiungi un dispositivo di memoria alla VM"
@@ -1961,6 +1952,24 @@ msgstr "Clona"
 #~ msgstr ""
 #~ "Il dispositivo host %(dev_name)s deve essere assegnato a una sola VM. "
 #~ "Attualmente, le seguenti VM detengono il dispositivo: %(names)s."
+
+#~ msgid "Invalid vm storage device name"
+#~ msgstr "Nome dispositivo di memoria vm non valido"
+
+#~ msgid "Device name %(dev_name)s already exists in vm %(vm_name)s"
+#~ msgstr ""
+#~ "Il nome dispositivo %(dev_name)s esiste già nella macchina virtuale "
+#~ "%(vm_name)s"
+
+#~ msgid "Device Name"
+#~ msgstr "Nome dispositivo"
+
+#~ msgid ""
+#~ "The name used to identify the device. If omitted, a name will be chosen "
+#~ "automatically."
+#~ msgstr ""
+#~ "Il nome utilizzato per identificare il dispositivo. Se omesso, ne verrà "
+#~ "scelto uno automaticamente."
 
 #~ msgid ""
 #~ "Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"

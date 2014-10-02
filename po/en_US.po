@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kimchi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-25 14:49-0300\n"
+"POT-Creation-Date: 2014-10-02 18:38-0300\n"
 "PO-Revision-Date: 2013-07-11 17:32-0400\n"
 "Last-Translator: Crístian Viana <vianac@linux.vnet.ibm.com>\n"
 "Language-Team: English\n"
@@ -785,19 +785,12 @@ msgstr "Timeout while running command '%(cmd)s' after %(seconds)s seconds"
 msgid "Unable to choose a virutal machine name"
 msgstr "Unable to choose a virutal machine name"
 
-msgid "Invalid vm storage device name"
-msgstr "Invalid vm storage device name"
-
 msgid "Invalid storage type. Types supported: 'cdrom', 'disk'"
 msgstr "Invalid storage type. Types supported: 'cdrom', 'disk'"
 
 #, python-format
 msgid "The path '%(value)s' is not valid local/remote path for the device"
 msgstr "The path '%(value)s' is not valid local/remote path for the device"
-
-#, python-format
-msgid "Device name %(dev_name)s already exists in vm %(vm_name)s"
-msgstr "Device name %(dev_name)s already exists in vm %(vm_name)s"
 
 msgid "Just support cdrom path update"
 msgstr "Just support cdrom path update"
@@ -1836,6 +1829,12 @@ msgstr "No templates found."
 
 msgid "Clone"
 msgstr "Clone"
+
+#~ msgid "Invalid vm storage device name"
+#~ msgstr "Invalid vm storage device name"
+
+#~ msgid "Device name %(dev_name)s already exists in vm %(vm_name)s"
+#~ msgstr "Device name %(dev_name)s already exists in vm %(vm_name)s"
 
 #~ msgid ""
 #~ "Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"

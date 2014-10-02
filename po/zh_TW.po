@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kimchi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-25 14:49-0300\n"
+"POT-Creation-Date: 2014-10-02 18:38-0300\n"
 "PO-Revision-Date: 2013-07-11 17:32-0400\n"
 "Last-Translator: Crístian Viana <vianac@linux.vnet.ibm.com>\n"
 "Language-Team: English\n"
@@ -749,19 +749,12 @@ msgstr "執行指令 '%(cmd)s' %(seconds)s 秒之後逾時"
 msgid "Unable to choose a virutal machine name"
 msgstr "無法選擇虛擬機器名稱"
 
-msgid "Invalid vm storage device name"
-msgstr "VM 儲存裝置名稱無效"
-
 msgid "Invalid storage type. Types supported: 'cdrom', 'disk'"
 msgstr "儲存體類型無效。支援的類型：'cdrom' 和 'disk'"
 
 #, python-format
 msgid "The path '%(value)s' is not valid local/remote path for the device"
 msgstr "對於該裝置，路徑 '%(value)s' 是無效的本端/遠端路徑"
-
-#, python-format
-msgid "Device name %(dev_name)s already exists in vm %(vm_name)s"
-msgstr "裝置名稱 %(dev_name)s 已存在於虛擬機器 %(vm_name)s 中"
 
 msgid "Just support cdrom path update"
 msgstr "僅支援 cdrom 路徑更新"
@@ -807,7 +800,7 @@ msgstr "其他 VM 已經在使用磁區"
 msgid ""
 "Only one of path or pool/volume can be specified to add a new virtual "
 "machine disk"
-msgstr "指定類型和路徑，或者鍵入儲存區/磁區，以新增虛擬機器磁碟"
+msgstr "僅可以指定一個路徑或集區/磁區以新增到虛擬機器磁碟"
 
 msgid "YUM Repository ID must be one word only string."
 msgstr "YUM 儲存庫 ID 必須是僅限一個單字的字串。"
@@ -1053,7 +1046,7 @@ msgid "Delete"
 msgstr "刪除"
 
 msgid "No CDROM found."
-msgstr ""
+msgstr "找不到 CDROM"
 
 msgid "Add a Storage Device to VM"
 msgstr "將儲存裝置新增至 VM"
@@ -1328,7 +1321,7 @@ msgid "VM Delete Confirmation"
 msgstr "確認 VM 刪除"
 
 msgid "This VM is not persistent. Power Off will delete it. Continue?"
-msgstr ""
+msgstr "此 VM 不是持續性的，關閉電源將會刪除它，要繼續嗎？"
 
 msgid ""
 "This CDROM will be detached permanently and you can re-attach it. Continue "
@@ -1766,12 +1759,11 @@ msgstr "找不到範本。"
 msgid "Clone"
 msgstr "複製"
 
-#~ msgid ""
-#~ "The host device %(dev_name)s should be assigned to just one VM. Currently "
-#~ "the following VM(s) are holding the device: %(names)s."
-#~ msgstr ""
-#~ "應該只將主機裝置 %(dev_name)s 指派給一個 VM。目前，下列 VM 正在保存該裝"
-#~ "置：%(names)s。"
+#~ msgid "Invalid vm storage device name"
+#~ msgstr "Invalid vm storage device name"
+
+#~ msgid "Device name %(dev_name)s already exists in vm %(vm_name)s"
+#~ msgstr "Device name %(dev_name)s already exists in vm %(vm_name)s"
 
 #~ msgid ""
 #~ "Invalid target device bus type, type supported: 'ide', 'scsi', 'virtio'"
