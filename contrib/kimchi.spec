@@ -4,7 +4,7 @@
 %endif
 
 %define frobisher_release 20
-%define release .14
+%define release .16
 Name:		kimchi
 Version:	1.2.1
 Release:	%{?frobisher_release}%{?release}%{?dist}
@@ -218,6 +218,13 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Oct 2 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.16
+- Fix: retrieve right bus type in vmstorage update - BZ#116633
+- Bug Fix: Correct select menu to handle empty input - BZ#115686
+- Bugfix: Cancel option not working properly in New Storage Define - BZ#116315
+- i18n support: Update translation files
+- Fix problems to open plugin's help pages - BZ#114095
+
 * Thu Sep 25 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.14
 - Bugfix: Overlap issue occurs on the Power Off confirmation dialog - BZ#116206
 - Bugfix#: Prevent overlap issue occurs under General tab on Edit - BZ#116198
