@@ -24,11 +24,16 @@ kimchi.main = function() {
         $(tabs).each(function(i, tab) {
             var title = tab['title'];
             var path = tab['path'];
+            var helpPath = kimchi.checkHelpFile(path);
+            var disableHelp = ""
+            if (helpPath == "disableHelp")
+                disableHelp = helpPath;
             tabsHtml.push(
                 '<li>',
-                    '<a class="item" href="', path, '">',
+                    '<a class="item ', disableHelp,'" href="', path, '">',
                         title,
                     '</a>',
+                    '<input id="helpPathId" name="helpPath" value="' + helpPath + '" type="hidden"/>',
                 '</li>'
             );
         });
@@ -138,6 +143,15 @@ kimchi.main = function() {
         $(tab).addClass('current');
         $(tab).focus();
 
+        // Disable Help button according to selected tab
+        if ($(tab).hasClass("disableHelp")) {
+            $('#btn-help').css('cursor', "not-allowed");
+            $('#btn-help').off("click");
+        }
+        else {
+            $('#btn-help').css('cursor', "pointer");
+            $('#btn-help').on("click", kimchi.openHelp);
+        }
         // Load page content.
         loadPage(url);
     };
@@ -230,7 +244,7 @@ kimchi.main = function() {
             event.preventDefault();
             });
 
-        $('#btn-help').on('click', kimchi.getHelp);
+        $('#btn-help').on('click', kimchi.openHelp);
     };
 
     var initUI = function() {
@@ -272,15 +286,27 @@ kimchi.main = function() {
             });
 };
 
-kimchi.getHelp = function(e) {
-        var url = window.location.hash;
-        var lang = kimchi.lang.get();
-        url = url.replace("#tabs", "/help/" + lang);
-        if (url == "/help" + lang)
-            url = url + "/index.html"
-        else
-            url = url + ".html";
+kimchi.checkHelpFile = function(path) {
+    var lang = kimchi.lang.get();
+    var url = ""
+    // Find help page path according to tab name
+    if (/^tabs/.test(path))
+        url = path.replace("tabs", "/help/" + lang);
+    else if (/^plugins/.test(path))
+        url = path.slice(0, path.lastIndexOf('/')) + "/help/" + lang + path.slice(path.lastIndexOf('/'));
+    // Checking if help page exist.
+    $.ajax({
+        url: url,
+        async: false,
+        error: function() { url = "disableHelp"; },
+        success: function() { }
+    });
+    return url;
+};
 
-        window.open(url, "Kimchi Help");
-        e.preventDefault();
+kimchi.openHelp = function(e) {
+    var tab = $('#nav-menu a.current');
+    var url = $(tab).parent().find("input[name='helpPath']").val();
+    window.open(url, "Kimchi Help");
+    e.preventDefault();
 };
