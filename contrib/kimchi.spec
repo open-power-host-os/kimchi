@@ -4,7 +4,7 @@
 %endif
 
 %define frobisher_release 20
-%define release .16
+%define release .17
 Name:		kimchi
 Version:	1.2.1
 Release:	%{?frobisher_release}%{?release}%{?dist}
@@ -218,6 +218,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Oct 7 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.17
+- i18n support: Update Italian translation file
+
 * Thu Oct 2 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.16
 - Fix: retrieve right bus type in vmstorage update - BZ#116633
 - Bug Fix: Correct select menu to handle empty input - BZ#115686
