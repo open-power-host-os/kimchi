@@ -255,8 +255,6 @@ kimchi.validateLogicalForm = function () {
 };
 
 kimchi.addPool = function(event) {
-    $('#pool-doAdd').hide();
-    $('#pool-loading').show();
     if (kimchi.validateForm()) {
         var formData = $('#form-pool-add').serializeObject();
         delete formData.authname;
