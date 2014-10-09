@@ -4,7 +4,7 @@
 %endif
 
 %define frobisher_release 20
-%define release .17
+%define release .18
 Name:		kimchi
 Version:	1.2.1
 Release:	%{?frobisher_release}%{?release}%{?dist}
@@ -218,6 +218,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Oct 9 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.18
+- i18n support: Update translation file
+
 * Tue Oct 7 2014 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com> 1.2.1-20.17
 - i18n support: Update Italian translation file
 
