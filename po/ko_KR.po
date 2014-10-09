@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kimchi 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-02 18:38-0300\n"
+"POT-Creation-Date: 2014-10-09 16:18-0300\n"
 "PO-Revision-Date: 2013-07-11 17:32-0400\n"
 "Last-Translator: Crístian Viana <vianac@linux.vnet.ibm.com>\n"
 "Language-Team: English\n"
@@ -1844,6 +1844,9 @@ msgstr "템플리트가 없습니다."
 
 msgid "Clone"
 msgstr "복제"
+
+#~ msgid "options needed."
+#~ msgstr "옵션이 필요합니다."
 
 #~ msgid "Invalid vm storage device name"
 #~ msgstr "Invalid vm storage device name"
