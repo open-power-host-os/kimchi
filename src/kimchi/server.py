@@ -89,12 +89,16 @@ class Server(object):
         cherrypy.server.socket_port = options.cherrypy_port
         cherrypy.config.nginx_port = options.port
 
-        cherrypy.log.screen = True
         cherrypy.log.access_file = options.access_log
         cherrypy.log.error_file = options.error_log
 
         logLevel = LOGGING_LEVEL.get(options.log_level, logging.DEBUG)
         dev_env = options.environment != 'production'
+
+        # Enable cherrypy screen logging if running environment
+        # is not 'production'
+        if dev_env:
+            cherrypy.log.screen = True
 
         # Create handler to rotate access log file
         h = logging.handlers.RotatingFileHandler(options.access_log, 'a',
