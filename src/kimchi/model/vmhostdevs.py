@@ -18,6 +18,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 
 import glob
+import platform
 
 import libvirt
 from lxml import etree, objectify
@@ -158,6 +159,19 @@ class VMHostDevsModel(object):
             if rc != 0:
                 kimchi_log.warning("Unable to turn on sebool virt_use_sysfs")
 
+    def _update_mem_limit(self, vmid):
+        if not platform.machine().startswith('ppc'):
+            return
+        # ppc guests need higher memory hard limit for vfio
+        dom = VMModel.get_vm(vmid, self.conn)
+        mem_flags = get_vm_config_flag(dom, mode='all')
+        # According to libvirt source code: include/libvirt/libvirt.h
+        # VIR_DOMAIN_MEMORY_PARAM_UNLIMITED is equal to INT64_MAX >> 10
+        # It's actually (2 ** 63 -1) >> 10
+        unlimited = 9007199254740991
+        dom.setMemoryParameters({'swap_hard_limit': unlimited,
+                                 'hard_limit': unlimited}, mem_flags)
+
     def _attach_pci_device(self, vmid, dev_info):
         self._validate_pci_passthrough_env()
 
@@ -192,6 +206,8 @@ class VMHostDevsModel(object):
                 rollback.prependDefer(dom.detachDeviceFlags,
                                       xmlstr, device_flags)
             rollback.commitAll()
+
+        self._update_mem_limit(vmid)
 
         return dev_info['name']
 
