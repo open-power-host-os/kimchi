@@ -63,6 +63,7 @@ PEP8_WHITELIST = \
 	src/kimchi/root.py \
 	src/kimchi/scan.py \
 	src/kimchi/server.py \
+	src/kimchi/sos.py \
 	src/kimchi/swupdate.py \
 	src/kimchi/template.py \
 	src/kimchi/utils.py \
