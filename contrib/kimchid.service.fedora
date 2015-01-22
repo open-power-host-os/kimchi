@@ -6,8 +6,8 @@ After=libvirtd.service
 [Service]
 Type=simple
 ExecStart=/usr/bin/kimchid
-ExecStop=/bin/kill -TERM $MAINPID
 EnvironmentFile=/etc/kimchi/kimchi.conf
+KillMode=process
 
 [Install]
 WantedBy=multi-user.target
