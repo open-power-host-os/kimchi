@@ -114,6 +114,11 @@ if [ $1 -eq 1 ] ; then
     /bin/systemctl daemon-reload >/dev/null 2>&1 || :
 fi
 
+if [ $1 -gt 1 ] ; then
+    # Update: reload systemd because kimchid.service might have changed
+    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+fi
+
 sed -i s/#host/host/ /etc/kimchi/kimchi.conf
 service firewalld status >/dev/null 2>&1
 if [ $? -ne 0 ]; then
