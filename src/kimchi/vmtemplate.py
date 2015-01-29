@@ -247,8 +247,10 @@ drive=drive-%(bus)s0-1-0,id=%(bus)s0-1-0'/>
                     'format': fmt,
                     'path': '%s/%s' % (storage_path, volume)}
 
-            info['allocation'] = 0 if fmt in ['qcow2', 'raw'] \
-                else info['capacity']
+            if 'logical' == self._get_storage_type():
+                info['allocation'] = info['capacity']
+            else:
+                info['allocation'] = 0
 
             info['xml'] = """
             <volume>
