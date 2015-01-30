@@ -19,7 +19,6 @@
 
 import cherrypy
 
-
 from kimchi.control.base import Collection, Resource
 from kimchi.control.storagevolumes import IsoVolumes, StorageVolumes
 from kimchi.control.utils import get_class_name, model_fn
@@ -76,7 +75,8 @@ class StoragePool(Resource):
         self.update_params = ["autostart", "disks"]
         self.uri_fmt = "/storagepools/%s"
         self.activate = self.generate_action_handler('activate')
-        self.deactivate = self.generate_action_handler('deactivate')
+        self.deactivate = self.generate_action_handler('deactivate',
+                                                       destructive=True)
         self.storagevolumes = StorageVolumes(self.model, ident)
 
     @property
