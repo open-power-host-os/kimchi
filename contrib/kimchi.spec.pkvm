@@ -1,0 +1,197 @@
+%define frobisher_release 20
+%define release .19
+%define git_repo git://git.linux.ibm.com/kimchi-ginger/kimchi.git
+%define git_branch pkvm-3.1
+
+%define ibm_release pkvm3_1_0
+
+Name:		kimchi
+Version:	1.5.1
+Release:	%{?frobisher_release}%{?dist}%{?ibm_release}
+Summary:	Kimchi server application
+BuildRoot:	%{_topdir}/BUILD/%{name}-%{version}-%{release}
+BuildArch:	noarch
+Group:		System Environment/Base
+License:	LGPL/ASL2
+
+Requires:	firewalld
+Requires:	iscsi-initiator-utils
+Requires:	libguestfs-tools
+Requires:	libvirt
+Requires:	libvirt-daemon-config-network
+Requires:	libvirt-python
+Requires:	m2crypto
+Requires:	nfs-utils
+Requires:	nginx
+Requires:	novnc
+Requires:	policycoreutils
+Requires:	policycoreutils-devel
+Requires:	policycoreutils-python
+Requires:	PyPAM
+Requires:	pyparted
+Requires:	python-cheetah
+Requires:	python-cherrypy >= 3.2.0
+Requires:	python-configobj
+Requires:	python-ethtool
+Requires:	python-imaging
+Requires:	python-ipaddr
+Requires:	python-jsonschema >= 1.3.0
+Requires:	python-ldap
+Requires:	python-libguestfs
+Requires:	python-lxml
+Requires:	python-psutil >= 0.6.0
+Requires:	python-websockify
+Requires:	qemu-kvm
+Requires:	sos
+Requires:	spice-html5
+Requires:	systemd
+
+Requires(post): systemd
+Requires(preun): systemd
+Requires(postun): systemd
+
+Requires(post): firewalld
+Requires(preun): firewalld
+
+Requires(post): policycoreutils
+Requires(post): policycoreutils-python
+Requires(post): selinux-policy-targeted
+Requires(postun): policycoreutils
+Requires(postun): policycoreutils-python
+Requires(postun): selinux-policy-targeted
+
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	gettext-devel
+BuildRequires:	git
+BuildRequires:	libxslt
+BuildRequires:  openssl
+BuildRequires:	python-lxml
+BuildRequires:  selinux-policy-devel
+BuildRequires:	systemd-units
+
+
+
+%description
+Web server application to manage KVM/Qemu virtual machines
+
+
+
+%prep
+%setup -n kimchi-%{?git_branch} -T -c
+git clone %{?git_repo} ./
+git checkout -b build-branch --track remotes/origin/%{?git_branch}
+rm -rf .git .gitignore
+
+
+%build
+./autogen.sh --system
+make
+cd selinux
+make -f /usr/share/selinux/devel/Makefile
+
+
+
+%install
+rm -rf %{buildroot}
+make DESTDIR=%{buildroot} install
+
+# create /var/lib/kimchi structure
+mkdir -p %{buildroot}/%{_sharedstatedir}/kimchi/{debugreports,screenshots,vnc-tokens,isos}
+touch %{buildroot}/%{_sharedstatedir}/kimchi/objectstore
+
+# create /var/log/kimchi structure
+mkdir -p %{buildroot}/%{_localstatedir}/log/kimchi/
+touch %{buildroot}/%{_localstatedir}/log/kimchi/kimchi-access.log
+touch %{buildroot}/%{_localstatedir}/log/kimchi/kimchi-error.log
+
+# create /etc/kimchi structure
+mkdir -p %{buildroot}/%{_sysconfdir}/kimchi/
+touch %{buildroot}/%{_sysconfdir}/nginx/conf.d/kimchi.conf
+
+# Install the systemd scripts
+install -Dm 0644 contrib/kimchid.service.fedora %{buildroot}%{_unitdir}/kimchid.service
+install -Dm 0640 src/firewalld.xml %{buildroot}%{_prefix}/lib/firewalld/services/kimchid.xml
+install -Dm 0744 src/kimchi-firewalld.sh %{buildroot}%{_datadir}/kimchi/utils/kimchi-firewalld.sh
+
+# ToDo
+install -Dm 0744 selinux/kimchid.pp %{buildroot}%{_datadir}/kimchi/selinux/kimchid.pp
+
+
+%post
+if [ $1 -eq 1 ] ; then
+    # Add kimchid as default service into public chain of firewalld
+    %{_datadir}/kimchi/utils/kimchi-firewalld.sh public add kimchid
+    firewall-cmd --reload > /dev/null 2>&1 || :
+    # Initial installation
+    /bin/systemctl enable kimchid.service >/dev/null 2>&1 || :
+fi
+
+# Install and Update: reload systemd because kimchid.service might have changed
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+
+if [ $1 -gt 1 ] ; then
+    # Update: reload systemd because kimchid.service might have changed
+    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+fi
+
+sed -i s/#host/host/ /etc/kimchi/kimchi.conf
+/bin/systemctl status firewalld.service >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+    /bin/systemctl start firewalld.service >/dev/null 2>&1
+fi
+
+# Install SELinux policy
+semodule -i %{_datadir}/kimchi/selinux/kimchid.pp
+
+
+
+%preun
+if [ $1 -eq 0 ] ; then
+    # Package removal, not upgrade
+    /bin/systemctl --no-reload disable kimchid.service > /dev/null 2>&1 || :
+    /bin/systemctl stop kimchid.service > /dev/null 2>&1 || :
+    %{_datadir}/kimchi/utils/kimchi-firewalld.sh public del kimchid
+    firewall-cmd --reload >/dev/null 2>&1 || :
+fi
+exit 0
+
+
+
+%postun
+if [ "$1" -ge 1 ] ; then
+    /bin/systemctl try-restart kimchid.service >/dev/null 2>&1 || :
+fi
+if [ $1 -eq 0 ] ; then
+    # Remove the SELinux policy, only during uninstall of the package
+    semodule -r kimchid
+fi
+exit 0
+
+
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+
+
+%files
+%attr(-,root,root)
+%{_bindir}/kimchid
+%{python_sitelib}/kimchi
+%{_datadir}/kimchi
+%{_sysconfdir}/kimchi
+%{_sysconfdir}/nginx/conf.d/kimchi.conf.in
+%{_sysconfdir}/nginx/conf.d/kimchi.conf
+%{_sharedstatedir}/kimchi
+%{_prefix}/lib/firewalld/services/kimchid.xml
+%{_prefix}/share/locale/*/LC_MESSAGES/kimchi.mo
+%{_localstatedir}/log/kimchi
+%{_mandir}/man8/kimchid.8.gz
+%{_unitdir}/kimchid.service
+
+
+
+%changelog
+* Thu Feb 5 2015 Rodrigo Trujillo <rodrigo.trujillo@linux.vnet.ibm.com>
+- Initial Kimchi PKVM 3.1 version
