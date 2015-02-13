@@ -32,10 +32,12 @@ from lxml.builder import E
 from kimchi.rollbackcontext import RollbackContext
 from kimchi.utils import kimchi_log, run_command
 
+FEATURETEST_VM_NAME = "FEATURETEST_VM"
+FEATURETEST_POOL_NAME = "FEATURETEST_POOL"
 
 ISO_STREAM_XML = """
 <domain type='kvm'>
-  <name>ISO_STREAMING</name>
+  <name>%(name)s</name>
   <memory unit='KiB'>1048576</memory>
   <os>
     <type arch='%(arch)s' machine='%(machine)s'>hvm</type>
@@ -57,7 +59,7 @@ ISO_STREAM_XML = """
 
 SIMPLE_VM_XML = """
 <domain type='kvm'>
-  <name>A_SIMPLE_VM</name>
+  <name>%(name)s</name>
   <memory unit='KiB'>10240</memory>
   <os>
     <type>hvm</type>
@@ -67,7 +69,7 @@ SIMPLE_VM_XML = """
 
 SCSI_FC_XML = """
 <pool type='scsi'>
-  <name>TEST_SCSI_FC_POOL</name>
+  <name>%(name)s</name>
   <source>
     <adapter type='fc_host' wwnn='1234567890abcdef' wwpn='abcdef1234567890'/>
   </source>
@@ -108,9 +110,10 @@ class FeatureTests(object):
         else:
             arch = "x86_64"
             machine = "pc-1.2"
-        xml = ISO_STREAM_XML % {'protocol': protocol, 'arch': arch,
-                                'machine': machine}
         conn = None
+        xml = ISO_STREAM_XML % {'name': FEATURETEST_VM_NAME,
+                                'protocol': protocol,
+                                'arch': arch, 'machine': machine}
         try:
             FeatureTests.disable_libvirt_error_logging()
             conn = libvirt.open('qemu:///system')
@@ -185,7 +188,8 @@ class FeatureTests(object):
             FeatureTests.disable_libvirt_error_logging()
             conn = libvirt.open('qemu:///system')
             pool = None
-            pool = conn.storagePoolDefineXML(SCSI_FC_XML, 0)
+            pool_xml = SCSI_FC_XML % {'name': FEATURETEST_POOL_NAME}
+            pool = conn.storagePoolDefineXML(pool_xml, 0)
         except libvirt.libvirtError as e:
             if e.get_error_code() == 27:
                 # Libvirt requires adapter name, not needed when supports to FC
@@ -205,7 +209,7 @@ class FeatureTests(object):
             rollback.prependDefer(FeatureTests.enable_libvirt_error_logging)
             conn = libvirt.open('qemu:///system')
             rollback.prependDefer(conn.close)
-            dom = conn.defineXML(SIMPLE_VM_XML)
+            dom = conn.defineXML(SIMPLE_VM_XML % {'name': FEATURETEST_VM_NAME})
             rollback.prependDefer(dom.undefine)
             try:
                 dom.setMetadata(libvirt.VIR_DOMAIN_METADATA_ELEMENT,

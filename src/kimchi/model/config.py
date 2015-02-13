@@ -1,7 +1,7 @@
 #
 # Project Kimchi
 #
-# Copyright IBM, Corp. 2013
+# Copyright IBM, Corp. 2014-2015
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,8 @@ from kimchi.config import config as kconfig
 from kimchi.config import find_qemu_binary, get_version
 from kimchi.distroloader import DistroLoader
 from kimchi.exception import NotFoundError
-from kimchi.featuretests import FeatureTests
+from kimchi.featuretests import FeatureTests, FEATURETEST_POOL_NAME
+from kimchi.featuretests import FEATURETEST_VM_NAME
 from kimchi.model.debugreports import DebugReportsModel
 from kimchi.repositories import Repositories
 from kimchi.screenshot import VMScreenshot
@@ -49,6 +50,7 @@ class CapabilitiesModel(object):
     __metaclass__ = Singleton
 
     def __init__(self, **kargs):
+        self.conn = kargs['conn']
         self.qemu_stream = False
         self.qemu_stream_dns = False
         self.libvirt_stream_protocols = []
@@ -60,6 +62,28 @@ class CapabilitiesModel(object):
         # server is up
         # It is needed because some features tests depends on the server
         cherrypy.engine.subscribe('start', self._set_capabilities)
+
+        # Subscribe function to clean any Kimchi leftovers
+        cherrypy.engine.subscribe('stop', self._clean_leftovers)
+
+    def _clean_leftovers(self):
+        conn = self.conn.get()
+        FeatureTests.disable_libvirt_error_logging()
+        try:
+            dom = conn.lookupByName(FEATURETEST_VM_NAME)
+            dom.undefine()
+        except Exception:
+            # Any exception can be ignored here
+            pass
+
+        try:
+            pool = conn.storagePoolLookupByName(FEATURETEST_POOL_NAME)
+            pool.undefine()
+        except Exception:
+            # Any exception can be ignored here
+            pass
+
+        FeatureTests.enable_libvirt_error_logging()
 
     def _set_capabilities(self):
         kimchi_log.info("*** Running feature tests ***")
