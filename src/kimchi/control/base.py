@@ -60,10 +60,12 @@ class Resource(object):
             uri_params += [urllib2.quote(ident.encode('utf-8'), safe="")]
             raise cherrypy.HTTPRedirect(self.uri_fmt % tuple(uri_params), code)
 
-    def generate_action_handler(self, action_name, action_args=None):
+    def generate_action_handler(self, action_name, action_args=None,
+                                destructive=False):
         def wrapper(*args, **kwargs):
             validate_method(('POST'))
             try:
+                self.lookup()
                 model_args = list(self.model_args)
                 if action_args is not None:
                     request = parse_request()
@@ -77,7 +79,10 @@ class Resource(object):
                         arg = ''
                     uri_params.append(urllib2.quote(arg.encode('utf-8'),
                                       safe=""))
-                raise internal_redirect(self.uri_fmt % tuple(uri_params))
+                if destructive is False or \
+                    ('persistent' in self.info.keys()
+                     and self.info['persistent'] is True):
+                    raise internal_redirect(self.uri_fmt % tuple(uri_params))
             except MissingParameter, e:
                 raise cherrypy.HTTPError(400, e.message)
             except InvalidParameter, e:
