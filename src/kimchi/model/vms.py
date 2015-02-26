@@ -1,4 +1,5 @@
 #
+
 # Project Kimchi
 #
 # Copyright IBM, Corp. 2013
@@ -25,7 +26,6 @@ import uuid
 from xml.etree import ElementTree
 
 import libvirt
-from cherrypy.process.plugins import BackgroundTask
 
 from kimchi import vnc
 from kimchi import xmlutils
@@ -52,7 +52,6 @@ DOM_STATE_MAP = {0: 'nostate',
                  6: 'crashed',
                  7: 'pmsuspended'}
 
-GUESTS_STATS_INTERVAL = 5
 VM_STATIC_UPDATE_PARAMS = {'name': './name',
                            'cpus': './vcpu',
                            'memory': './memory'}
@@ -66,36 +65,39 @@ class VMsModel(object):
         self.conn = kargs['conn']
         self.objstore = kargs['objstore']
         self.caps = CapabilitiesModel()
-        self.guests_stats_thread = BackgroundTask(GUESTS_STATS_INTERVAL,
-                                                  self._update_guests_stats)
-        self.guests_stats_thread.start()
 
-    def _update_guests_stats(self):
-        vm_list = self.get_list()
+    @staticmethod
+    def _update_guests_stats(names, conn):
+        for name in names:
+            try:
+                dom = VMModel.get_vm(name, conn)
+                vm_uuid = dom.UUIDString()
 
-        for name in vm_list:
-            dom = VMModel.get_vm(name, self.conn)
-            vm_uuid = dom.UUIDString()
-            info = dom.info()
-            state = DOM_STATE_MAP[info[0]]
+                info = dom.info()
+                state = DOM_STATE_MAP[info[0]]
+                if state != 'running':
+                    stats[vm_uuid] = {}
+                    continue
 
-            if state != 'running':
-                stats[vm_uuid] = {}
+                if stats.get(vm_uuid, None) is None:
+                    stats[vm_uuid] = {}
+
+                timestamp = time.time()
+                prevStats = stats.get(vm_uuid, {})
+                seconds = timestamp - prevStats.get('timestamp', 0)
+                stats[vm_uuid].update({'timestamp': timestamp})
+
+                VMsModel._get_percentage_cpu_usage(vm_uuid, info, seconds)
+                VMsModel._get_network_io_rate(vm_uuid, dom, seconds)
+                VMsModel._get_disk_io_rate(vm_uuid, dom, seconds)
+            except Exception as e:
+                # VM might be deleted just after we get the list.
+                # This is OK, just skip.
+                kimchi_log.debug('Error processing VM stats: %s', e.message)
                 continue
 
-            if stats.get(vm_uuid, None) is None:
-                stats[vm_uuid] = {}
-
-            timestamp = time.time()
-            prevStats = stats.get(vm_uuid, {})
-            seconds = timestamp - prevStats.get('timestamp', 0)
-            stats[vm_uuid].update({'timestamp': timestamp})
-
-            self._get_percentage_cpu_usage(vm_uuid, info, seconds)
-            self._get_network_io_rate(vm_uuid, dom, seconds)
-            self._get_disk_io_rate(vm_uuid, dom, seconds)
-
-    def _get_percentage_cpu_usage(self, vm_uuid, info, seconds):
+    @staticmethod
+    def _get_percentage_cpu_usage(vm_uuid, info, seconds):
         prevCpuTime = stats[vm_uuid].get('cputime', 0)
 
         cpus = info[3]
@@ -106,7 +108,8 @@ class VMsModel(object):
 
         stats[vm_uuid].update({'cputime': info[4], 'cpu': percentage})
 
-    def _get_network_io_rate(self, vm_uuid, dom, seconds):
+    @staticmethod
+    def _get_network_io_rate(vm_uuid, dom, seconds):
         prevNetRxKB = stats[vm_uuid].get('netRxKB', 0)
         prevNetTxKB = stats[vm_uuid].get('netTxKB', 0)
         currentMaxNetRate = stats[vm_uuid].get('max_net_io', 100)
@@ -133,7 +136,8 @@ class VMsModel(object):
         stats[vm_uuid].update({'net_io': rate, 'max_net_io': max_net_io,
                                'netRxKB': netRxKB, 'netTxKB': netTxKB})
 
-    def _get_disk_io_rate(self, vm_uuid, dom, seconds):
+    @staticmethod
+    def _get_disk_io_rate(vm_uuid, dom, seconds):
         prevDiskRdKB = stats[vm_uuid].get('diskRdKB', 0)
         prevDiskWrKB = stats[vm_uuid].get('diskWrKB', 0)
         currentMaxDiskRate = stats[vm_uuid].get('max_disk_io', 100)
@@ -226,13 +230,15 @@ class VMsModel(object):
         return name
 
     def get_list(self):
-        return self.get_vms(self.conn)
+        return VMsModel.get_vms(self.conn)
 
     @staticmethod
     def get_vms(conn):
-        conn = conn.get()
-        names = [dom.name().decode('utf-8') for dom in conn.listAllDomains(0)]
-        return sorted(names, key=unicode.lower)
+        conn_ = conn.get()
+        names = [dom.name().decode('utf-8') for dom in conn_.listAllDomains(0)]
+        names = sorted(names, key=unicode.lower)
+        VMsModel._update_guests_stats(names, conn)
+        return names
 
 
 class VMModel(object):
