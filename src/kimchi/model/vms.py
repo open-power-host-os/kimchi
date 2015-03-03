@@ -419,7 +419,8 @@ class VMModel(object):
         conn = self.conn.get()
         dom = self.get_vm(name, self.conn)
         if not dom.isPersistent():
-            raise InvalidOperation("KCHVM0031E", {'name': name})
+            raise InvalidOperation("KCHVM0021E", {'name': name,
+                                                  'err': "Non-persistent"})
 
         self._vmscreenshot_delete(dom.UUIDString())
         paths = self._vm_get_disk_paths(dom)

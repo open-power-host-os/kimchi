@@ -89,7 +89,6 @@ messages = {
     "KCHVM0028E": _("Group(s) '%(groups)s' do not exist"),
     "KCHVM0029E": _("Unable to shutdown virtual machine %(name)s. Details: %(err)s"),
     "KCHVM0030E": _("Unable to get access metadata of virtual machine %(name)s. Details: %(err)s"),
-    "KCHVM0031E": _("Invalid operation for non-persistent virtual machine %(name)s"),
 
     "KCHVMHDEV0001E": _("VM %(vmid)s does not contain directly assigned host device %(dev_name)s."),
     "KCHVMHDEV0002E": _("The host device %(dev_name)s is not allowed to directly assign to VM."),
