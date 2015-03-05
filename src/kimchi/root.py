@@ -109,7 +109,7 @@ class Root(Resource):
         if page.endswith('.html'):
             context = template.render('tabs/' + page, data)
             cherrypy.response.cookie[
-                "lastPage"] = "/#tabs/" + page.rstrip(".html")
+                "lastPage"] = "/#tabs/" + page[:-5]
             cherrypy.response.cookie['lastPage']['path'] = '/'
             return context
         raise cherrypy.HTTPError(404)
