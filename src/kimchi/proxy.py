@@ -70,6 +70,9 @@ def _create_proxy_config(p_port, k_port, p_ssl_port, cert, key):
             with open(key, "w") as f:
                 f.write(ssl_gen.key_pem())
 
+    # Setting up Diffie-Hellman group with 2048-bit file
+    dhparams_pem = os.path.join(config_dir, "dhparams.pem")
+
     # Read template file and create a new config file
     # with the specified parameters.
     with open(os.path.join(config_dir, "nginx.conf.in")) as template:
@@ -79,7 +82,8 @@ def _create_proxy_config(p_port, k_port, p_ssl_port, cert, key):
                                 proxy_port=p_port,
                                 kimchid_port=k_port,
                                 proxy_ssl_port=p_ssl_port,
-                                cert_pem=cert, cert_key=key)
+                                cert_pem=cert, cert_key=key,
+                                dhparams_pem=dhparams_pem)
 
     # Write file to be used for nginx.
     config_file = open(os.path.join(config_dir, "nginx_kimchi.conf"), "w")

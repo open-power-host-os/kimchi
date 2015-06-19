@@ -29,7 +29,7 @@ EXTRA_DIST = kimchid.in \
 bin_SCRIPTS = kimchid
 
 confdir = $(sysconfdir)/kimchi
-dist_conf_DATA = kimchi.conf nginx.conf.in
+dist_conf_DATA = kimchi.conf nginx.conf.in dhparams.pem
 
 BUILT_SOURCES = kimchi.conf
 
@@ -47,4 +47,10 @@ kimchid: kimchid.in Makefile
 kimchi.conf: kimchi.conf.in Makefile
 	$(do_substitution) < kimchi.conf.in > kimchi.conf
 
-CLEANFILES = $(bin_SCRIPTS) $(BUILT_SOURCES)
+# Generate unique Diffie-Hellman group with 2048-bit
+all-local: dhparams.pem
+
+dhparams.pem:
+	openssl dhparam -out dhparams.pem 2048
+
+CLEANFILES = $(bin_SCRIPTS) $(BUILT_SOURCES) dhparams.pem

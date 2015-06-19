@@ -68,6 +68,7 @@ BuildRequires:	automake
 BuildRequires:	gettext-devel
 BuildRequires:  libxslt
 BuildRequires:  libxml2-python
+BuildRequires:  openssl
 BuildRequires:  selinux-policy-devel
 
 %description
@@ -201,6 +202,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/kimchi/ui/pages/help/kimchi.css
 %{_datadir}/kimchi/ui/pages/tabs/*.html.tmpl
 %{_datadir}/kimchi/ui/pages/websockify/*.html
+%{_sysconfdir}/kimchi/dhparams.pem
 %{_sysconfdir}/kimchi/kimchi.conf
 %{_sysconfdir}/kimchi/nginx.conf.in
 %{_sysconfdir}/kimchi/distros.d/debian.json

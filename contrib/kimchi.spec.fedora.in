@@ -32,6 +32,7 @@ Requires:	nginx
 Requires:	iscsi-initiator-utils
 Requires:	policycoreutils-python
 BuildRequires:	libxslt
+BuildRequires:	openssl
 BuildRequires:	libxml2-python
 
 %if 0%{?rhel} == 6
@@ -191,6 +192,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/kimchi/ui/pages/help/kimchi.css
 %{_datadir}/kimchi/ui/pages/tabs/*.html.tmpl
 %{_datadir}/kimchi/ui/pages/websockify/*.html
+%{_sysconfdir}/kimchi/dhparams.pem
 %{_sysconfdir}/kimchi/kimchi.conf
 %{_sysconfdir}/kimchi/nginx.conf.in
 %{_sysconfdir}/kimchi/distros.d/debian.json
