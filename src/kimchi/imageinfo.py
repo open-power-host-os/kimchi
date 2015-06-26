@@ -41,7 +41,17 @@ def probe_img_info(path):
     return info
 
 
+def _ibm_powerkvm_guestfs_fix():
+    f_name = '/usr/lib64/guestfs/supermin.d/00-ignore'
+    ignore = '/opt/ibm\n'
+    with open(f_name, 'w+') as f:
+        data = f.read()
+        if ignore not in data:
+            f.write(ignore)
+
+
 def probe_image(image_path):
+    _ibm_powerkvm_guestfs_fix()
     if not os.path.isfile(image_path):
         raise InvalidParameter("KCHIMG0004E", {'filename': image_path})
 
