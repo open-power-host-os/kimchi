@@ -22,6 +22,7 @@ import lxml.etree as ET
 import os
 import random
 import string
+import threading
 import time
 import uuid
 
@@ -62,9 +63,14 @@ DOM_STATE_MAP = {0: 'nostate',
                  6: 'crashed',
                  7: 'pmsuspended'}
 
-VM_STATIC_UPDATE_PARAMS = {'name': './name',
-                           'cpus': './vcpu'}
+VM_STATIC_UPDATE_PARAMS = {'name': './name'}
 VM_LIVE_UPDATE_PARAMS = {}
+
+# update parameters which are updatable when the VM is online
+VM_ONLINE_UPDATE_PARAMS = ['graphics', 'groups', 'memory', 'users']
+# update parameters which are updatable when the VM is offline
+VM_OFFLINE_UPDATE_PARAMS = ['cpus', 'graphics', 'groups', 'memory', 'name',
+                            'users']
 
 XPATH_DOMAIN_DISK = "/domain/devices/disk[@device='disk']/source/@file"
 XPATH_DOMAIN_DISK_BY_FILE = "./devices/disk[@device='disk']/source[@file='%s']"
@@ -75,8 +81,12 @@ XPATH_DOMAIN_MAC_BY_ADDRESS = "./devices/interface[@type='network']/"\
 XPATH_DOMAIN_MEMORY = '/domain/memory'
 XPATH_DOMAIN_MEMORY_UNIT = '/domain/memory/@unit'
 XPATH_DOMAIN_UUID = '/domain/uuid'
+XPATH_DOMAIN_DEV_CPU_ID = '/domain/devices/spapr-cpu-socket/@id'
 
 XPATH_NUMA_CELL = './cpu/numa/cell'
+
+# key: VM name; value: lock object
+vm_locks = {}
 
 
 class VMsModel(object):
@@ -215,10 +225,28 @@ class VMModel(object):
         self.stats = {}
 
     def update(self, name, params):
-        dom = self.get_vm(name, self.conn)
-        vm_name, dom = self._static_vm_update(name, dom, params)
-        self._live_vm_update(dom, params)
-        return vm_name
+        lock = vm_locks.get(name)
+        if lock is None:
+            lock = threading.Lock()
+            vm_locks[name] = lock
+
+        with lock:
+            dom = self.get_vm(name, self.conn)
+
+            if DOM_STATE_MAP[dom.info()[0]] == 'shutoff':
+                ext_params = set(params.keys()) - set(VM_OFFLINE_UPDATE_PARAMS)
+                if len(ext_params) > 0:
+                    raise InvalidParameter('KCHVM0052E',
+                                           {'params': ', '.join(ext_params)})
+            else:
+                ext_params = set(params.keys()) - set(VM_ONLINE_UPDATE_PARAMS)
+                if len(ext_params) > 0:
+                    raise InvalidParameter('KCHVM0053E',
+                                           {'params': ', '.join(ext_params)})
+
+            vm_name, dom = self._static_vm_update(name, dom, params)
+            self._live_vm_update(dom, params)
+            return vm_name
 
     def clone(self, name):
         """Clone a virtual machine based on an existing one.
@@ -741,8 +769,7 @@ class VMModel(object):
         vcpus = params.get('cpus')
         if numa_mem == []:
             if vcpus is None:
-                vcpus = int(xpath_get_text(xml,
-                                           VM_STATIC_UPDATE_PARAMS['cpus'])[0])
+                vcpus = int(xpath_get_text(xml, 'vcpu')[0])
             cpu = root.find('./cpu')
             if cpu is None:
                 cpu = get_cpu_xml(vcpus, params['memory'] << 10)
@@ -802,6 +829,65 @@ class VMModel(object):
         self._vm_update_access_metadata(dom, params)
         if 'memory' in params and dom.isActive():
             self._update_memory_live(dom, params)
+
+        if 'cpus' in params:
+            cpus = params['cpus']
+
+            if DOM_STATE_MAP[dom.info()[0]] == 'shutoff':
+                try:
+                    # set maximum VCPU count
+                    max_vcpus = self.conn.get().getMaxVcpus('kvm')
+                    dom.setVcpusFlags(max_vcpus,
+                                      libvirt.VIR_DOMAIN_AFFECT_CONFIG |
+                                      libvirt.VIR_DOMAIN_VCPU_MAXIMUM)
+
+                    # set current VCPU count
+                    dom.setVcpusFlags(cpus, libvirt.VIR_DOMAIN_AFFECT_CONFIG)
+                except libvirt.libvirtError, e:
+                    raise OperationFailed('KCHVM0008E', {'name': dom.name(),
+                                                         'err': e.message})
+            else:
+                try:
+                    dev_cpu_ids = xpath_get_text(dom.XMLDesc(0),
+                                                 XPATH_DOMAIN_DEV_CPU_ID)
+                    vcpu_count = dom.vcpus(libvirt.VIR_DOMAIN_AFFECT_LIVE)
+                    total_cpu_count = vcpu_count + len(dev_cpu_ids)
+                    new_cpu_count = int(params['cpus'])
+                    max_cpu_count = dom.maxVcpus()
+
+                    if new_cpu_count > total_cpu_count:  # add CPUs
+                        if new_cpu_count > max_cpu_count:
+                            raise InvalidOperation('KCHVM0054E',
+                                                   {'cpus': max_cpu_count})
+
+                        if len(dev_cpu_ids) == 0:
+                            # there are no CPU devices yet; start from 0
+                            dev_id = 0
+                        else:
+                            # there are some CPU devices;
+                            # start from the last ID + 1
+                            dev_cpu_ids.sort()
+                            dev_id = int(dev_cpu_ids[-1]) + 1
+
+                        for i in xrange(new_cpu_count - total_cpu_count):
+                            xml = E('spapr-cpu-socket', id=str(dev_id))
+                            dom.attachDevice(etree.tostring(xml))
+                            dev_id += 1
+                    elif new_cpu_count < total_cpu_count:  # remove CPUs
+                        if new_cpu_count < vcpu_count:
+                            raise InvalidOperation('KCHVM0055E',
+                                                   {'cpus': vcpu_count})
+
+                        # the CPU IDs must be removed in descending order
+                        dev_cpu_ids.sort(reverse=True)
+                        last_id_idx = total_cpu_count - new_cpu_count
+                        to_remove = dev_cpu_ids[:last_id_idx]
+
+                        for dev_id in to_remove:
+                            xml = E('spapr-cpu-socket', id=dev_id)
+                            dom.detachDevice(etree.tostring(xml))
+                except (libvirt.libvirtError, ValueError), e:
+                    raise OperationFailed('KCHVM0056E', {'err': e.message})
 
     def _update_memory_live(self, dom, params):
         # Check if host supports memory device
@@ -1001,12 +1087,14 @@ class VMModel(object):
         else:
             memory = info[2] >> 10
 
+        cpu_devs = xpath_get_text(dom.XMLDesc(0), XPATH_DOMAIN_DEV_CPU_ID)
+
         return {'name': name,
                 'state': state,
                 'stats': res,
                 'uuid': dom.UUIDString(),
                 'memory': memory,
-                'cpus': info[3],
+                'cpus': info[3] + len(cpu_devs),
                 'screenshot': screenshot,
                 'icon': icon,
                 # (type, listen, port, passwd, passwdValidTo)

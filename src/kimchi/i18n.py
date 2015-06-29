@@ -76,7 +76,6 @@ messages = {
 
     "KCHVM0001E": _("Virtual machine %(name)s already exists"),
     "KCHVM0002E": _("Virtual machine %(name)s does not exist"),
-    "KCHVM0003E": _("Unable to rename virtual machine %(name)s. The name %(new_name)s is already in use or the virtual machine is not powered off."),
     "KCHVM0004E": _("Unable to retrieve screenshot for stopped virtual machine %(name)s"),
     "KCHVM0005E": _("Remote ISO image is not supported by this server."),
     "KCHVM0006E": _("Screenshot is not supported on virtual machine %(name)s"),
@@ -122,6 +121,11 @@ messages = {
     "KCHVM0049E": _("Cannot power off %(name)s. Virtual machine is shut off."),
     "KCHVM0050E": _("Cannot shutdown %(name)s. Virtual machine is shut off."),
     "KCHVM0051E": _("Cannot reset %(name)s. Virtual machine is already shut off."),
+    "KCHVM0052E": _("Unable to update the following parameters while the VM is offline: %(params)s"),
+    "KCHVM0053E": _("Unable to update the following parameters while the VM is online: %(params)s"),
+    "KCHVM0054E": _("VM '%(vm)s' cannot have more than %(cpus)d CPUs. Please update the CPU value when the VM is not running."),
+    "KCHVM0055E": _("VM '%(vm)s' cannot have less than %(cpus)d CPUs. Please update the CPU value when the VM is not running."),
+    "KCHVM0056E": _("Unable to hotplug CPUs. Details: %(err)s"),
 
     "KCHVMHDEV0001E": _("VM %(vmid)s does not contain directly assigned host device %(dev_name)s."),
     "KCHVMHDEV0002E": _("The host device %(dev_name)s is not allowed to directly assign to VM."),
