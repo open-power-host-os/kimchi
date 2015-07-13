@@ -110,6 +110,28 @@ class VMHostDevsModel(object):
             if rc != 0:
                 kimchi_log.warning("Unable to turn on sebool virt_use_sysfs")
 
+    def have_xhci_usb_controller(self, vmid):
+        dom = VMModel.get_vm(vmid, self.conn)
+
+        root = objectify.fromstring(dom.XMLDesc(0))
+
+        try:
+            controllers = root.devices.controller
+
+        except AttributeError:
+            return False
+
+        for controller in controllers:
+
+            if 'model' not in controller.attrib:
+                continue
+
+            if controller.attrib['type'] == 'usb' and \
+               controller.attrib['model'] == 'nec-xhci':
+                return True
+
+        return False
+
     def _attach_pci_device(self, vmid, dev_info):
         self._validate_pci_passthrough_env()
 
@@ -119,10 +141,16 @@ class VMHostDevsModel(object):
         driver = ('vfio' if DOM_STATE_MAP[dom.info()[0]] == "shutoff" and
                   self.caps.kernel_vfio else 'kvm')
 
-        # on powerkvm systems it must be vfio driver.
         distro, _, _ = platform.linux_distribution()
         if distro == 'IBM_PowerKVM':
+            # on powerkvm systems, the driver must be vfio.
             driver = 'vfio'
+
+            # powerkvm requires a xhci usb controller in order to support
+            # pci hotplug.
+            if DOM_STATE_MAP[dom.info()[0]] != "shutoff" and \
+               not self.have_xhci_usb_controller(vmid):
+                raise InvalidOperation("KCHVMHDEV0006E", {'vmid': vmid})
 
         # Attach all PCI devices in the same IOMMU group
         dev_model = DeviceModel(conn=self.conn)

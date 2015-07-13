@@ -18,6 +18,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 
 import os
+import platform
 import stat
 import time
 import urlparse
@@ -300,6 +301,19 @@ class VMTemplate(object):
                            self.info.get('memory') << 10,
                            cpu_topo)
 
+    def _get_usb_controller(self):
+        # powerkvm systems must include xhci controller model
+        distro, _, _ = platform.linux_distribution()
+        if distro != "IBM_PowerKVM":
+            return ''
+
+        return """
+        <controller type='usb' index='0' model='nec-xhci'>
+            <address type='pci' domain='0x0000'
+            bus='0x00' slot='0x0f' function='0x0'/>
+        </controller>
+        """
+
     def to_vm_xml(self, vm_name, vm_uuid, **kwargs):
         params = dict(self.info)
         params['name'] = vm_name
@@ -336,6 +350,8 @@ class VMTemplate(object):
         elif params['slots'] == 0:
             params['slots'] = 1
 
+        params['usb_controller'] = self._get_usb_controller()
+
         xml = """
         <domain type='%(domain)s'>
           %(qemu-stream-cmdline)s
@@ -365,6 +381,7 @@ class VMTemplate(object):
             %(networks)s
             %(graphics)s
             %(input_output)s
+            %(usb_controller)s
             <memballoon model='virtio' />
           </devices>
         </domain>
