@@ -38,6 +38,7 @@ from kimchi.exception import InvalidOperation, InvalidParameter
 from kimchi.exception import NotFoundError, OperationFailed
 from kimchi.kvmusertests import UserTests
 from kimchi.model.config import CapabilitiesModel
+from kimchi.model.cpuinfo import CPUInfoModel
 from kimchi.model.featuretests import FeatureTests
 from kimchi.model.tasks import TaskModel
 from kimchi.model.templates import TemplateModel
@@ -860,7 +861,9 @@ class VMModel(object):
 
                 try:
                     # set maximum VCPU count
-                    max_vcpus = self.conn.get().getMaxVcpus('kvm')
+                    cpu_model = CPUInfoModel(conn=self.conn)
+                    max_vcpus = cpu_model.cores_available *\
+                        cpu_model.threads_per_core
                     dom.setVcpusFlags(max_vcpus,
                                       libvirt.VIR_DOMAIN_AFFECT_CONFIG |
                                       libvirt.VIR_DOMAIN_VCPU_MAXIMUM)
