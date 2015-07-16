@@ -85,6 +85,8 @@ XPATH_DOMAIN_DEV_CPU_ID = '/domain/devices/spapr-cpu-socket/@id'
 
 XPATH_NUMA_CELL = './cpu/numa/cell'
 
+XPATH_TOPOLOGY = './cpu/topology'
+
 # key: VM name; value: lock object
 vm_locks = {}
 
@@ -834,6 +836,28 @@ class VMModel(object):
             cpus = params['cpus']
 
             if DOM_STATE_MAP[dom.info()[0]] == 'shutoff':
+
+                # user cannot change vcpu if topology is defined. In this case
+                # vcpu must always be sockets * cores * threads.
+                xml = dom.XMLDesc(0)
+                sockets = xpath_get_text(xml, XPATH_TOPOLOGY + '/@sockets')
+                cores = xpath_get_text(xml, XPATH_TOPOLOGY + '/@cores')
+                threads = xpath_get_text(xml, XPATH_TOPOLOGY + '/@threads')
+                current_vcpu = dom.vcpusFlags(libvirt.VIR_DOMAIN_VCPU_MAXIMUM)
+
+                if sockets and cores and threads:
+                    if current_vcpu != cpus:
+                        raise InvalidOperation('KCHVM0057E',
+                                               {'vm': dom.name(),
+                                                'sockets': sockets[0],
+                                                'cores': cores[0],
+                                                'threads': threads[0]})
+
+                    # do not need to update vcpu if the value edit did not
+                    # change
+                    else:
+                        return
+
                 try:
                     # set maximum VCPU count
                     max_vcpus = self.conn.get().getMaxVcpus('kvm')

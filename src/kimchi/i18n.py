@@ -126,6 +126,7 @@ messages = {
     "KCHVM0054E": _("VM '%(vm)s' cannot have more than %(cpus)d CPUs. Please update the CPU value when the VM is not running."),
     "KCHVM0055E": _("VM '%(vm)s' cannot have less than %(cpus)d CPUs. Please update the CPU value when the VM is not running."),
     "KCHVM0056E": _("Unable to hotplug CPUs. Details: %(err)s"),
+    "KCHVM0057E": _("Cannot change VCPU value because '%(vm)s' has a topology defined - sockets: %(sockets)s, cores: %(cores)s, threads: %(threads)s."),
 
     "KCHVMHDEV0001E": _("VM %(vmid)s does not contain directly assigned host device %(dev_name)s."),
     "KCHVMHDEV0002E": _("The host device %(dev_name)s is not allowed to directly assign to VM."),
