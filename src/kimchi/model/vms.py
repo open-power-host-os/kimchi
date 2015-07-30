@@ -20,6 +20,7 @@
 import copy
 import lxml.etree as ET
 import os
+import platform
 import random
 import string
 import threading
@@ -246,6 +247,13 @@ class VMModel(object):
                 if len(ext_params) > 0:
                     raise InvalidParameter('KCHVM0053E',
                                            {'params': ', '.join(ext_params)})
+
+            # make sure memory is alingned in 256MiB
+            distro, _, _ = platform.linux_distribution()
+            if 'memory' in params and distro == "IBM_PowerKVM":
+                if params['memory'] % 256 != 0:
+                    raise InvalidParameter('KCHVM0058E',
+                                           {'mem': str(params['memory'])})
 
             vm_name, dom = self._static_vm_update(name, dom, params)
             self._live_vm_update(dom, params)
@@ -812,6 +820,23 @@ class VMModel(object):
                 raise OperationFailed("KCHVM0041E")
             elif slots == 0:
                 slots = 1
+
+            force_max_mem_update = False
+            distro, _, _ = platform.linux_distribution()
+            if distro == "IBM_PowerKVM":
+
+                # max 32 slots on Power
+                if slots > 32:
+                    slots = 32
+
+                # max memory 256MiB alignment
+                host_mem -= (host_mem % 256)
+
+                # force max memory update if it exists but it's wrong.
+                if maxMem is not None and\
+                   int(maxMem.text) != (host_mem * 1024):
+                    force_max_mem_update = True
+
             if maxMem is None:
                 max_mem_xml = E.maxMemory(
                     str(host_mem * 1024),
@@ -825,6 +850,12 @@ class VMModel(object):
                                           './maxMemory',
                                           str(slots),
                                           attr='slots')
+
+                if force_max_mem_update:
+                    new_xml = xml_item_update(new_xml,
+                                              './maxMemory',
+                                              str(host_mem * 1024))
+
             return new_xml
         return ET.tostring(root, encoding="utf-8")
 
@@ -946,6 +977,10 @@ class VMModel(object):
         elif needed_slots == 0:
             # New memory value is same that current memory set
             return
+
+        distro, _, _ = platform.linux_distribution()
+        if distro == "IBM_PowerKVM" and needed_slots > 32:
+            raise OperationFailed('KCHVM0045E')
 
         # Finally, we are ok to hot add the memory devices
         try:

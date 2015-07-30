@@ -194,6 +194,11 @@ def lookup(distro, version):
     if params["arch"] == "ppc64le":
         params["arch"] = "ppc64"
 
+        # in Power, memory must be aligned in 256MiB
+        if (params['max_memory'] / 1024) % 256 != 0:
+            alignment = params['max_memory'] % (256 * 1024)
+            params['max_memory'] -= alignment
+
     if distro in modern_version_bases[arch]:
         if LooseVersion(version) >= LooseVersion(
                 modern_version_bases[arch][distro]):

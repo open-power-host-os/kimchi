@@ -342,13 +342,18 @@ class VMTemplate(object):
 
         # Setting maximum number of slots to avoid errors when hotplug memory
         # Number of slots are the numbers of chunks of 1GB that fit inside
-        # the max_memory of the host minus memory assigned to the VM
+        # the max_memory of the host minus memory assigned to the VM. It
+        # cannot have more than 32 slots in Power.
         params['slots'] = ((params['max_memory'] >> 10) -
                            params['memory']) >> 10
         if params['slots'] < 0:
             raise OperationFailed("KCHVM0041E")
         elif params['slots'] == 0:
             params['slots'] = 1
+        elif params['slots'] > 32:
+            distro, _, _ = platform.linux_distribution()
+            if distro == "IBM_PowerKVM":
+                params['slots'] = 32
 
         params['usb_controller'] = self._get_usb_controller()
 
