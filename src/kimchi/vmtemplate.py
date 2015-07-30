@@ -355,6 +355,9 @@ class VMTemplate(object):
             if distro == "IBM_PowerKVM":
                 params['slots'] = 32
 
+        # set a hard limit using max_memory + 1GiB
+        params['hard_limit'] = params['max_memory'] + 1024 ** 2
+
         params['usb_controller'] = self._get_usb_controller()
 
         xml = """
@@ -362,6 +365,9 @@ class VMTemplate(object):
           %(qemu-stream-cmdline)s
           <name>%(name)s</name>
           <uuid>%(uuid)s</uuid>
+          <memtune>
+            <hard_limit unit='KiB'>%(hard_limit)s</hard_limit>
+          </memtune>
           <maxMemory slots='%(slots)s' unit='KiB'>%(max_memory)s</maxMemory>
           <memory unit='MiB'>%(memory)s</memory>
           <vcpu>%(cpus)s</vcpu>
