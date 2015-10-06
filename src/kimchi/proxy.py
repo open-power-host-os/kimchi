@@ -101,5 +101,6 @@ def start_proxy(options):
 
 def terminate_proxy():
     """Stop nginx process."""
-    term_proxy_cmd = ['nginx', '-s', 'stop']
+    config_file = "%s/kimchi.conf" % paths.nginx_conf_dir
+    term_proxy_cmd = ['nginx', '-s', 'stop', '-c', config_file]
     subprocess.call(term_proxy_cmd)
