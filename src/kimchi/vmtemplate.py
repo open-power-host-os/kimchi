@@ -32,6 +32,7 @@ from kimchi import osinfo
 from kimchi.exception import InvalidParameter, IsoFormatError, MissingParameter
 from kimchi.exception import ImageFormatError, OperationFailed
 from kimchi.isoinfo import IsoImage
+from kimchi.model.cpuinfo import CPUInfoModel
 from kimchi.utils import check_url_path, pool_name_from_uri
 from kimchi.xmlutils.cpu import get_cpu_xml
 from kimchi.xmlutils.disk import get_disk_xml
@@ -297,7 +298,7 @@ class VMTemplate(object):
         cpu_info = self.info.get('cpu_info')
         if cpu_info is not None:
             cpu_topo = cpu_info.get('topology')
-        return get_cpu_xml(self.info.get('cpus'),
+        return get_cpu_xml(0,
                            self.info.get('memory') << 10,
                            cpu_topo)
 
@@ -323,7 +324,6 @@ class VMTemplate(object):
         params['qemu-namespace'] = ''
         params['cdroms'] = ''
         params['qemu-stream-cmdline'] = ''
-        params['cpu_info'] = self._get_cpu_xml()
         params['disks'] = self._get_disks_xml(vm_uuid)
 
         graphics = dict(self.info['graphics'])
@@ -360,6 +360,35 @@ class VMTemplate(object):
 
         params['usb_controller'] = self._get_usb_controller()
 
+        # VCPUS / maxVCPUS / CPU Topology
+        #  Adjust PPC limit
+        if params['arch'] in ['ppc', 'ppc64']:
+            cpu_model = CPUInfoModel(conn=self.conn)
+            max_vcpus = cpu_model.cores_available * cpu_model.threads_per_core
+            if max_vcpus > 255:
+                max_vcpus = 255
+        else:
+            max_vcpus = self.conn.get().getMaxVcpus('kvm')
+
+        cpu_topo = self.info.get('cpu_info').get('topology')
+        if (cpu_topo is not None):
+            sockets = int(max_vcpus / (cpu_topo['cores'] *
+                          cpu_topo['threads']))
+            self.info['cpu_info']['topology']['sockets'] = sockets
+
+            # Reduce maxvcpu to fit number of sockets if necessary
+            total_max_vcpu = sockets * cpu_topo['cores'] * cpu_topo['threads']
+            if total_max_vcpu != max_vcpus:
+                max_vcpus = total_max_vcpu
+
+            params['vcpus'] = "<vcpu current='%s'>%d</vcpu>" % \
+                              (params['cpus'], max_vcpus)
+        else:
+            params['vcpus'] = "<vcpu current='%s'>%d</vcpu>" % \
+                              (params['cpus'], max_vcpus)
+
+        params['cpu_info'] = self._get_cpu_xml()
+
         xml = """
         <domain type='%(domain)s'>
           %(qemu-stream-cmdline)s
@@ -370,7 +399,7 @@ class VMTemplate(object):
           </memtune>
           <maxMemory slots='%(slots)s' unit='KiB'>%(max_memory)s</maxMemory>
           <memory unit='MiB'>%(memory)s</memory>
-          <vcpu>%(cpus)s</vcpu>
+          %(vcpus)s
           %(cpu_info)s
           <os>
             <type arch='%(arch)s'>hvm</type>

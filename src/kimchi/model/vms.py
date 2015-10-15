@@ -29,6 +29,7 @@ import uuid
 
 from lxml import etree, objectify
 from lxml.builder import E
+from math import ceil
 from xml.etree import ElementTree
 
 import libvirt
@@ -65,11 +66,11 @@ DOM_STATE_MAP = {0: 'nostate',
                  6: 'crashed',
                  7: 'pmsuspended'}
 
-VM_STATIC_UPDATE_PARAMS = {'name': './name'}
+VM_STATIC_UPDATE_PARAMS = {'name': './name', 'cpus': './vcpu'}
 VM_LIVE_UPDATE_PARAMS = {}
 
 # update parameters which are updatable when the VM is online
-VM_ONLINE_UPDATE_PARAMS = ['graphics', 'groups', 'memory', 'users']
+VM_ONLINE_UPDATE_PARAMS = ['cpus', 'graphics', 'groups', 'memory', 'users']
 # update parameters which are updatable when the VM is offline
 VM_OFFLINE_UPDATE_PARAMS = ['cpus', 'graphics', 'groups', 'memory', 'name',
                             'users']
@@ -228,6 +229,30 @@ class VMModel(object):
         self.vmsnapshots = cls(**kargs)
         self.stats = {}
 
+    def has_topology(self, dom):
+        xml = dom.XMLDesc(0)
+        sockets = xpath_get_text(xml, XPATH_TOPOLOGY + '/@sockets')
+        cores = xpath_get_text(xml, XPATH_TOPOLOGY + '/@cores')
+        threads = xpath_get_text(xml, XPATH_TOPOLOGY + '/@threads')
+        return sockets and cores and threads
+
+    def get_vm_max_sockets(self, dom):
+        return int(xpath_get_text(dom.XMLDesc(0),
+                                  XPATH_TOPOLOGY + '/@sockets')[0])
+
+    def get_vm_sockets(self, dom):
+        current_vcpu = dom.vcpusFlags(libvirt.VIR_DOMAIN_AFFECT_CURRENT)
+        return (current_vcpu / self.get_vm_cores(dom) /
+                self.get_vm_threads(dom))
+
+    def get_vm_cores(self, dom):
+        return int(xpath_get_text(dom.XMLDesc(0),
+                                  XPATH_TOPOLOGY + '/@cores')[0])
+
+    def get_vm_threads(self, dom):
+        return int(xpath_get_text(dom.XMLDesc(0),
+                                  XPATH_TOPOLOGY + '/@threads')[0])
+
     def update(self, name, params):
         lock = vm_locks.get(name)
         if lock is None:
@@ -254,6 +279,17 @@ class VMModel(object):
                 if params['memory'] % 256 != 0:
                     raise InvalidParameter('KCHVM0058E',
                                            {'mem': str(params['memory'])})
+
+            if 'cpus' in params and DOM_STATE_MAP[dom.info()[0]] == 'shutoff':
+                # user cannot change vcpu if topology is defined.
+                curr_vcpu = dom.vcpusFlags(libvirt.VIR_DOMAIN_AFFECT_CURRENT)
+                if self.has_topology(dom) and curr_vcpu != params['cpus']:
+                    raise InvalidOperation(
+                        'KCHVM0057E',
+                        {'vm': dom.name(),
+                         'sockets': self.get_vm_sockets(dom),
+                         'cores': self.get_vm_cores(dom),
+                         'threads': self.get_vm_threads(dom)})
 
             vm_name, dom = self._static_vm_update(name, dom, params)
             self._live_vm_update(dom, params)
@@ -718,23 +754,35 @@ class VMModel(object):
             params['name'], nonascii_name = get_ascii_nonascii_name(name)
 
         for key, val in params.items():
+            change_numa = True
             if key in VM_STATIC_UPDATE_PARAMS:
                 if type(val) == int:
                     val = str(val)
                 xpath = VM_STATIC_UPDATE_PARAMS[key]
-                new_xml = xml_item_update(new_xml, xpath, val)
+                attrib = None
+                if key == 'cpus':
+                    if self.has_topology(dom) or dom.isActive():
+                        change_numa = False
+                        continue
+                    # Update maxvcpu firstly
+                    new_xml = xml_item_update(new_xml, xpath,
+                                              str(self._get_host_maxcpu()),
+                                              attrib)
+                    # Update current vcpu
+                    attrib = 'current'
+                new_xml = xml_item_update(new_xml, xpath, val, attrib)
 
         # Updating memory and NUMA if necessary, if vm is offline
         if not dom.isActive():
             if 'memory' in params:
                 new_xml = self._update_memory_config(new_xml, params)
-            elif 'cpus' in params and \
+            elif 'cpus' in params and change_numa and \
                  (xpath_get_text(new_xml, XPATH_NUMA_CELL + '/@memory') != []):
                 vcpus = params['cpus']
                 new_xml = xml_item_update(
                     new_xml,
                     XPATH_NUMA_CELL,
-                    value='0-' + str(vcpus - 1) if vcpus > 1 else '0',
+                    value='0',
                     attr='cpus')
 
         if 'graphics' in params:
@@ -769,6 +817,8 @@ class VMModel(object):
 
             raise OperationFailed("KCHVM0008E", {'name': vm_name,
                                                  'err': e.get_error_message()})
+        if name is not None:
+            vm_name = name
         return (nonascii_name if nonascii_name is not None else vm_name, dom)
 
     def _update_memory_config(self, xml, params):
@@ -783,17 +833,17 @@ class VMModel(object):
                 vcpus = int(xpath_get_text(xml, 'vcpu')[0])
             cpu = root.find('./cpu')
             if cpu is None:
-                cpu = get_cpu_xml(vcpus, params['memory'] << 10)
+                cpu = get_cpu_xml(0, params['memory'] << 10)
                 root.insert(0, ET.fromstring(cpu))
             else:
-                numa_element = get_numa_xml(vcpus, params['memory'] << 10)
+                numa_element = get_numa_xml(0, params['memory'] << 10)
                 cpu.insert(0, ET.fromstring(numa_element))
         else:
             if vcpus is not None:
                 xml = xml_item_update(
                     xml,
                     XPATH_NUMA_CELL,
-                    value='0-' + str(vcpus - 1) if vcpus > 1 else '0',
+                    value='0',
                     attr='cpus')
             root = ET.fromstring(xml_item_update(xml, XPATH_NUMA_CELL,
                                                  str(params['memory'] << 10),
@@ -864,88 +914,134 @@ class VMModel(object):
         if 'memory' in params and dom.isActive():
             self._update_memory_live(dom, params)
 
-        if 'cpus' in params:
-            cpus = params['cpus']
+        if 'cpus' in params and dom.isActive():
+            self._update_cpu_live(dom, params['cpus'])
 
-            if DOM_STATE_MAP[dom.info()[0]] == 'shutoff':
+    def _get_host_maxcpu(self):
+        if os.uname()[4] in ['ppc', 'ppc64', 'ppc64le']:
+            cpu_model = CPUInfoModel(conn=self.conn)
+            max_vcpu_val = (cpu_model.cores_available *
+                            cpu_model.threads_per_core)
+            if max_vcpu_val > 255:
+                max_vcpu_val = 255
+        else:
+            max_vcpu_val = self.conn.get().getMaxVcpus('kvm')
+        return max_vcpu_val
 
-                # user cannot change vcpu if topology is defined. In this case
-                # vcpu must always be sockets * cores * threads.
-                xml = dom.XMLDesc(0)
-                sockets = xpath_get_text(xml, XPATH_TOPOLOGY + '/@sockets')
-                cores = xpath_get_text(xml, XPATH_TOPOLOGY + '/@cores')
-                threads = xpath_get_text(xml, XPATH_TOPOLOGY + '/@threads')
-                current_vcpu = dom.vcpusFlags(libvirt.VIR_DOMAIN_VCPU_MAXIMUM)
+    def _update_cpu_live(self, dom, cpus):
+        # Performe CPU HotPlug, adding sockets to the guest
+        has_topology = self.has_topology(dom)
+        if has_topology:
+            num_cores = self.get_vm_cores(dom)
+            num_threads = self.get_vm_threads(dom)
+        current_vcpu = dom.vcpusFlags(libvirt.VIR_DOMAIN_AFFECT_CURRENT)
 
-                if sockets and cores and threads:
-                    if current_vcpu != cpus:
-                        raise InvalidOperation('KCHVM0057E',
-                                               {'vm': dom.name(),
-                                                'sockets': sockets[0],
-                                                'cores': cores[0],
-                                                'threads': threads[0]})
+        try:
+            max_vcpu_limit = dom.maxVcpus()
+            if cpus > max_vcpu_limit:
+                raise InvalidOperation('KCHVM0054E',
+                                       {'vm': dom.name(),
+                                        'cpus': max_vcpu_limit})
 
-                    # do not need to update vcpu if the value edit did not
-                    # change
-                    else:
-                        return
+            current_vcpus_total = dom.vcpusFlags(
+                libvirt.VIR_DOMAIN_AFFECT_LIVE)
+            dev_cpu_ids = xpath_get_text(dom.XMLDesc(0),
+                                         XPATH_DOMAIN_DEV_CPU_ID)
+            dev_cpu_ids.sort(cmp=lambda x, y: int(x) < int(y))
+            attached_cpu_sockets = len(dev_cpu_ids)
 
-                try:
-                    # set maximum VCPU count
-                    cpu_model = CPUInfoModel(conn=self.conn)
-                    max_vcpus = cpu_model.cores_available *\
-                        cpu_model.threads_per_core
-                    dom.setVcpusFlags(max_vcpus,
-                                      libvirt.VIR_DOMAIN_AFFECT_CONFIG |
-                                      libvirt.VIR_DOMAIN_VCPU_MAXIMUM)
+            current_vcpus_cfg = current_vcpus_total - \
+                attached_cpu_sockets
+            if has_topology:
+                current_vcpus_cfg = current_vcpus_total - \
+                    (attached_cpu_sockets * num_cores * num_threads)
 
-                    # set current VCPU count
-                    dom.setVcpusFlags(cpus, libvirt.VIR_DOMAIN_AFFECT_CONFIG)
-                except libvirt.libvirtError, e:
-                    raise OperationFailed('KCHVM0008E', {'name': dom.name(),
-                                                         'err': e.message})
+            # Nothing to hot unplug
+            if cpus < current_vcpus_cfg:
+                raise InvalidOperation('KCHVM0055E',
+                                       {'vm': dom.name(),
+                                        'cpus': current_vcpus_cfg})
+
+            # Check if new cpu value fits topology
+            extra_cpus = cpus - current_vcpus_cfg
+            if has_topology and (extra_cpus %
+                                 (num_cores * num_threads) != 0):
+                raise InvalidOperation(
+                    'KCHVM0059E',
+                    {'cores': str(num_cores),
+                     'threads': str(num_threads),
+                     'mult': str(num_cores * num_threads)})
+
+            if attached_cpu_sockets == 0:
+                # there are no CPU devices yet; start from 0
+                dev_id = 0
             else:
-                try:
-                    dev_cpu_ids = xpath_get_text(dom.XMLDesc(0),
-                                                 XPATH_DOMAIN_DEV_CPU_ID)
-                    vcpu_count = dom.vcpus(libvirt.VIR_DOMAIN_AFFECT_LIVE)
-                    total_cpu_count = vcpu_count + len(dev_cpu_ids)
-                    new_cpu_count = int(params['cpus'])
-                    max_cpu_count = dom.maxVcpus()
+                # there are some CPU devices. Start from last ID + 1
+                dev_id = int(dev_cpu_ids[-1]) + 1
 
-                    if new_cpu_count > total_cpu_count:  # add CPUs
-                        if new_cpu_count > max_cpu_count:
-                            raise InvalidOperation('KCHVM0054E',
-                                                   {'cpus': max_cpu_count})
+            if cpus > current_vcpus_total:  # add CPUs
+                # Handle topology, include number of sockets that fits
+                # new number of cpus requested
+                if has_topology:
+                    new_cpu_count = int(ceil(float(
+                        cpus - current_vcpus_total) /
+                        (num_cores * num_threads)))
+                else:
+                    new_cpu_count = cpus - current_vcpus_total
 
-                        if len(dev_cpu_ids) == 0:
-                            # there are no CPU devices yet; start from 0
-                            dev_id = 0
-                        else:
-                            # there are some CPU devices;
-                            # start from the last ID + 1
-                            dev_cpu_ids.sort()
-                            dev_id = int(dev_cpu_ids[-1]) + 1
+                for i in xrange(new_cpu_count):
+                    xml = E('spapr-cpu-socket', id=str(dev_id))
+                    # Attachment should be persistent, but this is
+                    # not enabled in libvirt yet. Reference for future
+                    # flags = libvirt.VIR_DOMAIN_MEM_CONFIG | \
+                    #         libvirt.VIR_DOMAIN_AFFECT_LIVE
+                    # dom.attachDeviceFlags(etree.tostring(xml), flags)
+                    dom.attachDeviceFlags(etree.tostring(xml),
+                                          libvirt.VIR_DOMAIN_AFFECT_LIVE)
+                    dev_id += 1
 
-                        for i in xrange(new_cpu_count - total_cpu_count):
-                            xml = E('spapr-cpu-socket', id=str(dev_id))
-                            dom.attachDevice(etree.tostring(xml))
-                            dev_id += 1
-                    elif new_cpu_count < total_cpu_count:  # remove CPUs
-                        if new_cpu_count < vcpu_count:
-                            raise InvalidOperation('KCHVM0055E',
-                                                   {'cpus': vcpu_count})
+            elif cpus < current_vcpus_total:  # remove sockets
+                # Handle topology, remove number of sockets rounded to
+                # floor of cpus (core*threads)
+                if has_topology:
+                    topology_cpus = cpus - current_vcpus_cfg
+                    new_sockets_count = int(topology_cpus /
+                                            (num_cores * num_threads))
+                    sockets_to_remove = attached_cpu_sockets - \
+                        new_sockets_count
+                else:
+                    sockets_to_remove = current_vcpus_total - cpus
 
-                        # the CPU IDs must be removed in descending order
-                        dev_cpu_ids.sort(reverse=True)
-                        last_id_idx = total_cpu_count - new_cpu_count
-                        to_remove = dev_cpu_ids[:last_id_idx]
+                # the CPU IDs must be removed in descending order
+                dev_cpu_ids.reverse()
+                to_remove = dev_cpu_ids[:sockets_to_remove]
 
-                        for dev_id in to_remove:
-                            xml = E('spapr-cpu-socket', id=dev_id)
-                            dom.detachDevice(etree.tostring(xml))
-                except (libvirt.libvirtError, ValueError), e:
-                    raise OperationFailed('KCHVM0056E', {'err': e.message})
+                for dev_id in to_remove:
+                    xml = E('spapr-cpu-socket', id=dev_id)
+                    flag = libvirt.VIR_DOMAIN_AFFECT_LIVE
+                    dom.detachDeviceFlags(etree.tostring(xml), flag)
+        except (libvirt.libvirtError, ValueError), e:
+            raise OperationFailed('KCHVM0056E', {'err': e.message})
+
+        # Remove cpu socket devices from xml (offline), once they are not
+        # persistent. Some guests may not have correct drivers and then
+        # devices will remain in xml, causing errors in next boot
+        if dom.isActive():
+            new_xml = dom.XMLDesc(0)
+            tree = ET.fromstring(new_xml)
+            dev_cpu_ids = tree.xpath('/domain/devices/spapr-cpu-socket')
+            attached_cpu_sockets = len(dev_cpu_ids)
+            if attached_cpu_sockets > 0:
+                for dev in dev_cpu_ids:
+                    dev.getparent().remove(dev)
+                if not has_topology:
+                    num_cores = num_threads = 1
+                val = str(dom.vcpusFlags(libvirt.VIR_DOMAIN_AFFECT_CURRENT) -
+                          (attached_cpu_sockets * num_cores * num_threads))
+                new_xml = xml_item_update(ET.tostring(tree), './vcpu',
+                                          val, 'current')
+            conn = self.conn.get()
+            conn.defineXML(new_xml)
 
     def _update_memory_live(self, dom, params):
         # Check if host supports memory device
@@ -1149,14 +1245,12 @@ class VMModel(object):
         else:
             memory = info[2] >> 10
 
-        cpu_devs = xpath_get_text(dom.XMLDesc(0), XPATH_DOMAIN_DEV_CPU_ID)
-
         return {'name': name,
                 'state': state,
                 'stats': res,
                 'uuid': dom.UUIDString(),
                 'memory': memory,
-                'cpus': info[3] + len(cpu_devs),
+                'cpus': info[3],
                 'screenshot': screenshot,
                 'icon': icon,
                 # (type, listen, port, passwd, passwdValidTo)
