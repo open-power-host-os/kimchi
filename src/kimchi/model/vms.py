@@ -862,49 +862,64 @@ class VMModel(object):
         else:
             if memory is not None:
                 root.remove(memory)
+
+            def _get_slots(maxMem):
+                slots = (maxMem - params['memory']) >> 10
+                # Libvirt does not accepts slots <= 1
+                if slots < 0:
+                    raise OperationFailed("KCHVM0041E")
+                elif slots == 0:
+                    slots = 1
+
+                distro, _, _ = platform.linux_distribution()
+                if distro == "IBM_PowerKVM":
+                    # max 32 slots on Power
+                    if slots > 32:
+                        slots = 32
+                return slots
+            # End of _get_slots
+
+            def _get_newMaxMem(hostMem):
+                # Setting max memory to 4x memory requested. This should avoid
+                # problems with live migration
+                tmp_max_mem = params['memory'] * 4
+                if tmp_max_mem < hostMem:
+                    newMaxMem = tmp_max_mem
+                else:
+                    newMaxMem = hostMem
+
+                distro, _, _ = platform.linux_distribution()
+                if distro == "IBM_PowerKVM":
+                    # max memory 256MiB alignment
+                    newMaxMem -= (newMaxMem % 256)
+                return newMaxMem
+
             maxMem = root.find('.maxMemory')
-            host_mem = self.conn.get().getInfo()[1]
-            slots = (host_mem - params['memory']) >> 10
-            # Libvirt does not accepts slots <= 1
-            if slots < 0:
-                raise OperationFailed("KCHVM0041E")
-            elif slots == 0:
-                slots = 1
-
-            force_max_mem_update = False
-            distro, _, _ = platform.linux_distribution()
-            if distro == "IBM_PowerKVM":
-
-                # max 32 slots on Power
-                if slots > 32:
-                    slots = 32
-
-                # max memory 256MiB alignment
-                host_mem -= (host_mem % 256)
-
-                # force max memory update if it exists but it's wrong.
-                if maxMem is not None and\
-                   int(maxMem.text) != (host_mem * 1024):
-                    force_max_mem_update = True
-
+            # Must set maxMemory
             if maxMem is None:
+                newMaxMem = _get_newMaxMem(self.conn.get().getInfo()[1])
+                slots = _get_slots(newMaxMem)
                 max_mem_xml = E.maxMemory(
-                    str(host_mem * 1024),
+                    str(newMaxMem * 1024),
                     unit='Kib',
                     slots=str(slots))
                 root.insert(0, max_mem_xml)
                 new_xml = ET.tostring(root, encoding="utf-8")
             else:
-                # Update slots only
+                # Check if host total memory is enough to current max memory.
+                # If not, must set new maxMemory
+                if (int(maxMem.text) >> 10) > self.conn.get().getInfo()[1]:
+                    newMaxMem = _get_newMaxMem(self.conn.get().getInfo()[1])
+                    root.find('./maxMemory').text = str(newMaxMem * 1024)
+                    slots = _get_slots(newMaxMem)
+                else:
+                    slots = _get_slots(int(maxMem.text) >> 10)
+
+                # Update slots
                 new_xml = xml_item_update(ET.tostring(root, encoding="utf-8"),
                                           './maxMemory',
                                           str(slots),
                                           attr='slots')
-
-                if force_max_mem_update:
-                    new_xml = xml_item_update(new_xml,
-                                              './maxMemory',
-                                              str(host_mem * 1024))
 
             return new_xml
         return ET.tostring(root, encoding="utf-8")

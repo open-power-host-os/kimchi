@@ -340,6 +340,12 @@ class VMTemplate(object):
         else:
             params['cdroms'] = cdrom_xml
 
+        # Setting max memory to 4x memory requested. This should avoid problems
+        # with live migration
+        tmp_max_mem = (params['memory'] << 10) * 4
+        if tmp_max_mem < params['max_memory']:
+            params['max_memory'] = tmp_max_mem
+
         # Setting maximum number of slots to avoid errors when hotplug memory
         # Number of slots are the numbers of chunks of 1GB that fit inside
         # the max_memory of the host minus memory assigned to the VM. It
