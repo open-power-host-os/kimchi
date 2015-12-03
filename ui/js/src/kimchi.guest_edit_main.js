@@ -470,7 +470,7 @@ kimchi.guest_edit_main = function() {
     };
     var setupNode = function(arrPCIDevices, iconClass){
         var pciEnabled = kimchi.capabilities.kernel_vfio;
-        var pciDeviceName, pciDeviceProduct, pciDeviceProductDesc, pciDeviceVendor, pciDeviceVendorDesc;        
+        var pciDeviceName, pciDeviceProduct, pciDeviceProductDesc, pciDeviceVendor, pciDeviceVendorDesc;
         for(var i=0; i<arrPCIDevices.length; i++){
             pciDeviceName = arrPCIDevices[i].name;
             pciDeviceProduct = arrPCIDevices[i].product;
@@ -490,7 +490,8 @@ kimchi.guest_edit_main = function() {
             pciEnabled || $("button", itemNode).remove();
             $("button", itemNode).button({
                 icons: { primary: iconClass },
-                text: false
+                text: false,
+                disabled: kimchi.thisVMState === "running" && arrPCIDevices[i].multifunction
             }).click(function(){
                 var obj = $(this);
                 var id = obj.parent().prop("id");
