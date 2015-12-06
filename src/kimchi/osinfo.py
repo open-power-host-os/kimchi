@@ -86,6 +86,9 @@ modern_version_bases = {'x86': {'debian': '6.0', 'ubuntu': '7.10',
 icon_available_distros = [icon[5:-4] for icon in glob.glob1('%s/images/'
                           % paths.ui_dir, 'icon-*.png')]
 
+# Max memory 1TB, in KiB
+MAX_MEM_LIM = 1073741824
+
 
 def _get_arch():
     for arch, sub_archs in SUPPORTED_ARCHS.iteritems():
@@ -187,7 +190,9 @@ def lookup(distro, version):
     params['os_version'] = version
     arch = _get_arch()
 
-    # Setting maxMemory of the VM, which will be equal total Host memory in Kib
+    # Setting maxMemory of the VM, which will be lesser value between:
+    # [ 1TB,  (Template Memory * 4),  Host Physical Memory.
+    # Here, we return 1TB or aligned Host Physical Memory
     params['max_memory'] = psutil.TOTAL_PHYMEM >> 10
 
     # set up arch to ppc64 instead of ppc64le due to libvirt compatibility
@@ -198,6 +203,10 @@ def lookup(distro, version):
         if (params['max_memory'] / 1024) % 256 != 0:
             alignment = params['max_memory'] % (256 * 1024)
             params['max_memory'] -= alignment
+
+    # Setting limit to 1TB
+    if params['max_memory'] > MAX_MEM_LIM:
+        params['max_memory'] = MAX_MEM_LIM
 
     if distro in modern_version_bases[arch]:
         if LooseVersion(version) >= LooseVersion(

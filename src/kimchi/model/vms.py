@@ -47,6 +47,7 @@ from kimchi.model.templates import TemplateModel
 from kimchi.model.utils import get_ascii_nonascii_name, get_vm_name
 from kimchi.model.utils import get_metadata_node, remove_metadata_node
 from kimchi.model.utils import set_metadata_node
+from kimchi.osinfo import MAX_MEM_LIM
 from kimchi.rollbackcontext import RollbackContext
 from kimchi.screenshot import VMScreenshot
 from kimchi.utils import add_task, convert_data_size, get_next_clone_name
@@ -778,7 +779,6 @@ class VMModel(object):
                 new_xml = self._update_memory_config(new_xml, params)
             elif 'cpus' in params and change_numa and \
                  (xpath_get_text(new_xml, XPATH_NUMA_CELL + '/@memory') != []):
-                vcpus = params['cpus']
                 new_xml = xml_item_update(
                     new_xml,
                     XPATH_NUMA_CELL,
@@ -879,14 +879,16 @@ class VMModel(object):
                 return slots
             # End of _get_slots
 
-            def _get_newMaxMem(hostMem):
-                # Setting max memory to 4x memory requested. This should avoid
-                # problems with live migration
-                tmp_max_mem = params['memory'] * 4
-                if tmp_max_mem < hostMem:
-                    newMaxMem = tmp_max_mem
-                else:
+            def _get_newMaxMem():
+                # Setting max memory to 4x memory requested, host total memory,
+                # or 1 TB. This should avoid problems with live migration
+                newMaxMem = MAX_MEM_LIM
+                hostMem = self.conn.get().getInfo()[1] << 10
+                if hostMem < newMaxMem:
                     newMaxMem = hostMem
+                mem = params.get('memory', 0)
+                if (mem != 0) and (((mem * 4) << 10) < newMaxMem):
+                    newMaxMem = (mem * 4) << 10
 
                 distro, _, _ = platform.linux_distribution()
                 if distro == "IBM_PowerKVM":
@@ -895,33 +897,28 @@ class VMModel(object):
                 return newMaxMem
 
             maxMem = root.find('.maxMemory')
-            # Must set maxMemory
-            if maxMem is None:
-                newMaxMem = _get_newMaxMem(self.conn.get().getInfo()[1])
-                slots = _get_slots(newMaxMem)
-                max_mem_xml = E.maxMemory(
-                    str(newMaxMem * 1024),
-                    unit='Kib',
-                    slots=str(slots))
-                root.insert(0, max_mem_xml)
-                new_xml = ET.tostring(root, encoding="utf-8")
-            else:
-                # Check if host total memory is enough to current max memory.
-                # If not, must set new maxMemory
-                if (int(maxMem.text) >> 10) > self.conn.get().getInfo()[1]:
-                    newMaxMem = _get_newMaxMem(self.conn.get().getInfo()[1])
-                    root.find('./maxMemory').text = str(newMaxMem * 1024)
-                    slots = _get_slots(newMaxMem)
-                else:
-                    slots = _get_slots(int(maxMem.text) >> 10)
+            if maxMem is not None:
+                root.remove(maxMem)
 
-                # Update slots
-                new_xml = xml_item_update(ET.tostring(root, encoding="utf-8"),
-                                          './maxMemory',
-                                          str(slots),
-                                          attr='slots')
+            # Setting maxMemory
+            newMaxMem = _get_newMaxMem()
+            slots = _get_slots(newMaxMem >> 10)
+            max_mem_xml = E.maxMemory(
+                str(newMaxMem),
+                unit='Kib',
+                slots=str(slots))
+            root.insert(0, max_mem_xml)
 
+            # Setting memory hard limit to max_memory + 1GiB
+            memtune = root.find('memtune')
+            hl = memtune.find('hard_limit')
+            memtune.remove(hl)
+            memtune.insert(0, E.hard_limit(str(newMaxMem + 1048576),
+                                           unit='Kib'))
+
+            new_xml = ET.tostring(root, encoding="utf-8")
             return new_xml
+
         return ET.tostring(root, encoding="utf-8")
 
     def _live_vm_update(self, dom, params):
@@ -949,7 +946,6 @@ class VMModel(object):
         if has_topology:
             num_cores = self.get_vm_cores(dom)
             num_threads = self.get_vm_threads(dom)
-        current_vcpu = dom.vcpusFlags(libvirt.VIR_DOMAIN_AFFECT_CURRENT)
 
         try:
             max_vcpu_limit = dom.maxVcpus()

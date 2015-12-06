@@ -340,8 +340,9 @@ class VMTemplate(object):
         else:
             params['cdroms'] = cdrom_xml
 
-        # Setting max memory to 4x memory requested. This should avoid problems
-        # with live migration
+        # In order to avoid problems with live migration, setting maxMemory of
+        # the VM, which will be lesser value between:
+        # [ 1TB,  (Template Memory * 4),  Host Physical Memory.
         tmp_max_mem = (params['memory'] << 10) * 4
         if tmp_max_mem < params['max_memory']:
             params['max_memory'] = tmp_max_mem

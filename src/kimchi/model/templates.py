@@ -98,6 +98,8 @@ class TemplatesModel(object):
             with self.objstore as session:
                 if name in session.get_list('template'):
                     raise InvalidOperation("KCHTMPL0001E", {'name': name})
+                if 'max_memory' in t.info:
+                    del t.info['max_memory']
                 session.store('template', name, t.info)
         except InvalidOperation:
             raise
