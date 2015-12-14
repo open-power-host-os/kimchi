@@ -196,6 +196,7 @@ class VMTemplate(object):
             else:
                 volume = "%s-%s.img" % (vm_uuid, params['index'])
                 params['path'] = os.path.join(storage_path, volume)
+                params['pool_type'] = storage_type
 
             disks_xml += get_disk_xml(params)[1]
 
