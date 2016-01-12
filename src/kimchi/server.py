@@ -102,7 +102,7 @@ class Server(object):
 
         # Create handler to rotate access log file
         h = logging.handlers.RotatingFileHandler(options.access_log, 'a',
-                                                 10000000, 1000)
+                                                 10000000, 10)
         h.setLevel(logLevel)
         h.setFormatter(cherrypy._cplogging.logfmt)
 
@@ -111,7 +111,7 @@ class Server(object):
 
         # Create handler to rotate error log file
         h = logging.handlers.RotatingFileHandler(options.error_log, 'a',
-                                                 10000000, 1000)
+                                                 10000000, 10)
         h.setLevel(logLevel)
         h.setFormatter(cherrypy._cplogging.logfmt)
 
