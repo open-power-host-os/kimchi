@@ -57,13 +57,14 @@ def _get_dev_info_tree(dev_infos):
 
 def _is_pci_qualified(pci_dev):
     # PCI bridge is not suitable to passthrough
-    # KVM does not support passthrough graphic card now
+    # KVM does not support passthrough graphic card now but support
+    # 3D controller (pci class 0x030200)
     blacklist_classes = (0x030000, 0x060000)
 
     with open(os.path.join(pci_dev['path'], 'class')) as f:
         pci_class = int(f.readline().strip(), 16)
 
-    if pci_class & 0xff0000 in blacklist_classes:
+    if pci_class != 0x030200 and pci_class & 0xff0000 in blacklist_classes:
         return False
 
     return True
