@@ -105,9 +105,13 @@ class Resource(object):
                     raise UnauthorizedError('KCHAPI0009E')
 
                 model_args = list(self.model_args)
+                request = parse_request()
+                validate_params(request, self, action_name)
                 if action_args is not None:
-                    request = parse_request()
-                    model_args.extend(request[key] for key in action_args)
+                    model_args.extend(
+                        request[key] if key in request.keys() else None
+                        for key in action_args
+                    )
 
                 action_fn = getattr(self.model, model_fn(self, action_name))
                 action_result = action_fn(*model_args)
