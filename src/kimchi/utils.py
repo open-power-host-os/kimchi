@@ -257,15 +257,17 @@ def run_command(cmd, timeout=None, silent=False, tee=None):
                 tee_log(line, tee)
             out = ''.join(output)
             error = proc.stderr.read()
+            returncode = proc.poll()
         else:
             out, error = proc.communicate()
 
         if out:
             kimchi_log.debug("out:\n%s", out)
 
-        if proc.returncode != 0:
+        returncode = proc.returncode
+        if returncode != 0:
             msg = "rc: %s error: %s returned from cmd: %s" %\
-                  (proc.returncode, error, ' '.join(cmd))
+                  (returncode, error, ' '.join(cmd))
 
             if silent:
                 kimchi_log.debug(msg)
@@ -284,7 +286,7 @@ def run_command(cmd, timeout=None, silent=False, tee=None):
             msg_args = {'cmd': " ".join(cmd), 'seconds': str(timeout)}
             raise TimeoutExpired("KCHUTILS0002E", msg_args)
 
-        return out, error, proc.returncode
+        return out, error, returncode
     except TimeoutExpired:
         raise
     except OSError as e:
