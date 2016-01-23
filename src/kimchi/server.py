@@ -23,12 +23,15 @@ import logging
 import logging.handlers
 import os
 
+from string import Template
+
 from kimchi import auth
 from kimchi import config
 from kimchi.model import model
 from kimchi import mockmodel
 from kimchi import vnc
-from kimchi.config import KimchiConfig, PluginConfig
+from kimchi.config import config as configParser
+from kimchi.config import paths, KimchiConfig, PluginConfig
 from kimchi.control import sub_nodes
 from kimchi.proxy import start_proxy, terminate_proxy
 from kimchi.root import KimchiRoot
@@ -103,8 +106,7 @@ class Server(object):
             cherrypy.log.screen = True
 
         # Create handler to rotate access log file
-        h = logging.handlers.RotatingFileHandler(options.access_log, 'a',
-                                                 10000000, 1000)
+        h = logging.handlers.WatchedFileHandler(options.access_log, 'a', delay=1)
         h.setLevel(logLevel)
         h.setFormatter(cherrypy._cplogging.logfmt)
 
@@ -112,13 +114,30 @@ class Server(object):
         cherrypy.log.access_log.addHandler(h)
 
         # Create handler to rotate error log file
-        h = logging.handlers.RotatingFileHandler(options.error_log, 'a',
-                                                 10000000, 1000)
+        h = logging.handlers.WatchedFileHandler(options.error_log, 'a', delay=1)
         h.setLevel(logLevel)
         h.setFormatter(cherrypy._cplogging.logfmt)
 
         # Add rotating log file to cherrypy configuration
         cherrypy.log.error_log.addHandler(h)
+
+        # only add logrotate if kimchi is installed
+        if paths.installed:
+
+            # redefine logrotate configuration according to kimchi.conf
+            with open(os.path.join(paths.logrotate_dir,
+                      "kimchi.in")) as template:
+                data = template.read()
+
+            data = Template(data)
+            data = data.safe_substitute(log_dir=configParser.get("logging",
+                                                                 "log_dir"))
+
+            # Write file to be used for nginx.
+            config_file = open(os.path.join(paths.logrotate_dir,
+                                            "kimchi"), "w")
+            config_file.write(data)
+            config_file.close()
 
         # Handling running mode
         if not dev_env:

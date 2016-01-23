@@ -12,6 +12,7 @@ Requires:	gettext-tools
 Requires:	libvirt
 Requires:	libvirt-python
 Requires:	libvirt-daemon-config-network
+Requires:   logrotate
 Requires:	python-CherryPy >= 3.2.0
 Requires:	python-Cheetah
 Requires:	python-websockify
@@ -120,6 +121,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/kimchi/distros.d/gentoo.json
 %{_sysconfdir}/kimchi
 %{_sysconfdir}/kimchi/
+%{_sysconfdir}/logrotate.d/kimchi
+%{_sysconfdir}/logrotate.d/kimchi
 %{_var}/lib/kimchi/debugreports/
 %{_var}/lib/kimchi/screenshots/
 %{_var}/lib/kimchi/vnc-tokens/

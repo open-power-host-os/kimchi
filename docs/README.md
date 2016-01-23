@@ -55,7 +55,8 @@ Install Dependencies
                         python-ipaddr python-ldap python-lxml nfs-utils \
                         iscsi-initiator-utils libxslt pyparted nginx \
                         python-libguestfs libguestfs-tools python-websockify \
-                        novnc spice-html5 python-configobj python-magic
+                        novnc spice-html5 python-configobj python-magic \
+                        logrotate
 
      # If using RHEL, install the following additional packages:
      $ sudo yum install python-unittest2 python-ordereddict
@@ -87,7 +88,8 @@ channel at RHN Classic or Red Hat Satellite.
                            sosreport python-ipaddr python-ldap \
                            python-lxml nfs-common open-iscsi lvm2 xsltproc \
                            python-parted nginx python-guestfs libguestfs-tools \
-                           websockify novnc spice-html5 python-magic
+                           websockify novnc spice-html5 python-magic \
+                           logrotate
 
     Packages version requirement:
         python-jsonschema >= 1.3.0
@@ -106,7 +108,8 @@ channel at RHN Classic or Red Hat Satellite.
                           python-ipaddr python-ldap python-lxml nfs-client \
                           open-iscsi libxslt-tools python-xml python-parted \
                           nginx python-libguestfs python-configobj \
-                          guestfs-tools python-websockify novnc python-magic
+                          guestfs-tools python-websockify novnc python-magic \
+                          logrotate
 
     Packages version requirement:
         python-psutil >= 0.6.0

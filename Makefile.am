@@ -136,6 +136,9 @@ install-data-local:
 	mkdir -p $(DESTDIR)/etc/kimchi/
 	$(INSTALL_DATA) src/dhparams.pem $(DESTDIR)/etc/kimchi/dhparams.pem
 	touch $(DESTDIR)/etc/nginx/conf.d/kimchi.conf
+	mkdir -p $(DESTDIR)/etc/logrotate.d/
+	$(INSTALL_DATA) contrib/kimchi.logrotate.in $(DESTDIR)/etc/logrotate.d/kimchi.in
+	touch $(DESTDIR)/etc/logrotate.d/kimchi
 
 uninstall-local:
 	@if test -f $(systemdsystemunitdir)/kimchid.service; then \
@@ -151,6 +154,8 @@ uninstall-local:
 	$(RM) -rf $(DESTDIR)/var/log/kimchi
 	$(RM) -rf $(DESTDIR)/etc/kimchi
 	$(RM) $(DESTDIR)/etc/nginx/conf.d/kimchi.conf
+	$(RM) $(DESTDIR)/etc/logrotate.d/kimchi.in
+	$(RM) $(DESTDIR)/etc/logrotate.d/kimchi
 
 VERSION:
 	@if test -d .git; then                                \

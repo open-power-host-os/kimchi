@@ -120,6 +120,7 @@ class Paths(object):
             self.plugins_dir = '@kimchidir@/plugins'
             self.mo_dir = '@prefix@/share/locale'
             self.spice_css_file = os.path.join(self.spice_dir, 'spice.css')
+            self.logrotate_dir = "@sysconfdir@/logrotate.d/"
         else:
             self.nginx_conf_dir = self.add_prefix('src/nginx')
             self.state_dir = self.add_prefix('data')
@@ -129,6 +130,7 @@ class Paths(object):
             self.plugins_dir = self.add_prefix('plugins')
             self.mo_dir = self.add_prefix('mo')
             self.spice_css_file = os.path.join(self.spice_dir, 'css/spice.css')
+            self.logrotate_dir = ""
 
     def get_prefix(self):
         if __file__.startswith("/"):
