@@ -23,6 +23,7 @@ EXTRA_DIST = \
 	kimchid-upstart.conf.debian \
 	kimchid-upstart.conf.fedora \
 	make-deb.sh.in \
+	kimchi.logrotate
 	$(NULL)
 
 make-deb.sh: make-deb.sh.in $(top_builddir)/config.status

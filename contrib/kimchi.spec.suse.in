@@ -10,6 +10,7 @@ Requires:	kvm
 Requires:	gettext-tools
 Requires:	libvirt
 Requires:	libvirt-python
+Requires:   logrotate
 Requires:	python-CherryPy >= 3.2.0
 Requires:	python-Cheetah
 Requires:	python-imaging
@@ -49,6 +50,9 @@ make DESTDIR=%{buildroot} install
 
 # Install the SysV init scripts
 install -Dm 0755 contrib/kimchid.sysvinit %{buildroot}%{_initrddir}/kimchid
+
+install -Dm 0644 contrib/kimchi.logrotate %{buildroot}/%{_sysconfdir}/logrotate.d/kimchi
+touch %{buildroot}/%{_sysconfdir}/logrotate.d/kimchi.in
 
 
 %post
@@ -111,6 +115,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/kimchi/distros.d/opensuse.json
 %{_sysconfdir}/kimchi/distros.d/ubuntu.json
 %{_sysconfdir}/kimchi/distros.d/gentoo.json
+%{_sysconfdir}/logrotate.d/kimchi
+%{_sysconfdir}/logrotate.d/kimchi.in
 %{_initrddir}/kimchid
 
 %changelog

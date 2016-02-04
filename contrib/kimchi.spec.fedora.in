@@ -14,6 +14,7 @@ Requires:	qemu-kvm
 Requires:	gettext-devel
 Requires:	libvirt
 Requires:	libvirt-python
+Requires:   logrotate
 Requires:	python-cherrypy >= 3.2.0
 Requires:	python-cheetah
 Requires:	m2crypto
@@ -71,6 +72,9 @@ rm -rf %{buildroot}
 make DESTDIR=%{buildroot} install
 install -Dm 0644 src/kimchi/sos.py \
                  %{buildroot}/%{python_sitelib}/sos/plugins/kimchi.py
+
+install -Dm 0644 contrib/kimchi.logrotate %{buildroot}/%{_sysconfdir}/logrotate.d/kimchi.in
+touch %{buildroot}/%{_sysconfdir}/logrotate.d/kimchi
 
 %if 0%{?with_systemd}
 # Install the systemd scripts
@@ -200,6 +204,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/kimchi/distros.d/opensuse.json
 %{_sysconfdir}/kimchi/distros.d/ubuntu.json
 %{_sysconfdir}/kimchi/distros.d/gentoo.json
+%{_sysconfdir}/logrotate.d/kimchi.in
+%{_sysconfdir}/logrotate.d/kimchi
 
 %if 0%{?with_systemd}
 %{_unitdir}/kimchid.service

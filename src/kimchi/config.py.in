@@ -94,12 +94,14 @@ class Paths(object):
             self.conf_dir = '@sysconfdir@/kimchi'
             self.src_dir = '@kimchidir@'
             self.plugins_dir = '@kimchidir@/plugins'
+            self.logrotate_dir = "@sysconfdir@/logrotate.d/"
         else:
             self.state_dir = self.add_prefix('data')
             self.log_dir = self.add_prefix('log')
             self.conf_dir = self.add_prefix('src')
             self.src_dir = self.add_prefix('src/kimchi')
             self.plugins_dir = self.add_prefix('plugins')
+            
 
         self.ui_dir = self.add_prefix('ui')
         self.mo_dir = self.add_prefix('mo')
