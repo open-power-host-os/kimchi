@@ -491,7 +491,7 @@ kimchi.guest_edit_main = function() {
             $("button", itemNode).button({
                 icons: { primary: iconClass },
                 text: false,
-                disabled: kimchi.thisVMState === "running" && arrPCIDevices[i].multifunction
+                disabled: kimchi.thisVMState === "running" && (arrPCIDevices[i].multifunction || arrPCIDevices[i].vga3d)
             }).click(function(){
                 var obj = $(this);
                 var id = obj.parent().prop("id");
