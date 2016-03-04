@@ -212,6 +212,11 @@ class VMHostDevsModel(object):
             DOM_STATE_MAP[dom.info()[0]] == "shutoff"
         pci_infos = sorted(pci_infos, key=itemgetter('name'))
 
+        if dev_model.is_device_3D_controller(dev_info) and \
+           DOM_STATE_MAP[dom.info()[0]] != "shutoff":
+            raise InvalidOperation('KCHVMHDEV0007E',
+                                   {'name': dev_info['name']})
+
         # all devices in the group that is going to be attached to the vm
         # must be detached from the host first
         with RollbackContext() as rollback:
@@ -308,7 +313,8 @@ class VMHostDevModel(object):
                         'type': e.attrib['type'],
                         'product': dev_info.get('product', None),
                         'vendor': dev_info.get('vendor', None),
-                        'multifunction': dev_info.get('multifunction', None)}
+                        'multifunction': dev_info.get('multifunction', None),
+                        'vga3d': dev_info.get('vga3d', None)}
 
         raise NotFoundError('KCHVMHDEV0001E',
                             {'vmid': vmid, 'dev_name': dev_name})
