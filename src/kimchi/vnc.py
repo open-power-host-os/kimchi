@@ -27,6 +27,12 @@ from websockify import WebSocketProxy
 
 from kimchi.config import config, paths
 
+try:
+    from websockify.token_plugins import TokenFile
+    tokenFile = True
+except ImportError:
+    tokenFile = False
+
 
 WS_TOKENS_DIR = '/var/lib/kimchi/vnc-tokens'
 
@@ -46,8 +52,14 @@ def new_ws_proxy():
 
     params = {'web': os.path.join(paths.ui_dir, 'pages/websockify'),
               'listen_port': config.get('display', 'display_proxy_port'),
-              'target_cfg': WS_TOKENS_DIR,
               'key': key, 'cert': cert, 'ssl_only': True}
+
+    # old websockify: do not use TokenFile
+    if not tokenFile:
+        params['target_cfg'] = WS_TOKENS_DIR
+    # websockify 0.7 and higher: use TokenFile
+    else:
+        params['token_plugin'] = TokenFile(src=WS_TOKENS_DIR)
 
     def start_proxy():
         server = WebSocketProxy(**params)
