@@ -23,6 +23,13 @@ _ = gettext.gettext
 
 
 messages = {
+    "KCHCPUHP0001E": _("VM '%(vm)s' cannot have more than %(cpus)s CPUs. Please update the CPU value when the VM is not running or increase Max CPU value."),
+    "KCHCPUHP0002E": _("VM '%(vm)s' cannot have less than %(cpus)s CPUs. Please update the CPU value when the VM is not running."),
+    "KCHCPUHP0003E": _("Topology is set: cores='%(cores)s' and threads='%(threads)s'. New CPU value must be multiple of '%(mult)s' (cores * threads)"),
+    "KCHCPUHP0004E": _("Unable to hot plug/unplug CPUs. Details: %(err)s"),
+    "KCHCPUHP0005E": _("Cannot update Max vCPU or Topology when guest is running."),
+    "KCHCPUHP0006E": _("Guest does not have support to CPU hot unplug."),
+
     "KCHAPI0001E": _("Unknown parameter %(value)s"),
 
     "KCHAUTH0004E": _("User %(user_id)s not found with given LDAP settings."),

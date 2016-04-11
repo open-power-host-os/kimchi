@@ -32,6 +32,7 @@ import time
 import uuid
 from lxml import etree, objectify
 from lxml.builder import E
+from math import ceil
 from xml.etree import ElementTree
 
 from wok.config import config
@@ -77,7 +78,7 @@ DOM_STATE_MAP = {0: 'nostate',
                  7: 'pmsuspended'}
 
 # update parameters which are updatable when the VM is online
-VM_ONLINE_UPDATE_PARAMS = ['graphics', 'groups', 'memory', 'users']
+VM_ONLINE_UPDATE_PARAMS = ['graphics', 'groups', 'memory', 'users', 'cpu_info']
 
 # update parameters which are updatable when the VM is offline
 VM_OFFLINE_UPDATE_PARAMS = ['cpu_info', 'graphics', 'groups', 'memory',
@@ -249,6 +250,14 @@ class VMModel(object):
         cores = xpath_get_text(xml, XPATH_TOPOLOGY + '/@cores')
         threads = xpath_get_text(xml, XPATH_TOPOLOGY + '/@threads')
         return sockets and cores and threads
+
+    def get_vm_cores(self, dom):
+        return int(xpath_get_text(dom.XMLDesc(0),
+                                  XPATH_TOPOLOGY + '/@cores')[0])
+
+    def get_vm_threads(self, dom):
+        return int(xpath_get_text(dom.XMLDesc(0),
+                                  XPATH_TOPOLOGY + '/@threads')[0])
 
     def update(self, name, params):
         lock = vm_locks.get(name)
@@ -971,6 +980,99 @@ class VMModel(object):
         # Memory Hotplug/Unplug
         if (('memory' in params) and ('current' in params['memory'])):
             self._update_memory_live(dom, params)
+
+        # CPU HotPlug/Unplug
+        if 'cpu_info' in params:
+            if (('maxvcpus' in params['cpu_info']) or
+                    ('topology' in params['cpu_info'])):
+                raise InvalidParameter('KCHCPUHP0005E')
+            elif 'vcpus' in params['cpu_info']:
+                self._update_cpu_live(dom, params['cpu_info'].get('vcpus'))
+
+    def _update_cpu_live(self, dom, cpus):
+        # Performe CPU HotPlug, adding/removing sockets to/from the guest
+        if self.has_topology(dom):
+            num_cores = self.get_vm_cores(dom)
+            num_threads = self.get_vm_threads(dom)
+        else:
+            num_cores = 1
+            num_threads = 1
+
+        try:
+            if cpus > dom.maxVcpus():
+                raise InvalidParameter('KCHCPUHP0001E',
+                                       {'vm': dom.name(),
+                                        'cpus': dom.maxVcpus()})
+
+            curr_vcpus_total = dom.vcpusFlags(libvirt.VIR_DOMAIN_AFFECT_LIVE)
+            dev_cpu_ids = xpath_get_text(dom.XMLDesc(0),
+                                         XPATH_DOMAIN_DEV_CPU_ID)
+            dev_cpu_ids.sort(cmp=lambda x, y: int(x) < int(y))
+            attached_cpu_sockets = len(dev_cpu_ids)
+            curr_vcpus_cfg = curr_vcpus_total - \
+                (attached_cpu_sockets * num_cores * num_threads)
+
+            # Nothing to hot unplug
+            if cpus < curr_vcpus_cfg:
+                raise InvalidParameter('KCHCPUHP0002E',
+                                       {'vm': dom.name(),
+                                        'cpus': curr_vcpus_cfg})
+
+            # Check if new cpu value fits topology
+            if ((cpus - curr_vcpus_cfg) % (num_cores * num_threads) != 0):
+                raise InvalidParameter('KCHCPUHP0003E',
+                                       {'cores': str(num_cores),
+                                        'threads': str(num_threads),
+                                        'mult': str(num_cores * num_threads)})
+
+            if attached_cpu_sockets == 0:
+                # there are no CPU devices yet; start from 0
+                dev_id = 0
+            else:
+                # there are some CPU devices. Start from last ID + 1
+                dev_id = int(dev_cpu_ids[-1]) + 1
+
+            if cpus > curr_vcpus_total:  # add CPUs
+                # Handle topology, include number of sockets that fits
+                # new number of cpus requested
+                sockets_count = int(ceil(float(cpus - curr_vcpus_total) /
+                                         (num_cores * num_threads)))
+
+                for i in xrange(sockets_count):
+                    xml = E('spapr-cpu-socket', id=str(dev_id))
+                    # Attachment should be persistent, but this is
+                    # not enabled in libvirt yet. Reference for future
+                    # flags = libvirt.VIR_DOMAIN_MEM_CONFIG | \
+                    #         libvirt.VIR_DOMAIN_AFFECT_LIVE
+                    # dom.attachDeviceFlags(etree.tostring(xml), flags)
+                    dom.attachDeviceFlags(etree.tostring(xml),
+                                          libvirt.VIR_DOMAIN_AFFECT_LIVE)
+                    dev_id += 1
+            elif cpus < curr_vcpus_total:  # remove sockets
+                # Handle topology, remove number of sockets rounded to
+                # floor of cpus (core*threads)
+                topology_cpus = cpus - curr_vcpus_cfg
+                sockets_count = int(topology_cpus /
+                                    (num_cores * num_threads))
+                sockets_to_remove = attached_cpu_sockets - sockets_count
+
+                # the CPU IDs must be removed in descending order
+                dev_cpu_ids.reverse()
+                flag = libvirt.VIR_DOMAIN_AFFECT_LIVE
+                vcpu = dom.vcpusFlags(flag)
+                for dev_id in dev_cpu_ids[:sockets_to_remove]:
+                    xml = E('spapr-cpu-socket', id=dev_id)
+                    dom.detachDeviceFlags(etree.tostring(xml), flag)
+                    if vcpu == dom.vcpusFlags(flag):
+                        # Test if guest supports cpu hotplug in PPC.
+                        # Must have installed the packages powerpc-utils,
+                        # ppc64-diag and librtas. Also rtas_errd.service
+                        # must be running
+                        wok_log.warning("Guest '%s' does not support CPU "
+                                        "hotplug operations." % dom.name())
+                        raise InvalidOperation("KCHCPUHP0006E")
+        except (libvirt.libvirtError, ValueError), e:
+            raise OperationFailed('KCHCPUHP0004E', {'err': e.message})
 
     def _get_mem_dev_total_size(self, xml):
         root = ET.fromstring(xml)
