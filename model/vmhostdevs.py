@@ -113,6 +113,28 @@ class VMHostDevsModel(object):
 
         return '<devices>%s</devices>' % hostdevs
 
+    def have_xhci_usb_controller(self, vmid):
+        dom = VMModel.get_vm(vmid, self.conn)
+
+        root = objectify.fromstring(dom.XMLDesc(0))
+
+        try:
+            controllers = root.devices.controller
+
+        except AttributeError:
+            return False
+
+        for controller in controllers:
+
+            if 'model' not in controller.attrib:
+                continue
+
+            if controller.attrib['type'] == 'usb' and \
+               controller.attrib['model'] == 'nec-xhci':
+                return True
+
+        return False
+
     def _get_pci_device_xml(self, dev_info, slot, is_multifunction):
         if 'detach_driver' not in dev_info:
             dev_info['detach_driver'] = 'kvm'
@@ -199,10 +221,16 @@ class VMHostDevsModel(object):
         driver = ('vfio' if DOM_STATE_MAP[dom.info()[0]] == "shutoff" and
                   self.caps.kernel_vfio else 'kvm')
 
-        # on powerkvm systems it must be vfio driver.
         distro, _, _ = platform.linux_distribution()
         if distro == 'IBM_PowerKVM':
+            # on powerkvm systems it must be vfio driver.
             driver = 'vfio'
+
+            # powerkvm requires a xhci usb controller in order to support
+            # pci hotplug.
+            if DOM_STATE_MAP[dom.info()[0]] != "shutoff" and \
+               not self.have_xhci_usb_controller(vmid):
+                raise InvalidOperation("KCHVMHDEV0007E", {'vmid': vmid})
 
         # Attach all PCI devices in the same IOMMU group
         dev_model = DeviceModel(conn=self.conn)
