@@ -1115,7 +1115,37 @@ class VMModel(object):
             # Nothing to do
             return
         if memory < 0:
-            raise InvalidOperation('KCHVM0043E')
+            distro, _, _ = platform.linux_distribution()
+            if distro == "IBM_PowerKVM":
+                # HotUnplug of memory is minimally supported in PPC64. At this
+                # time only DIMM of 256MiB will be detached
+                obj = objectify.fromstring(xml)
+                size_set = set(obj.findall('./devices/memory/target/size'))
+                if len(size_set) == 0:
+                    raise InvalidOperation('KCHMEMHOTUN0002E')
+                elif len(size_set) > 1 or int(size_set.pop()) != (256 << 10):
+                    raise InvalidOperation('KCHMEMHOTUN0003E')
+
+                # Must remove ALL devices
+                mem_devs = (self._get_mem_dev_total_size(xml) >> 10)
+                if new_mem != (old_mem - mem_devs):
+                    raise InvalidOperation('KCHMEMHOTUN0001E',
+                                           {'mem': str(old_mem - mem_devs)})
+
+                # Fullfilling all condictions, detach devices
+                devs = ET.fromstring(xml).findall('./devices/memory')
+                devs.reverse()
+                flags = libvirt.VIR_DOMAIN_MEM_LIVE
+                for dev in devs:
+                    try:
+                        dom.detachDeviceFlags(ET.tostring(dev), flags)
+                    except Exception as e:
+                        raise OperationFailed("KCHVM0047E",
+                                              {'error': e.message})
+                return
+            else:
+                # X86 does not have support to mem hotunplug yet
+                raise InvalidOperation('KCHVM0043E')
 
         # Finally HotPlug operation ( memory > 0 )
         try:
