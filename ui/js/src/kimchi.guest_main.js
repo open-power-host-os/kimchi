@@ -315,7 +315,7 @@ kimchi.initClone = function() {
 
 
 kimchi.listVmsAuto = function() {
-    $('.wok-mask').removeClass('hidden');
+    $('#guests-root-container > .wok-mask').removeClass('hidden');
     //Check if the actions button is opened or not,
     //if opended stop the reload of the itens until closed
     var $isDropdownOpened = $('[name="guest-actions"] ul.dropdown-menu').is(":visible");
@@ -360,6 +360,17 @@ kimchi.listVmsAuto = function() {
             return guests;
         };
 
+        var trackFailedCloningGuests = function() {
+            kimchi.getTasksByFilter('status=failed&target_uri=' + encodeURIComponent('^/plugins/kimchi/vms/.+/clone'), function(tasks) {
+                for (var i = 0; i < tasks.length; i++) {
+                    if (kimchi.trackingTasks.indexOf(tasks[i].id) == -1)
+                        kimchi.trackTask(tasks[i].id, null, function(err) {
+                           wok.message.error(err.message);
+                        }, null);
+                }
+            }, null, true);
+        };
+
         var getMigratingGuests = function() {
             var guests = [];
             kimchi.getTasksByFilter('status=running&target_uri=' + encodeURIComponent('^/plugins/kimchi/vms/.+/migrate'), function(tasks) {
@@ -381,7 +392,9 @@ kimchi.listVmsAuto = function() {
 
         kimchi.listVMs(function(result, textStatus, jqXHR) {
                 if (result && textStatus == "success") {
-
+                    // Some clone tasks may fail before being tracked. Show
+                    // error message for them.
+                    trackFailedCloningGuests();
                     var migrated = getMigratingGuests();
                     for (i = migrated.length - 1; i >= 0; i--) {
                         for (j = result.length - 1; j >= 0; j--) {
@@ -418,13 +431,13 @@ kimchi.listVmsAuto = function() {
                                 });
                             });
                         }
-                        $('.wok-mask').fadeOut(300, function() {
+                        $('#guests-root-container > .wok-mask').fadeOut(300, function() {
                         });
                     } else {
                         $('.grid-control').addClass('hidden');
                         $('#guestListField').hide();
                         $('#noGuests').show();
-                        $('.wok-mask').fadeOut(300, function() {});
+                        $('#guests-root-container > .wok-mask').fadeOut(300, function() {});
                     }
                 }
 
@@ -433,8 +446,8 @@ kimchi.listVmsAuto = function() {
             function(errorResponse, textStatus, errorThrown) {
                 if (errorResponse.responseJSON && errorResponse.responseJSON.reason) {
                     wok.message.error(errorResponse.responseJSON.reason);
-                    $('.wok-mask').fadeOut(300, function() {
-                        $('.wok-mask').addClass('hidden');
+                    $('#guests-root-container > .wok-mask').fadeOut(300, function() {
+                        $('#guests-root-container > .wok-mask').addClass('hidden');
                     });
                 }
                 kimchi.vmTimeout = window.setTimeout("kimchi.listVmsAuto();", 5000);

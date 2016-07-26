@@ -1039,6 +1039,11 @@ body.wok-gallery {
   width: 22%;
 }
 
+#guest-edit-window #form-guest-edit-pci .wok-mask {
+  top: 0 !important;
+  z-index: 2 !important;
+}
+
 #guest-edit-window #form-guest-edit-pci .column-actions {
   width: 4.47%;
 }
@@ -1728,6 +1733,11 @@ body.wok-gallery {
 
 #template-add-window .tooltip-arrow {
   display: none;
+}
+
+#template-add-window #loading-isos {
+  top: 0 !important;
+  z-index: 4 !important;
 }
 
 /* VM List View classes*/
