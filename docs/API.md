@@ -146,6 +146,7 @@ server.
       Default is: empty (i.e. only root-users may access).
     * groups: A list of system groups whose users have permission to access
       the VM. Default is: empty (i.e. no groups given access).
+    * bootorder: list of devices in boot order
 * **DELETE**: Remove the Virtual Machine
 * **PUT**: update the parameters of existing VM
     * name: New name for this VM (only applied for shutoff VM)
@@ -174,6 +175,8 @@ server.
             * sockets - The maximum number of sockets to use.
             * cores   - The number of cores per socket.
             * threads - The number of threads per core.
+    * bootorder: guest bootorder, types accepted: hd, cdrom, network or fd
+    * bootmenu: prompts guest bootmenu. Bool type.
 
 * **POST**: *See Virtual Machine Actions*
 
@@ -285,6 +288,12 @@ Represents a snapshot of the Virtual Machine's primary monitor.
 ### Sub-resource: Current snapshot
 **URI:** /plugins/kimchi/vms/*:name*/snapshots/current
 * **GET**: Retrieve current snapshot information for the virtual machine.
+
+### Sub-resource: Virt-Viewer File
+**URI:** /plugins/kimchi/vms/*:name*/virtviewerfile
+* **GET**: Retrieve the Virt-Viewer launcher file to connect to the
+           graphics of this virtual machine. Virtual machine must
+           be running.
 
 ### Collection: Templates
 

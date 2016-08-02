@@ -63,6 +63,8 @@ from wok.plugins.kimchi.osinfo import defaults, MEM_DEV_SLOTS
 from wok.plugins.kimchi.screenshot import VMScreenshot
 from wok.plugins.kimchi.utils import get_next_clone_name
 from wok.plugins.kimchi.utils import template_name_from_uri
+from wok.plugins.kimchi.xmlutils.bootorder import get_bootorder_node
+from wok.plugins.kimchi.xmlutils.bootorder import get_bootmenu_node
 from wok.plugins.kimchi.xmlutils.cpu import get_topology_xml
 from wok.plugins.kimchi.xmlutils.disk import get_vm_disk_info, get_vm_disks
 from utils import has_cpu_numa, set_numa_memory
@@ -82,7 +84,7 @@ VM_ONLINE_UPDATE_PARAMS = ['graphics', 'groups', 'memory', 'users', 'cpu_info']
 
 # update parameters which are updatable when the VM is offline
 VM_OFFLINE_UPDATE_PARAMS = ['cpu_info', 'graphics', 'groups', 'memory',
-                            'name', 'users']
+                            'name', 'users', 'bootorder', 'bootmenu']
 
 XPATH_DOMAIN_DISK = "/domain/devices/disk[@device='disk']/source/@file"
 XPATH_DOMAIN_DISK_BY_FILE = "./devices/disk[@device='disk']/source[@file='%s']"
@@ -94,6 +96,8 @@ XPATH_DOMAIN_MEMORY_UNIT = '/domain/memory/@unit'
 XPATH_DOMAIN_UUID = '/domain/uuid'
 XPATH_DOMAIN_DEV_CPU_ID = '/domain/devices/spapr-cpu-socket/@id'
 
+XPATH_BOOT = 'os/boot/@dev'
+XPATH_BOOTMENU = 'os/bootmenu/@enable'
 XPATH_CPU = './cpu'
 XPATH_NAME = './name'
 XPATH_NUMA_CELL = './cpu/numa/cell'
@@ -754,6 +758,31 @@ class VMModel(object):
         else:
             remove_metadata_node(dom, 'name')
 
+    def _update_bootorder(self, xml, params):
+        # get element tree from xml
+        et = ET.fromstring(xml)
+
+        # get machine type
+        os = et.find("os")
+
+        # remove old order
+        for device in os.findall("boot"):
+            os.remove(device)
+
+        # add new bootorder
+        if "bootorder" in params:
+            for device in get_bootorder_node(params["bootorder"]):
+                os.append(device)
+
+        # update bootmenu
+        if params.get("bootmenu") is False:
+            [os.remove(bm) for bm in os.findall("bootmenu")]
+        elif params.get("bootmenu") is True:
+            os.append(get_bootmenu_node())
+
+        # update <os>
+        return ET.tostring(et)
+
     def _static_vm_update(self, vm_name, dom, params):
         old_xml = new_xml = dom.XMLDesc(libvirt.VIR_DOMAIN_XML_SECURE)
         params = copy.deepcopy(params)
@@ -799,6 +828,10 @@ class VMModel(object):
         # Updating memory
         if ('memory' in params and params['memory'] != {}):
             new_xml = self._update_memory_config(new_xml, params, dom)
+
+        # update bootorder or bootmenu
+        if "bootorder" or "bootmenu" in params:
+            new_xml = self._update_bootorder(new_xml, params)
 
         snapshots_info = []
         conn = self.conn.get()
@@ -1286,7 +1319,7 @@ class VMModel(object):
         state = DOM_STATE_MAP[info[0]]
         screenshot = None
         # (type, listen, port, passwd, passwdValidTo)
-        graphics = self._vm_get_graphics(name)
+        graphics = self.get_graphics(name, self.conn)
         graphics_port = graphics[2]
         graphics_port = graphics_port if state == 'running' else None
         try:
@@ -1360,6 +1393,11 @@ class VMModel(object):
         else:
             maxmemory = memory
 
+        # get boot order and bootmenu
+        boot = xpath_get_text(xml, XPATH_BOOT)
+        bootmenu = "yes" if "yes" in xpath_get_text(xml, XPATH_BOOTMENU) \
+            else "no"
+
         return {'name': name,
                 'state': state,
                 'stats': res,
@@ -1377,7 +1415,9 @@ class VMModel(object):
                 'users': users,
                 'groups': groups,
                 'access': 'full',
-                'persistent': True if dom.isPersistent() else False
+                'persistent': True if dom.isPersistent() else False,
+                'bootorder': boot,
+                'bootmenu': bootmenu
                 }
 
     def _vm_get_disk_paths(self, dom):
@@ -1558,8 +1598,9 @@ class VMModel(object):
 
         return True
 
-    def _vm_get_graphics(self, name):
-        dom = self.get_vm(name, self.conn)
+    @staticmethod
+    def get_graphics(name, conn):
+        dom = VMModel.get_vm(name, conn)
         xml = dom.XMLDesc(libvirt.VIR_DOMAIN_XML_SECURE)
 
         expr = "/domain/devices/graphics/@type"
@@ -1624,7 +1665,7 @@ class VMModel(object):
 
     def connect(self, name):
         # (type, listen, port, passwd, passwdValidTo)
-        graphics_port = self._vm_get_graphics(name)[2]
+        graphics_port = self.get_graphics(name, self.conn)[2]
         if graphics_port is not None:
             websocket.add_proxy_token(name.encode('utf-8'), graphics_port)
         else:

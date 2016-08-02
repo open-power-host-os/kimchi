@@ -18,14 +18,20 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 
+import __builtin__ as builtins
+
+import base64
 import grp
 import lxml.etree as ET
 import os
 import pwd
+import mock
 import re
 import shutil
 import time
 import unittest
+
+from mock import call, mock_open, patch
 
 import tests.utils as utils
 
@@ -43,6 +49,8 @@ from wok.plugins.kimchi import osinfo
 from wok.plugins.kimchi.config import kimchiPaths as paths
 from wok.plugins.kimchi.model import model
 from wok.plugins.kimchi.model.libvirtconnection import LibvirtConnection
+from wok.plugins.kimchi.model.virtviewerfile import FirewallManager
+from wok.plugins.kimchi.model.virtviewerfile import VMVirtViewerFileModel
 from wok.plugins.kimchi.model.vms import VMModel
 
 import iso_gen
@@ -108,7 +116,8 @@ class ModelTests(unittest.TestCase):
         # test_rest or test_mockmodel to avoid overriding problems
         LibvirtConnection._connections['test:///default'] = {}
 
-        os.unlink(self.tmp_store)
+        if os.path.isfile(self.tmp_store):
+            os.unlink(self.tmp_store)
 
     def test_vm_info(self):
         inst = model.Model('test:///default', self.tmp_store)
@@ -118,7 +127,7 @@ class ModelTests(unittest.TestCase):
 
         keys = set(('name', 'state', 'stats', 'uuid', 'memory', 'cpu_info',
                     'screenshot', 'icon', 'graphics', 'users', 'groups',
-                    'access', 'persistent'))
+                    'access', 'persistent', 'bootorder', 'bootmenu'))
 
         stats_keys = set(('cpu_utilization', 'mem_utilization',
                           'net_throughput', 'net_throughput_peak',
@@ -335,6 +344,223 @@ class ModelTests(unittest.TestCase):
             info = inst.vm_lookup('kimchi-spice')
             self.assertEquals('spice', info['graphics']['type'])
             self.assertEquals('127.0.0.1', info['graphics']['listen'])
+
+        inst.template_delete('test')
+
+    @unittest.skipUnless(utils.running_as_root(), 'Must be run as root')
+    def test_vm_virtviewerfile_vmnotrunning(self):
+        inst = model.Model(objstore_loc=self.tmp_store)
+        params = {'name': 'test',
+                  'source_media': {'type': 'disk', 'path': UBUNTU_ISO}}
+        inst.templates_create(params)
+
+        vm_name = 'kìmchí-vñç'
+
+        with RollbackContext() as rollback:
+            params = {'name': vm_name.decode('utf-8'),
+                      'template': '/plugins/kimchi/templates/test'}
+            task1 = inst.vms_create(params)
+            inst.task_wait(task1['id'])
+            rollback.prependDefer(inst.vm_delete, vm_name.decode('utf-8'))
+
+            error_msg = "KCHVM0083E"
+            with self.assertRaisesRegexp(InvalidOperation, error_msg):
+                vvmodel = VMVirtViewerFileModel(conn=inst.conn)
+                vvmodel.lookup(vm_name.decode('utf-8'))
+
+        inst.template_delete('test')
+
+    @mock.patch('wok.plugins.kimchi.model.virtviewerfile._get_request_host')
+    @mock.patch('wok.plugins.kimchi.model.virtviewerfile.'
+                'VMModel.get_graphics')
+    @mock.patch('wok.plugins.kimchi.model.virtviewerfile.'
+                'FirewallManager.add_vm_graphics_port')
+    @mock.patch('wok.plugins.kimchi.model.virtviewerfile.'
+                'VMVirtViewerFileModel.handleVMShutdownPowerOff')
+    @mock.patch('wok.plugins.kimchi.model.virtviewerfile.'
+                'VMVirtViewerFileModel._check_if_vm_running')
+    def test_vm_virtviewerfile_vnc(self, mock_vm_running, mock_handleVMOff,
+                                   mock_add_port, mock_get_graphics,
+                                   mock_get_host):
+
+        mock_get_host.return_value = 'kimchi-test-host'
+        mock_get_graphics.return_value = ['vnc', 'listen', '5999', None]
+        mock_vm_running.return_value = True
+
+        vvmodel = VMVirtViewerFileModel(conn=None)
+
+        open_ = mock_open(read_data='')
+        with patch.object(builtins, 'open', open_):
+            vvfilepath = vvmodel.lookup('kimchi-vm')
+
+        self.assertEqual(
+            vvfilepath,
+            'plugins/kimchi/data/virtviewerfiles/kimchi-vm-access.vv'
+        )
+
+        expected_write_content = "[virt-viewer]\ntype=vnc\n"\
+            "host=kimchi-test-host\nport=5999\n"
+        self.assertEqual(
+            open_().write.mock_calls, [call(expected_write_content)]
+        )
+
+        mock_get_graphics.assert_called_once_with('kimchi-vm', None)
+        mock_vm_running.assert_called_once_with('kimchi-vm')
+        mock_handleVMOff.assert_called_once_with('kimchi-vm')
+        mock_add_port.assert_called_once_with('kimchi-vm', '5999')
+
+    @mock.patch('wok.plugins.kimchi.model.virtviewerfile._get_request_host')
+    @mock.patch('wok.plugins.kimchi.model.virtviewerfile.'
+                'VMModel.get_graphics')
+    @mock.patch('wok.plugins.kimchi.model.virtviewerfile.'
+                'FirewallManager.add_vm_graphics_port')
+    @mock.patch('wok.plugins.kimchi.model.virtviewerfile.'
+                'VMVirtViewerFileModel.handleVMShutdownPowerOff')
+    @mock.patch('wok.plugins.kimchi.model.virtviewerfile.'
+                'VMVirtViewerFileModel._check_if_vm_running')
+    def test_vm_virtviewerfile_spice_passwd(self, mock_vm_running,
+                                            mock_handleVMOff,
+                                            mock_add_port,
+                                            mock_get_graphics,
+                                            mock_get_host):
+
+        mock_get_host.return_value = 'kimchi-test-host'
+        mock_get_graphics.return_value = [
+            'spice', 'listen', '6660', 'spicepasswd'
+        ]
+        mock_vm_running.return_value = True
+
+        vvmodel = VMVirtViewerFileModel(conn=None)
+
+        open_ = mock_open(read_data='')
+        with patch.object(builtins, 'open', open_):
+            vvfilepath = vvmodel.lookup('kimchi-vm')
+
+        self.assertEqual(
+            vvfilepath,
+            'plugins/kimchi/data/virtviewerfiles/kimchi-vm-access.vv'
+        )
+
+        expected_write_content = "[virt-viewer]\ntype=spice\n"\
+            "host=kimchi-test-host\nport=6660\npassword=spicepasswd\n"
+        self.assertEqual(
+            open_().write.mock_calls, [call(expected_write_content)]
+        )
+
+        mock_get_graphics.assert_called_once_with('kimchi-vm', None)
+        mock_vm_running.assert_called_once_with('kimchi-vm')
+        mock_handleVMOff.assert_called_once_with('kimchi-vm')
+        mock_add_port.assert_called_once_with('kimchi-vm', '6660')
+
+    @mock.patch('wok.plugins.kimchi.model.virtviewerfile.run_command')
+    def test_firewall_provider_firewallcmd(self, mock_run_cmd):
+        mock_run_cmd.side_effect = [
+            ['', '', 0], ['', '', 0], ['', '', 0]
+        ]
+
+        fw_manager = FirewallManager()
+        fw_manager.add_vm_graphics_port('vm-name', 5905)
+        self.assertEqual(fw_manager.opened_ports, {'vm-name': 5905})
+
+        fw_manager.remove_vm_graphics_port('vm-name')
+        self.assertEqual(fw_manager.opened_ports, {})
+
+        mock_run_cmd.assert_has_calls(
+            [
+                 call(['firewall-cmd', '--state', '-q']),
+                 call(['firewall-cmd', '--add-port=5905/tcp']),
+                 call(['firewall-cmd', '--remove-port=5905/tcp'])
+            ]
+        )
+
+    @mock.patch('wok.plugins.kimchi.model.virtviewerfile.run_command')
+    def test_firewall_provider_ufw(self, mock_run_cmd):
+        mock_run_cmd.side_effect = [
+            ['', '', 1], ['', '', 0], ['', '', 0], ['', '', 0]
+        ]
+
+        fw_manager = FirewallManager()
+        fw_manager.add_vm_graphics_port('vm-name', 5905)
+        self.assertEqual(fw_manager.opened_ports, {'vm-name': 5905})
+
+        fw_manager.remove_vm_graphics_port('vm-name')
+        self.assertEqual(fw_manager.opened_ports, {})
+
+        mock_run_cmd.assert_has_calls(
+            [
+                 call(['firewall-cmd', '--state', '-q']),
+                 call(['ufw', 'status']),
+                 call(['ufw', 'allow', '5905/tcp']),
+                 call(['ufw', 'deny', '5905/tcp'])
+            ]
+        )
+
+    @mock.patch('wok.plugins.kimchi.model.virtviewerfile.run_command')
+    def test_firewall_provider_iptables(self, mock_run_cmd):
+        mock_run_cmd.side_effect = [
+            ['', '', 1], ['', '', 1], ['', '', 0], ['', '', 0]
+        ]
+
+        fw_manager = FirewallManager()
+        fw_manager.add_vm_graphics_port('vm-name', 5905)
+        self.assertEqual(fw_manager.opened_ports, {'vm-name': 5905})
+
+        fw_manager.remove_vm_graphics_port('vm-name')
+        self.assertEqual(fw_manager.opened_ports, {})
+
+        iptables_add = ['iptables', '-I', 'INPUT', '-p', 'tcp', '--dport',
+                        5905, '-j', 'ACCEPT']
+
+        iptables_del = ['iptables', '-D', 'INPUT', '-p', 'tcp', '--dport',
+                        5905, '-j', 'ACCEPT']
+
+        mock_run_cmd.assert_has_calls(
+            [
+                 call(['firewall-cmd', '--state', '-q']),
+                 call(['ufw', 'status']),
+                 call(iptables_add), call(iptables_del)
+            ]
+        )
+
+    @unittest.skipUnless(utils.running_as_root(), 'Must be run as root')
+    @mock.patch('wok.plugins.kimchi.model.virtviewerfile.'
+                'FirewallManager.remove_vm_graphics_port')
+    @mock.patch('wok.plugins.kimchi.model.virtviewerfile.'
+                'FirewallManager.add_vm_graphics_port')
+    def test_vm_virtviewerfile_vmlifecycle(self, mock_add_port,
+                                           mock_remove_port):
+
+        inst = model.Model(objstore_loc=self.tmp_store)
+        params = {'name': 'test',
+                  'source_media': {'type': 'disk', 'path': UBUNTU_ISO}}
+        inst.templates_create(params)
+
+        vm_name = 'kìmçhí-vñç'
+
+        with RollbackContext() as rollback:
+            params = {'name': u'%s' % vm_name.decode('utf-8'),
+                      'template': '/plugins/kimchi/templates/test'}
+            task1 = inst.vms_create(params)
+            inst.task_wait(task1['id'])
+            rollback.prependDefer(inst.vm_delete, vm_name.decode('utf-8'))
+
+            inst.vm_start(vm_name.decode('utf-8'))
+
+            graphics_info = VMModel.get_graphics(vm_name.decode('utf-8'),
+                                                 inst.conn)
+            graphics_port = graphics_info[2]
+
+            vvmodel = VMVirtViewerFileModel(conn=inst.conn)
+            vvmodel.lookup(vm_name.decode('utf-8'))
+
+            inst.vm_poweroff(vm_name.decode('utf-8'))
+            time.sleep(5)
+
+            mock_add_port.assert_called_once_with(vm_name.decode('utf-8'),
+                                                  graphics_port)
+            mock_remove_port.assert_called_once_with(
+                base64.b64encode(vm_name)
+            )
 
         inst.template_delete('test')
 
@@ -1123,6 +1349,25 @@ class ModelTests(unittest.TestCase):
             inst.vm_update(u'пeω-∨м', {'users': [], 'groups': []})
             self.assertEquals([], inst.vm_lookup(u'пeω-∨м')['users'])
             self.assertEquals([], inst.vm_lookup(u'пeω-∨м')['groups'])
+
+            # change bootorder
+            b_order = ["hd", "network", "cdrom"]
+            inst.vm_update(u'пeω-∨м', {"bootorder": b_order})
+            self.assertEquals(b_order, inst.vm_lookup(u'пeω-∨м')['bootorder'])
+
+            # try to add empty list
+            self.assertRaises(OperationFailed, inst.vm_update, u'пeω-∨м',
+                              {"bootorder": [""]})
+
+            # try to pass invalid parameter
+            self.assertRaises(OperationFailed, inst.vm_update, u'пeω-∨м',
+                              {"bootorder": ["bla"]})
+
+            # enable/disable bootmenu
+            inst.vm_update(u'пeω-∨м', {"bootmenu": True})
+            self.assertEquals("yes", inst.vm_lookup(u'пeω-∨м')['bootmenu'])
+            inst.vm_update(u'пeω-∨м', {"bootmenu": False})
+            self.assertEquals("no", inst.vm_lookup(u'пeω-∨м')['bootmenu'])
 
     def test_get_interfaces(self):
         inst = model.Model('test:///default',
