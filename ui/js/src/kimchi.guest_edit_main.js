@@ -20,6 +20,11 @@ kimchi.guest_edit_main = function() {
     var formTargetId;
     var guestEditForm = $('#form-guest-edit-general');
     var saveButton = $('#guest-edit-button-save');
+    clearTimeout(kimchi.vmTimeout);
+
+    $('#modalWindow').on('hidden.bs.modal', function() {
+        kimchi.setListVMAutoTimeout();
+    });
 
     $('#guest-edit-window a[data-toggle="tab"]').on('show.bs.tab', function(tab) {
         tab.target; // newly activated tab
@@ -467,30 +472,6 @@ kimchi.guest_edit_main = function() {
             if (kimchi.thisVMState === "running" && device.vga3d) {
                 $('button', deviceHtml).prop("disabled", true);
             }
-            kimchi.getPCIDeviceCompanions(device.name, function(infoData) {
-                var pciTitle = i18n['KCHVMED6007M'] + '\n';
-                var haveCompanions = false;
-                for (var p = 0; p < infoData.length; p++) {
-                    if (infoData[p].device_type === 'net') {
-                        haveCompanions = true;
-                        pciTitle += '   ' + infoData[p].name + '\n';
-                        pciTitle += '      ' + i18n['KCHVMED6001M'] + ' ' + infoData[p].interface;
-                        pciTitle += ', ' + i18n['KCHVMED6002M'] + ' ' + infoData[p].address;
-                        pciTitle += ', ' + i18n['KCHVMED6003M'] + ' ' + infoData[p].link_type + '\n';
-                    } else if (infoData[p].device_type === 'storage') {
-                        haveCompanions = true;
-                        pciTitle += '   ' + infoData[p].name + '\n';
-                        pciTitle += '      ' + i18n['KCHVMED6004M'] + ' ' + infoData[p].block;
-                        pciTitle += ', ' + i18n['KCHVMED6005M'] + ' ' + infoData[p].drive_type;
-                        pciTitle += ', ' + i18n['KCHVMED6006M'] + ' ' + infoData[p].model + '\n';
-                    }
-                }
-                for (var q = 0; q < infoData.length; q++) {
-                    haveCompanions && $('.name', '#' + infoData[q].parent).attr('title', pciTitle);
-                    haveCompanions && $('.product', '#' + infoData[q].parent).attr('title', pciTitle);
-                    haveCompanions && $('.vendor', '#' + infoData[q].parent).attr('title', pciTitle);
-                }
-            });
             device = deviceHtml[0].outerHTML;
             $('.body', '#form-guest-edit-pci').append(device);
         });
@@ -553,7 +534,7 @@ kimchi.guest_edit_main = function() {
         });
     };
     var pciDeviceButtonHandler = function() {
-        $('button', '#form-guest-edit-pci').on('click', function(event) {
+        $('.btn.btn-link', '#form-guest-edit-pci').on('click', function(event) {
             event.preventDefault();
             var obj = $(this);
             var objIcon = obj.find('i');
@@ -565,13 +546,56 @@ kimchi.guest_edit_main = function() {
                     wok.message.error(err.responseJSON.reason, '#alert-modal-container');
                 });
             } else {
-                kimchi.addVMPCIDevice(kimchi.selectedGuest, {
-                    name: id
-                }, function(task) {
-                    getOngoingAttachingDevices(task);
-                }, function(err) {
-                    wok.message.error(err.responseJSON.reason, '#alert-modal-container');
+                $('html').addClass('in-progress');
+                $('#form-guest-edit-pci > .wok-mask').show();
+                var haveCompanions = false;
+                var pciTitle = i18n['KCHVMED6007M'] + '\n';
+                kimchi.getPCIDeviceCompanions(id, function(infoData) {
+                    for (var p = 0; p < infoData.length; p++) {
+                        if (infoData[p].device_type === 'net') {
+                            haveCompanions = true;
+                            pciTitle += '   ' + infoData[p].name + '\n';
+                            pciTitle += '      ' + i18n['KCHVMED6001M'] + ' ' + infoData[p].interface;
+                            pciTitle += ', ' + i18n['KCHVMED6002M'] + ' ' + infoData[p].address;
+                            pciTitle += ', ' + i18n['KCHVMED6003M'] + ' ' + infoData[p].link_type + '\n';
+                        } else if (infoData[p].device_type === 'storage') {
+                            haveCompanions = true;
+                            pciTitle += '   ' + infoData[p].name + '\n';
+                            pciTitle += '      ' + i18n['KCHVMED6004M'] + ' ' + infoData[p].block;
+                            pciTitle += ', ' + i18n['KCHVMED6005M'] + ' ' + infoData[p].drive_type;
+                            pciTitle += ', ' + i18n['KCHVMED6006M'] + ' ' + infoData[p].model + '\n';
+                        }
+                    }
                 });
+                $('#form-guest-edit-pci > .wok-mask').fadeOut(300, function() {});
+                $('html').removeClass('in-progress');
+
+                var settings = {
+                    title: i18n['KCHVMED6012M'],
+                    content: pciTitle,
+                    confirm: i18n['KCHAPI6002M'],
+                    cancel: i18n['KCHAPI6003M']
+                };
+
+                if (haveCompanions) {
+                    wok.confirm(settings, function() {
+                        kimchi.addVMPCIDevice(kimchi.selectedGuest, {
+                            name: id
+                        }, function(task) {
+                            getOngoingAttachingDevices(task);
+                        }, function(err) {
+                            wok.message.error(err.responseJSON.reason, '#alert-modal-container');
+                        });
+                    });
+                } else {
+                    kimchi.addVMPCIDevice(kimchi.selectedGuest, {
+                        name: id
+                    }, function(task) {
+                        getOngoingAttachingDevices(task);
+                    }, function(err) {
+                        wok.message.error(err.responseJSON.reason, '#alert-modal-container');
+                    });
+                }
             }
         });
     };

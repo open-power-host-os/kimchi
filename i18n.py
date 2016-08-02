@@ -115,6 +115,8 @@ messages = {
     "KCHVM0049E": _("Cannot power off %(name)s. Virtual machine is shut off."),
     "KCHVM0050E": _("Cannot shutdown %(name)s. Virtual machine is shut off."),
     "KCHVM0051E": _("Cannot reset %(name)s. Virtual machine is already shut off."),
+    "KCHVM0052E": _("Boot order must be a list. Devices accepted: hd, cdrom, fd or network."),
+    "KCHVM0053E": _("Bootmenu must be boolean. Values accepted: true of false."),
 
     "KCHVM0055E": _("Migrate to localhost %(host)s is not allowed."),
     "KCHVM0056E": _("To migrate a virtual machine to the remote host %(host)s the user %(user)s must have password-less login to the remote host."),
@@ -142,6 +144,8 @@ messages = {
     "KCHVM0080E": _("Cannot update Maximum Memory when guest is running."),
     "KCHVM0081E": _("Impossible to create %(dir)s directory."),
     "KCHVM0082E": _("Either the guest %(name)s did not start to listen to the serial or it is not configured to use the serial console."),
+    "KCHVM0083E": _("Unable to retrieve Virt Viewer file for stopped virtual machine %(name)s"),
+    "KCHVM0084E": _("Error occured while retrieving the Virt Viewer file for virtual machine %(name)s : %(err)s"),
 
     "KCHVMHDEV0001E": _("VM %(vmid)s does not contain directly assigned host device %(dev_name)s."),
     "KCHVMHDEV0002E": _("The host device %(dev_name)s is not allowed to directly assign to VM."),

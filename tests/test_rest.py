@@ -290,6 +290,17 @@ class RestTests(unittest.TestCase):
         resp = self.request('/plugins/kimchi/vms/∨м-црdαtеd', req, 'PUT')
         self.assertEquals(400, resp.status)
 
+        # change bootorder
+        b_order = ["hd", "network", "cdrom"]
+        req = json.dumps({"bootorder": b_order})
+        resp = self.request('/plugins/kimchi/vms/∨м-црdαtеd', req, 'PUT')
+        self.assertEquals(200, resp.status)
+        self.assertEquals(json.loads(resp.read())["bootorder"], b_order)
+
+        req = json.dumps({"bootorder": ["bla"]})
+        resp = self.request('/plugins/kimchi/vms/∨м-црdαtеd', req, 'PUT')
+        self.assertEquals(400, resp.status)
+
     def test_vm_lifecycle(self):
         # Create a Template
         req = json.dumps({'name': 'test',
@@ -347,6 +358,18 @@ class RestTests(unittest.TestCase):
         resp = self.request('/' + vm['screenshot'], method='HEAD')
         self.assertEquals(200, resp.status)
         self.assertTrue(resp.getheader('Content-type').startswith('image'))
+
+        # Test Virt Viewer file
+        resp = self.request(
+            '/plugins/kimchi/vms/test-vm/virtviewerfile',
+            '{}',
+            'GET')
+        self.assertEquals(200, resp.status)
+        vvfilecontent = resp.read()
+        self.assertEqual(
+            vvfilecontent,
+            "[virt-viewer]\ntype=vnc\nhost=127.0.0.1\nport=5999\n"
+        )
 
         # Clone a running VM
         resp = self.request('/plugins/kimchi/vms/test-vm/clone', '{}', 'POST')

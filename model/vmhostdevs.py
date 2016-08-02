@@ -51,6 +51,8 @@ class VMHostDevsModel(object):
         self.objstore = kargs['objstore']
         self.events = kargs['eventsloop']
         self.caps = CapabilitiesModel(**kargs)
+        self.devs_model = DevicesModel(**kargs)
+        self.dev_model = DeviceModel(**kargs)
         self.task = TaskModel(**kargs)
         self._cb = None
         self.events.registerAttachDevicesEvent(
@@ -70,8 +72,7 @@ class VMHostDevsModel(object):
         return [DeviceModel.deduce_dev_name(e, self.conn) for e in hostdev]
 
     def _passthrough_device_validate(self, dev_name):
-        eligible_dev_names = \
-            DevicesModel(conn=self.conn).get_list(_passthrough='true')
+        eligible_dev_names = self.devs_model.get_list(_passthrough='true')
         if dev_name not in eligible_dev_names:
             raise InvalidParameter('KCHVMHDEV0002E', {'dev_name': dev_name})
 
@@ -88,8 +89,7 @@ class VMHostDevsModel(object):
 
     def create(self, vmid, params):
         dev_name = params['name']
-        self._passthrough_device_validate(dev_name)
-        dev_info = DeviceModel(conn=self.conn).lookup(dev_name)
+        dev_info = self.dev_model.lookup(dev_name)
 
         if dev_info['device_type'] == 'pci':
             taskid = add_task(u'/plugins/kimchi/vms/%s/hostdevs/' %
@@ -214,7 +214,7 @@ class VMHostDevsModel(object):
         slots = []
         try:
             devices = root.devices
-            slots = [DeviceModel._toint(dev.attrib['slot'])
+            slots = [self.dev_model._toint(dev.attrib['slot'])
                      for dev in devices.findall('.//address')
                      if 'slot' in dev.attrib]
 
@@ -236,6 +236,13 @@ class VMHostDevsModel(object):
         vmid = params['vmid']
         dev_info = params['dev_info']
         lock = params['lock']
+
+        try:
+            self._passthrough_device_validate(dev_info['name'])
+
+        except InvalidParameter as e:
+            cb(e.message, False)
+            raise
 
         with lock:
             try:
@@ -266,14 +273,12 @@ class VMHostDevsModel(object):
                     raise InvalidOperation("KCHVMHDEV0007E", {'vmid': vmid})
 
             # Attach all PCI devices in the same IOMMU group
-            dev_model = DeviceModel(conn=self.conn)
-            devs_model = DevicesModel(conn=self.conn)
-            affected_names = devs_model.get_list(
+            affected_names = self.devs_model.get_list(
                 _passthrough_affected_by=dev_info['name'])
-            passthrough_names = devs_model.get_list(
+            passthrough_names = self.devs_model.get_list(
                 _cap='pci', _passthrough='true')
             group_names = list(set(affected_names) & set(passthrough_names))
-            pci_infos = [dev_model.lookup(dev_name) for dev_name in
+            pci_infos = [self.dev_model.lookup(dev_name) for dev_name in
                          group_names]
             pci_infos.append(dev_info)
 
@@ -281,7 +286,7 @@ class VMHostDevsModel(object):
             pci_infos = sorted(pci_infos, key=itemgetter('name'))
 
             # does not allow hot-plug of 3D graphic cards
-            is_3D_device = dev_model.is_device_3D_controller(dev_info)
+            is_3D_device = self.dev_model.is_device_3D_controller(dev_info)
             if is_3D_device and DOM_STATE_MAP[dom.info()[0]] != "shutoff":
                 msg = WokMessage('KCHVMHDEV0006E', {'name': dev_info['name']})
                 cb(msg.get_text(), False)
@@ -390,7 +395,7 @@ class VMHostDevsModel(object):
                 continue
 
             name = DeviceModel.deduce_dev_name(device, self.conn)
-            info = DeviceModel(conn=self.conn).lookup(name)
+            info = self.dev_model.lookup(name)
             if 'vga3d' in info and info['vga3d']:
                 counter += 1
 
@@ -487,6 +492,13 @@ class VMHostDevsModel(object):
         dev_info = params['dev_info']
         lock = params['lock']
 
+        try:
+            self._passthrough_device_validate(dev_info['name'])
+
+        except InvalidParameter as e:
+            cb(e.message, False)
+            raise
+
         with lock:
             dom = VMModel.get_vm(vmid, self.conn)
 
@@ -533,6 +545,13 @@ class VMHostDevsModel(object):
         dom = VMModel.get_vm(vmid, self.conn)
         lock = params['lock']
 
+        try:
+            self._passthrough_device_validate(dev_info['name'])
+
+        except InvalidParameter as e:
+            cb(e.message, False)
+            raise
+
         with lock:
             with RollbackContext() as rollback:
                 xmlstr = self._get_usb_device_xml(dev_info)
@@ -565,6 +584,8 @@ class VMHostDevModel(object):
         self.objstore = kargs['objstore']
         self.events = kargs['eventsloop']
         self.task = TaskModel(**kargs)
+        self.devs_model = DevicesModel(**kargs)
+        self.dev_model = DeviceModel(**kargs)
         self._cb = None
         self.events.registerDetachDevicesEvent(
             self.conn,
@@ -581,11 +602,10 @@ class VMHostDevModel(object):
             raise NotFoundError('KCHVMHDEV0001E',
                                 {'vmid': vmid, 'dev_name': dev_name})
 
-        dev_model = DeviceModel(conn=self.conn)
         for e in hostdev:
             deduced_name = DeviceModel.deduce_dev_name(e, self.conn)
             if deduced_name == dev_name:
-                dev_info = dev_model.lookup(dev_name)
+                dev_info = self.dev_model.lookup(dev_name)
                 return {'name': dev_name,
                         'type': e.attrib['type'],
                         'product': dev_info.get('product', None),
@@ -643,9 +663,8 @@ class VMHostDevModel(object):
             pci_devs = [(DeviceModel.deduce_dev_name(e, self.conn), e)
                         for e in hostdev if e.attrib['type'] == 'pci']
 
-            dev_model = DeviceModel(conn=self.conn)
-            dev_info = dev_model.lookup(dev_name)
-            is_3D_device = dev_model.is_device_3D_controller(dev_info)
+            dev_info = self.dev_model.lookup(dev_name)
+            is_3D_device = self.dev_model.is_device_3D_controller(dev_info)
             if is_3D_device and DOM_STATE_MAP[dom.info()[0]] != "shutoff":
                 raise InvalidOperation('KCHVMHDEV0006E',
                                        {'name': dev_info['name']})
@@ -716,9 +735,8 @@ class VMHostDevModel(object):
         return True
 
     def _delete_affected_pci_devices(self, dom, dev_name, pci_devs):
-        dev_model = DeviceModel(conn=self.conn)
         try:
-            dev_model.lookup(dev_name)
+            self.dev_model.lookup(dev_name)
         except NotFoundError:
             return
 
