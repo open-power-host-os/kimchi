@@ -361,7 +361,8 @@ class VMTemplate(object):
         params['qemu-stream-cmdline'] = ''
         params['disks'] = self._get_disks_xml(vm_uuid)
         params['serial'] = get_serial_xml(params)
-
+        params['title'] = kwargs.get('title', '')
+        params['description'] = kwargs.get('description', '')
         graphics = dict(self.info['graphics'])
         graphics.update(kwargs.get('graphics', {}))
         # Graphics is not supported on s390x, this check will
@@ -421,6 +422,8 @@ class VMTemplate(object):
         <domain type='%(domain)s'>
           %(qemu-stream-cmdline)s
           <name>%(name)s</name>
+          <title>%(title)s</title>
+          <description>%(description)s</description>
           <uuid>%(uuid)s</uuid>
           <memtune>
             <hard_limit unit='MiB'>%(hard_limit)s</hard_limit>
@@ -507,12 +510,18 @@ class VMTemplate(object):
         if invalid_networks:
             invalid['networks'] = invalid_networks
 
-        # validate storagepools integrity
+        # validate storagepools and image-based templates integrity
         for disk in self.info['disks']:
             pool_uri = disk['pool']['name']
             pool_name = pool_name_from_uri(pool_uri)
             if pool_name not in self._get_active_storagepools_name():
                 invalid['storagepools'] = [pool_name]
+
+            if disk.get("base") is None:
+                continue
+
+            if os.path.exists(disk.get("base")) is False:
+                invalid['vm-image'] = disk["base"]
 
         # validate iso integrity
         # FIXME when we support multiples cdrom devices

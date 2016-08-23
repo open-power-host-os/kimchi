@@ -127,7 +127,8 @@ class ModelTests(unittest.TestCase):
 
         keys = set(('name', 'state', 'stats', 'uuid', 'memory', 'cpu_info',
                     'screenshot', 'icon', 'graphics', 'users', 'groups',
-                    'access', 'persistent', 'bootorder', 'bootmenu'))
+                    'access', 'persistent', 'bootorder', 'bootmenu', 'title',
+                    'description'))
 
         stats_keys = set(('cpu_utilization', 'mem_utilization',
                           'net_throughput', 'net_throughput_peak',
@@ -466,12 +467,9 @@ class ModelTests(unittest.TestCase):
         self.assertEqual(fw_manager.opened_ports, {})
 
         mock_run_cmd.assert_has_calls(
-            [
-                 call(['firewall-cmd', '--state', '-q']),
-                 call(['firewall-cmd', '--add-port=5905/tcp']),
-                 call(['firewall-cmd', '--remove-port=5905/tcp'])
-            ]
-        )
+            [call(['firewall-cmd', '--state', '-q']),
+             call(['firewall-cmd', '--add-port=5905/tcp']),
+             call(['firewall-cmd', '--remove-port=5905/tcp'])])
 
     @mock.patch('wok.plugins.kimchi.model.virtviewerfile.run_command')
     def test_firewall_provider_ufw(self, mock_run_cmd):
@@ -487,13 +485,10 @@ class ModelTests(unittest.TestCase):
         self.assertEqual(fw_manager.opened_ports, {})
 
         mock_run_cmd.assert_has_calls(
-            [
-                 call(['firewall-cmd', '--state', '-q']),
-                 call(['ufw', 'status']),
-                 call(['ufw', 'allow', '5905/tcp']),
-                 call(['ufw', 'deny', '5905/tcp'])
-            ]
-        )
+            [call(['firewall-cmd', '--state', '-q']),
+             call(['ufw', 'status']),
+             call(['ufw', 'allow', '5905/tcp']),
+             call(['ufw', 'deny', '5905/tcp'])])
 
     @mock.patch('wok.plugins.kimchi.model.virtviewerfile.run_command')
     def test_firewall_provider_iptables(self, mock_run_cmd):
@@ -515,12 +510,9 @@ class ModelTests(unittest.TestCase):
                         5905, '-j', 'ACCEPT']
 
         mock_run_cmd.assert_has_calls(
-            [
-                 call(['firewall-cmd', '--state', '-q']),
-                 call(['ufw', 'status']),
-                 call(iptables_add), call(iptables_del)
-            ]
-        )
+            [call(['firewall-cmd', '--state', '-q']),
+             call(['ufw', 'status']),
+             call(iptables_add), call(iptables_del)])
 
     @unittest.skipUnless(utils.running_as_root(), 'Must be run as root')
     @mock.patch('wok.plugins.kimchi.model.virtviewerfile.'
