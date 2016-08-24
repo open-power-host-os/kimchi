@@ -331,7 +331,8 @@ class VMHostDevsModel(object):
                 # must be attached together within one xml file, the same does
                 # not happen to multifunction coldplug - where each function
                 # is attached individually
-                if DOM_STATE_MAP[dom.info()[0]] != 'shutoff' and \
+                if (distro == 'IBM_PowerKVM' or
+                    DOM_STATE_MAP[dom.info()[0]] != 'shutoff') and \
                    is_multifunction:
                     xmlstr = self._get_pci_devices_xml(pci_infos, slot, driver)
 
@@ -717,7 +718,9 @@ class VMHostDevModel(object):
         return devices
 
     def _hotunplug_multifunction_pci(self, dom, hostdev, dev_name):
-        if DOM_STATE_MAP[dom.info()[0]] == "shutoff":
+        distro, _, _ = platform.linux_distribution()
+        if distro != 'IBM_PowerKVM' and \
+           DOM_STATE_MAP[dom.info()[0]] == "shutoff":
             return False
 
         domain, bus, slot, _ = dev_name.split('_')[1:]
