@@ -35,12 +35,13 @@ from lxml.builder import E
 from math import ceil
 from xml.etree import ElementTree
 
+from wok.asynctask import AsyncTask
 from wok.config import config
 from wok.exception import InvalidOperation, InvalidParameter
 from wok.exception import NotFoundError, OperationFailed
 from wok.model.tasks import TaskModel
 from wok.rollbackcontext import RollbackContext
-from wok.utils import add_task, convert_data_size
+from wok.utils import convert_data_size
 from wok.utils import import_class, run_setfacl_set_attr, run_command, wok_log
 from wok.xmlutils.utils import dictize, xpath_get_text, xml_item_insert
 from wok.xmlutils.utils import xml_item_remove, xml_item_update
@@ -145,8 +146,8 @@ class VMsModel(object):
                 'graphics': params.get('graphics', {}),
                 "title": params.get("title", ""),
                 "description": params.get("description", "")}
-        taskid = add_task(u'/plugins/kimchi/vms/%s' % name, self._create_task,
-                          self.objstore, data)
+        taskid = AsyncTask(u'/plugins/kimchi/vms/%s' % name, self._create_task,
+                           data).id
 
         return self.task.lookup(taskid)
 
@@ -358,9 +359,9 @@ class VMModel(object):
         new_name = get_next_clone_name(current_vm_names, name, ts=True)
 
         # create a task with the actual clone function
-        taskid = add_task(u'/plugins/kimchi/vms/%s/clone' % new_name,
-                          self._clone_task, self.objstore,
-                          {'name': name, 'new_name': new_name})
+        taskid = AsyncTask(u'/plugins/kimchi/vms/%s/clone' % new_name,
+                           self._clone_task, {'name': name,
+                                              'new_name': new_name}).id
 
         return self.task.lookup(taskid)
 
@@ -2032,9 +2033,8 @@ class VMModel(object):
                   'non_shared': non_shared,
                   'remote_host': remote_host,
                   'user': user}
-        task_id = add_task('/plugins/kimchi/vms/%s/migrate' % name,
-                           self._migrate_task,
-                           self.objstore, params)
+        task_id = AsyncTask('/plugins/kimchi/vms/%s/migrate' % name,
+                            self._migrate_task, params).id
 
         return self.task.lookup(task_id)
 
