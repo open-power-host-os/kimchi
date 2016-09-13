@@ -327,35 +327,27 @@ class VMHostDevsModel(object):
                 slot = self._available_slot(dom)
 
             with RollbackContext() as rollback:
-                # multifunction hotplug is a special case where all functions
-                # must be attached together within one xml file, the same does
-                # not happen to multifunction coldplug - where each function
-                # is attached individually
-                if (distro == 'IBM_PowerKVM' or
-                    DOM_STATE_MAP[dom.info()[0]] != 'shutoff') and \
-                   is_multifunction:
+                # multifuction: try to attach all functions together within one
+                # xml file. It requires libvirt support.
+                if is_multifunction:
                     xmlstr = self._get_pci_devices_xml(pci_infos, slot, driver)
 
                     try:
                         dom.attachDeviceFlags(xmlstr, device_flags)
 
                     except libvirt.libvirtError:
-                        msg = WokMessage('KCHVMHDEV0008E',
-                                         {'device': pci_info['name'],
-                                          'vm': vmid})
-                        cb(msg.get_text(), False)
-                        wok_log.error(
-                            'Failed to attach mutifunction device VM %s: \n%s',
-                            vmid, xmlstr)
-                        raise
+                        # If operation fails, we try the other way, where each
+                        # function is attached individually
+                        pass
+                    else:
+                        rollback.prependDefer(dom.detachDeviceFlags, xmlstr,
+                                              device_flags)
+                        rollback.commitAll()
+                        if DOM_STATE_MAP[dom.info()[0]] == "shutoff":
+                            cb('OK', True)
+                        return
 
-                    rollback.prependDefer(dom.detachDeviceFlags, xmlstr,
-                                          device_flags)
-                    rollback.commitAll()
-                    if DOM_STATE_MAP[dom.info()[0]] == "shutoff":
-                        cb('OK', True)
-                    return
-
+                # attach each function individually (multi or single function)
                 for pci_info in pci_infos:
                     pci_info['detach_driver'] = driver
                     xmlstr = self._get_pci_device_xml(pci_info,
@@ -670,7 +662,14 @@ class VMHostDevModel(object):
                 raise InvalidOperation('KCHVMHDEV0006E',
                                        {'name': dev_info['name']})
 
-            if self._hotunplug_multifunction_pci(dom, hostdev, dev_name):
+            # check for multifunction and detach all functions together
+            try:
+                multi = self._unplug_multifunction_pci(dom, hostdev, dev_name)
+            except libvirt.libvirtError:
+                multi = False
+
+            # successfully detached all functions: finish operation
+            if multi:
                 if is_3D_device:
                     devsmodel = VMHostDevsModel(conn=self.conn)
                     devsmodel.update_mmio_guest(vmid, False)
@@ -679,6 +678,7 @@ class VMHostDevModel(object):
                     cb('OK', True)
                 return
 
+            # detach each function individually
             for e in hostdev:
                 if DeviceModel.deduce_dev_name(e, self.conn) == dev_name:
                     xmlstr = etree.tostring(e)
@@ -717,16 +717,11 @@ class VMHostDevModel(object):
 
         return devices
 
-    def _hotunplug_multifunction_pci(self, dom, hostdev, dev_name):
-        distro, _, _ = platform.linux_distribution()
-        if distro != 'IBM_PowerKVM' and \
-           DOM_STATE_MAP[dom.info()[0]] == "shutoff":
-            return False
-
-        domain, bus, slot, _ = dev_name.split('_')[1:]
+    def _unplug_multifunction_pci(self, dom, hostdev, dev_name):
         # get all devices attached to the guest in the same domain+bus+slot
         # that the one we are going to detach because they must be detached
         # together
+        domain, bus, slot, _ = dev_name.split('_')[1:]
         devices = self._get_devices_same_addr(hostdev,
                                               int(domain, 16),
                                               int(bus, 16),
