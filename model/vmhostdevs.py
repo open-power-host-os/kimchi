@@ -254,18 +254,11 @@ class VMHostDevsModel(object):
                 raise
 
             dom = VMModel.get_vm(vmid, self.conn)
-            # Due to libvirt limitation, we don't support live assigne device
-            # to vfio driver.
-            driver = ('vfio' if DOM_STATE_MAP[dom.info()[0]] == "shutoff" and
-                      self.caps.kernel_vfio else 'kvm')
+            driver = 'vfio' if self.caps.kernel_vfio else 'kvm'
 
-            # on powerkvm systems it must be vfio driver.
-            distro, _, _ = platform.linux_distribution()
-            if distro == 'IBM_PowerKVM':
-                driver = 'vfio'
-
-                # powerkvm requires a xhci usb controller in order to support
-                # pci hotplug.
+            # 'vfio' systems requires a xhci usb controller in order to support
+            # pci hotplug.
+            if driver == 'vfio':
                 if DOM_STATE_MAP[dom.info()[0]] != "shutoff" and \
                    not self.have_xhci_usb_controller(vmid):
                     msg = WokMessage('KCHVMHDEV0008E',
