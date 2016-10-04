@@ -743,14 +743,15 @@ kimchi.guest_edit_main = function() {
             wok.window.open('plugins/kimchi/guest-storage-add.html', 'extendCreateStorage');
         });
         if ((kimchi.thisVMState === "running") || (kimchi.thisVMState === "paused")) {
-            $("#form-guest-edit-general input").not("#guest-edit-cores-textbox").prop("disabled", true);
-            $("#guest-edit-cores-hotplug-unsupported").removeClass('hidden');
             if (kimchi.capabilities.mem_hotplug_support) {
-                $("#guest-edit-memory-textbox").prop("disabled", false);
+                $("#form-guest-edit-general input").not("#guest-edit-memory-textbox").prop("disabled", true);
+            } else {
+                $("#form-guest-edit-general input").prop("disabled", true);
             }
-            else {
-                $("#guest-edit-memory-hotplug-unsupported").removeClass('hidden');
-            }
+        }
+        if (! kimchi.capabilities.mem_hotplug_support) {
+            $("#guest-edit-max-memory-textbox").prop("disabled", true);
+            $("#guest-edit-memory-hotplug-unsupported").removeClass('hidden');
         }
 
         $('#guest-show-max-memory').on('click', function(e) {
