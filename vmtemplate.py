@@ -301,8 +301,7 @@ class VMTemplate(object):
 
     def _get_usb_controller(self):
         # powerkvm systems must include xhci controller model
-        distro, _, _ = platform.linux_distribution()
-        if distro != "IBM_PowerKVM":
+        if not platform.machine().startswith('ppc'):
             return ''
 
         return """
