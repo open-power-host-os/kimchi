@@ -257,14 +257,13 @@ class VMHostDevsModel(object):
             driver = 'vfio' if self.caps.kernel_vfio else 'kvm'
 
             # 'vfio' systems requires a xhci usb controller in order to support
-            # pci hotplug.
-            if driver == 'vfio':
-                if DOM_STATE_MAP[dom.info()[0]] != "shutoff" and \
-                   not self.have_xhci_usb_controller(vmid):
-                    msg = WokMessage('KCHVMHDEV0008E',
-                                     {'vmid': vmid})
-                    cb(msg.get_text(), False)
-                    raise InvalidOperation("KCHVMHDEV0007E", {'vmid': vmid})
+            # pci hotplug on Power.
+            if driver == 'vfio' and platform.machine().startswith('ppc') and \
+               DOM_STATE_MAP[dom.info()[0]] != "shutoff" and \
+               not self.have_xhci_usb_controller(vmid):
+                msg = WokMessage('KCHVMHDEV0007E', {'vmid': vmid})
+                cb(msg.get_text(), False)
+                raise InvalidOperation("KCHVMHDEV0007E", {'vmid': vmid})
 
             # Attach all PCI devices in the same IOMMU group
             affected_names = self.devs_model.get_list(

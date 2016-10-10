@@ -1588,12 +1588,11 @@ class ModelTests(unittest.TestCase):
             volumes = inst.storagevolumes_get_list(args['name'])
             self.assertEquals(len(volumes), 2)
 
-    def _host_is_PKVM():
+    def _host_is_power():
         import platform
-        distro, _, _ = platform.linux_distribution()
-        return distro == 'IBM_PowerKVM'
+        return platform.machine().startswith('ppc')
 
-    @unittest.skipUnless(_host_is_PKVM(), 'Only required for PowerKVM host')
+    @unittest.skipUnless(_host_is_power(), 'Only required for Power hosts')
     def test_pci_hotplug_requires_xhci_usb_controller(self):
         config.set("authentication", "method", "pam")
         inst = model.Model(None, objstore_loc=self.tmp_store)
