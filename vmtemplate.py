@@ -342,7 +342,7 @@ class VMTemplate(object):
         """
 
         tablet = """
-            <input type='tablet' bus='%(kbd_bus)s'> </input>
+            <input type='tablet' bus='%(tablet_bus)s'> </input>
         """
 
         video = """
