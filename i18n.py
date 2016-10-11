@@ -30,8 +30,9 @@ messages = {
     "KCHCPUHP0005E": _("Cannot update Max vCPU or Topology when guest is running."),
     "KCHCPUHP0006E": _("Guest does not have support to CPU hot unplug."),
 
-    "KCHMEMHOTUN0001E": _("Guest does not have 256 MiB memory devices to live detach."),
-    "KCHMEMHOTUN0002E": _("Only memory devices with size 256MiB are allowed to be detached. You can decrease your memory up to %(mem)s MiB"),
+    "KCHMEMHOTUN0001E": _("Decrease memory in running guests is only allowed if you remove all attached memory devices. New memory value must be %(mem)s."),
+    "KCHMEMHOTUN0002E": _("Guest does not have memory devices to live detach."),
+    "KCHMEMHOTUN0003E": _("Only memory devices with size 256MiB are allowed to be detached. Guest has memory devices with different values."),
 
     "KCHAPI0001E": _("Unknown parameter %(value)s"),
 

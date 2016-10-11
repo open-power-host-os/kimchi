@@ -1143,14 +1143,13 @@ class VMModel(object):
         except (libvirt.libvirtError, ValueError), e:
             raise OperationFailed('KCHCPUHP0004E', {'err': e.message})
 
-    def _get_mem_dev_total_size(self, xml, mem_value=None):
+    def _get_mem_dev_total_size(self, xml):
         root = ET.fromstring(xml)
         totMemDevs = 0
         for size in root.findall('./devices/memory/target/size'):
-            if (mem_value is None) or (mem_value == size.text):
-                totMemDevs += convert_data_size(size.text,
-                                                size.get('unit'),
-                                                'KiB')
+            totMemDevs += convert_data_size(size.text,
+                                            size.get('unit'),
+                                            'KiB')
         return int(totMemDevs)
 
     def _update_memory_live(self, dom, params):
@@ -1189,14 +1188,17 @@ class VMModel(object):
             if distro == "IBM_PowerKVM":
                 # HotUnplug of memory is minimally supported in PPC64. At this
                 # time only DIMM of 256MiB will be detached
-                mem_devs = self._get_mem_dev_total_size(xml, str(256 << 10))
-                mem_devs = mem_devs >> 10
+                obj = objectify.fromstring(xml)
+                size_set = set(obj.findall('./devices/memory/target/size'))
+                if len(size_set) == 0:
+                    raise InvalidOperation('KCHMEMHOTUN0002E')
+                elif len(size_set) > 1 or int(size_set.pop()) != (256 << 10):
+                    raise InvalidOperation('KCHMEMHOTUN0003E')
 
-                if (mem_devs == 0):
-                    raise InvalidOperation('KCHMEMHOTUN0001E')
-
-                if (new_mem < (old_mem - mem_devs)):
-                    raise InvalidOperation('KCHMEMHOTUN0002E',
+                # Must remove ALL devices
+                mem_devs = (self._get_mem_dev_total_size(xml) >> 10)
+                if new_mem != (old_mem - mem_devs):
+                    raise InvalidOperation('KCHMEMHOTUN0001E',
                                            {'mem': str(old_mem - mem_devs)})
 
                 # Fullfilling all condictions, detach devices
@@ -1204,15 +1206,11 @@ class VMModel(object):
                 devs.reverse()
                 flags = libvirt.VIR_DOMAIN_MEM_LIVE
                 for dev in devs:
-                    if dev.find('./target/size').text == str(256 << 10):
-                        try:
-                            dom.detachDeviceFlags(ET.tostring(dev), flags)
-                        except Exception as e:
-                            raise OperationFailed("KCHVM0047E",
-                                                  {'error': e.message})
-                        memory = memory + 256
-                        if memory == 0:
-                            break
+                    try:
+                        dom.detachDeviceFlags(ET.tostring(dev), flags)
+                    except Exception as e:
+                        raise OperationFailed("KCHVM0047E",
+                                              {'error': e.message})
                 return
             else:
                 # X86 does not have support to mem hotunplug yet
