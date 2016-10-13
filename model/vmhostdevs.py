@@ -20,7 +20,6 @@
 import glob
 import libvirt
 import os
-import platform
 import threading
 from lxml import etree, objectify
 from lxml.builder import E, ElementMaker
