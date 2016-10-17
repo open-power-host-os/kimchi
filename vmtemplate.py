@@ -40,6 +40,7 @@ from wok.plugins.kimchi.xmlutils.graphics import get_graphics_xml
 from wok.plugins.kimchi.xmlutils.interface import get_iface_xml
 from wok.plugins.kimchi.xmlutils.qemucmdline import get_qemucmdline_xml
 from wok.plugins.kimchi.xmlutils.serial import get_serial_xml
+from wok.plugins.kimchi.xmlutils.usb import get_usb_controller_xml
 
 
 class VMTemplate(object):
@@ -329,6 +330,13 @@ class VMTemplate(object):
                                         self.info['os_version'])
         return unicode(interfaces, 'utf-8')
 
+    def _get_usb_controller(self):
+        # Power systems must include USB controller model
+        if not platform.machine().startswith('ppc'):
+            return ''
+
+        return get_usb_controller_xml('nec-xhci')
+
     def _get_input_output_xml(self):
         sound = """
             <sound model='%(sound_model)s' />
@@ -436,7 +444,7 @@ class VMTemplate(object):
         # cpu_info element
         params['cpu_info_xml'] = self._get_cpu_xml()
 
-        # usb controller xhci
+        # usb controller
         params['usb_controller'] = self._get_usb_controller()
 
         xml = """

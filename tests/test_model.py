@@ -24,6 +24,7 @@ import base64
 import grp
 import lxml.etree as ET
 import os
+import platform
 import pwd
 import mock
 import re
@@ -1589,11 +1590,10 @@ class ModelTests(unittest.TestCase):
             self.assertEquals(len(volumes), 2)
 
     def _host_is_power():
-        import platform
         return platform.machine().startswith('ppc')
 
     @unittest.skipUnless(_host_is_power(), 'Only required for Power hosts')
-    def test_pci_hotplug_requires_xhci_usb_controller(self):
+    def test_pci_hotplug_requires_usb_controller(self):
         config.set("authentication", "method", "pam")
         inst = model.Model(None, objstore_loc=self.tmp_store)
         tpl_params = {'name': 'test', 'memory': 1024, 'cdrom': UBUNTU_ISO}
@@ -1609,10 +1609,9 @@ class ModelTests(unittest.TestCase):
             inst.vm_start('kimchi-vm1')
             rollback.prependDefer(utils.rollback_wrapper, inst.vm_poweroff,
                                   'kimchi-vm1')
-
-            # check if create VM has USB XHCI controller
+            # check if create VM has USB controller
             self.assertTrue(
-                inst.vmhostdevs_have_xhci_usb_controller('kimchi-vm1'))
+                inst.vmhostdevs_have_usb_controller('kimchi-vm1'))
 
 
 class BaseModelTests(unittest.TestCase):

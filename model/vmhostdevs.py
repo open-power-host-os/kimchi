@@ -20,6 +20,7 @@
 import glob
 import libvirt
 import os
+import platform
 import threading
 from lxml import etree, objectify
 from lxml.builder import E, ElementMaker
@@ -42,6 +43,9 @@ from wok.plugins.kimchi.xmlutils.qemucmdline import QEMU_NAMESPACE
 
 
 CMDLINE_FIELD_NAME = 'spapr-pci-host-bridge.mem_win_size'
+USB_MODELS_PCI_HOTPLUG = ["piix3-uhci", "piix4-uhci", "ehci", "ich9-ehci1",
+                          "ich9-uhci1", "ich9-uhci2", "ich9-uhci3",
+                          "vt82c686b-uhci", "pci-ohci", "nec-xhci"]
 WINDOW_SIZE_BAR = 0x800000000
 
 
@@ -134,7 +138,7 @@ class VMHostDevsModel(object):
 
         return '<devices>%s</devices>' % hostdevs
 
-    def have_xhci_usb_controller(self, vmid):
+    def have_usb_controller(self, vmid):
         dom = VMModel.get_vm(vmid, self.conn)
 
         root = objectify.fromstring(dom.XMLDesc(0))
@@ -151,7 +155,7 @@ class VMHostDevsModel(object):
                 continue
 
             if controller.attrib['type'] == 'usb' and \
-               controller.attrib['model'] == 'nec-xhci':
+               controller.attrib['model'] in USB_MODELS_PCI_HOTPLUG:
                 return True
 
         return False
@@ -255,14 +259,14 @@ class VMHostDevsModel(object):
             dom = VMModel.get_vm(vmid, self.conn)
             driver = 'vfio' if self.caps.kernel_vfio else 'kvm'
 
-            # 'vfio' systems requires a xhci usb controller in order to support
-            # pci hotplug on Power.
+            # 'vfio' systems requires a usb controller in order to support pci
+            # hotplug on Power.
             if driver == 'vfio' and platform.machine().startswith('ppc') and \
                DOM_STATE_MAP[dom.info()[0]] != "shutoff" and \
-               not self.have_xhci_usb_controller(vmid):
-                msg = WokMessage('KCHVMHDEV0007E', {'vmid': vmid})
+               not self.have_usb_controller(vmid):
+                msg = WokMessage('KCHVMHDEV0008E', {'vmid': vmid})
                 cb(msg.get_text(), False)
-                raise InvalidOperation("KCHVMHDEV0007E", {'vmid': vmid})
+                raise InvalidOperation("KCHVMHDEV0008E", {'vmid': vmid})
 
             # Attach all PCI devices in the same IOMMU group
             affected_names = self.devs_model.get_list(
