@@ -300,18 +300,6 @@ class VMTemplate(object):
                                       self.info['os_version'])
         return unicode(networks, 'utf-8')
 
-    def _get_usb_controller(self):
-        # powerkvm systems must include xhci controller model
-        if not platform.machine().startswith('ppc'):
-            return ''
-
-        return """
-        <controller type='usb' index='0' model='nec-xhci'>
-            <address type='pci' domain='0x0000'
-            bus='0x00' slot='0x0f' function='0x0'/>
-        </controller>
-        """
-
     def _get_interfaces_xml(self):
         interfaces = ""
         params = {'model': self.info['nic_model']}

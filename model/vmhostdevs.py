@@ -352,7 +352,7 @@ class VMHostDevsModel(object):
                         dom.attachDeviceFlags(xmlstr, device_flags)
 
                     except libvirt.libvirtError:
-                        msg = WokMessage('KCHVMHDEV0008E',
+                        msg = WokMessage('KCHVMHDEV0007E',
                                          {'device': pci_info['name'],
                                           'vm': vmid})
                         cb(msg.get_text(), False)
@@ -499,7 +499,7 @@ class VMHostDevsModel(object):
                     dom.attachDeviceFlags(xmlstr, device_flags)
 
                 except libvirt.libvirtError:
-                    msg = WokMessage('KCHVMHDEV0008E',
+                    msg = WokMessage('KCHVMHDEV0007E',
                                      {'device': dev_info['name'],
                                       'vm': vmid})
                     cb(msg.get_text(), False)
@@ -550,7 +550,7 @@ class VMHostDevsModel(object):
                     dom.attachDeviceFlags(xmlstr, device_flags)
 
                 except libvirt.libvirtError:
-                    msg = WokMessage('KCHVMHDEV0008E',
+                    msg = WokMessage('KCHVMHDEV0007E',
                                      {'device': dev_info['name'],
                                       'vm': vmid})
                     cb(msg.get_text(), False)
