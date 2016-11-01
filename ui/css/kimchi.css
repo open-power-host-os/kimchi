@@ -231,37 +231,37 @@
 
 #template-add-window.modal-content h3.iso-title.centos,
 #guest-add-window.modal-content h3.iso-title.centos {
-  background-image: url("/images/theme-default/icon-centos.png");
+  background-image: url("../../../images/theme-default/icon-centos.png");
 }
 
 #template-add-window.modal-content h3.iso-title.debian,
 #guest-add-window.modal-content h3.iso-title.debian {
-  background-image: url("/images/theme-default/icon-debian.png");
+  background-image: url("../../../images/theme-default/icon-debian.png");
 }
 
 #template-add-window.modal-content h3.iso-title.fedora,
 #guest-add-window.modal-content h3.iso-title.fedora {
-  background-image: url("/images/theme-default/icon-fedora.png");
+  background-image: url("../../../images/theme-default/icon-fedora.png");
 }
 
 #template-add-window.modal-content h3.iso-title.opensuse,
 #guest-add-window.modal-content h3.iso-title.opensuse {
-  background-image: url("/images/theme-default/icon-opensuse.png");
+  background-image: url("../../../images/theme-default/icon-opensuse.png");
 }
 
 #template-add-window.modal-content h3.iso-title.ubuntu,
 #guest-add-window.modal-content h3.iso-title.ubuntu {
-  background-image: url("/images/theme-default/icon-ubuntu.png");
+  background-image: url("../../../images/theme-default/icon-ubuntu.png");
 }
 
 #template-add-window.modal-content h3.iso-title.gentoo,
 #guest-add-window.modal-content h3.iso-title.gentoo {
-  background-image: url("/images/theme-default/icon-gentoo.png");
+  background-image: url("../../../images/theme-default/icon-gentoo.png");
 }
 
 #template-add-window.modal-content h3.iso-title.unknown,
 #guest-add-window.modal-content h3.iso-title.unknown {
-  background-image: url("/images/theme-default/icon-unknown.png");
+  background-image: url("../../../images/theme-default/icon-unknown.png");
 }
 
 /* Create Guest Modal */
@@ -1037,31 +1037,31 @@
 }
 
 #guest-content-container .distro-icon.icon-centos {
-  background-image: url("/images/theme-default/icon-centos.png");
+  background-image: url("../../../images/theme-default/icon-centos.png");
 }
 
 #guest-content-container .distro-icon.icon-debian {
-  background-image: url("/images/theme-default/icon-debian.png");
+  background-image: url("../../../images/theme-default/icon-debian.png");
 }
 
 #guest-content-container .distro-icon.icon-fedora {
-  background-image: url("/images/theme-default/icon-fedora.png");
+  background-image: url("../../../images/theme-default/icon-fedora.png");
 }
 
 #guest-content-container .distro-icon.icon-opensuse {
-  background-image: url("/images/theme-default/icon-opensuse.png");
+  background-image: url("../../../images/theme-default/icon-opensuse.png");
 }
 
 #guest-content-container .distro-icon.icon-ubuntu {
-  background-image: url("/images/theme-default/icon-ubuntu.png");
+  background-image: url("../../../images/theme-default/icon-ubuntu.png");
 }
 
 #guest-content-container .distro-icon.icon-gentoo {
-  background-image: url("/images/theme-default/icon-gentoo.png");
+  background-image: url("../../../images/theme-default/icon-gentoo.png");
 }
 
 #guest-content-container .distro-icon.icon-unknown {
-  background-image: url("/images/theme-default/icon-unknown.png");
+  background-image: url("../../../images/theme-default/icon-unknown.png");
 }
 
 body.wok-gallery {
@@ -1097,7 +1097,7 @@ body.wok-gallery {
 }
 
 #guest-edit-window #form-guest-edit-interface .column-actions {
-  width: 23%;
+  width: 20%;
 }
 
 #guest-edit-window #form-guest-edit-storage .column-actions {
@@ -1157,19 +1157,25 @@ body.wok-gallery {
 #guest-edit-window form .header .cell.column-type,
 #guest-edit-window form .task .cell.column-type,
 #guest-edit-window form .body .cell.column-type {
-  width: 11.35%;
+  width: 18%;
+}
+
+#guest-edit-window form .header .cell.column-mode,
+#guest-edit-window form .task .cell.column-mode,
+#guest-edit-window form .body .cell.column-mode {
+  width: 16%;
 }
 
 #guest-edit-window form .header .cell.column-mac,
 #guest-edit-window form .task .cell.column-mac,
 #guest-edit-window form .body .cell.column-mac {
-  width: 14.5%;
+  width: 14%;
 }
 
 #guest-edit-window form .header .cell.column-ip,
 #guest-edit-window form .task .cell.column-ip,
 #guest-edit-window form .body .cell.column-ip {
-  width: 31%;
+  width: 12%;
 }
 
 #guest-edit-window form .header .cell.column-sel,
@@ -1305,6 +1311,18 @@ body.wok-gallery {
 #guest-edit-window form .header .cell.column-network .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn),
 #guest-edit-window form .task .cell.column-network .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn),
 #guest-edit-window form .body .cell.column-network .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
+  width: 180px;
+}
+
+#guest-edit-window form .header .cell.column-mode .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn),
+#guest-edit-window form .task .cell.column-mode .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn),
+#guest-edit-window form .body .cell.column-mode .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
+  width: 160px;
+}
+
+#guest-edit-window form .header .cell.column-type .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn),
+#guest-edit-window form .task .cell.column-type .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn),
+#guest-edit-window form .body .cell.column-type .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
   width: 180px;
 }
 
@@ -1666,7 +1684,19 @@ body.wok-gallery {
 }
 
 #template-edit-window .template-storage-cell.storage-pool {
-  width: 220px !important;
+  width: 180px !important;
+}
+
+#template-edit-window .template-storage-cell.storage {
+  width: 180px !important;
+}
+
+#template-edit-window .template-storage-cell.storage-path {
+  width: 180px !important;
+}
+
+#template-edit-window .template-storage-cell.source {
+  width: 180px !important;
 }
 
 #template-edit-window .template-storage-cell.type {
@@ -1678,7 +1708,7 @@ body.wok-gallery {
 }
 
 #template-edit-window .template-storage-cell.format {
-  width: 320px;
+  width: 250px;
 }
 
 #template-edit-window .template-interface-cell.network {
@@ -2021,31 +2051,31 @@ body.wok-gallery {
 }
 
 #templates-root-container .wok-vm-list .distro-icon.icon-centos {
-  background-image: url("/images/theme-default/icon-centos.png");
+  background-image: url("../../../images/theme-default/icon-centos.png");
 }
 
 #templates-root-container .wok-vm-list .distro-icon.icon-debian {
-  background-image: url("/images/theme-default/icon-debian.png");
+  background-image: url("../../../images/theme-default/icon-debian.png");
 }
 
 #templates-root-container .wok-vm-list .distro-icon.icon-fedora {
-  background-image: url("/images/theme-default/icon-fedora.png");
+  background-image: url("../../../images/theme-default/icon-fedora.png");
 }
 
 #templates-root-container .wok-vm-list .distro-icon.icon-opensuse {
-  background-image: url("/images/theme-default/icon-opensuse.png");
+  background-image: url("../../../images/theme-default/icon-opensuse.png");
 }
 
 #templates-root-container .wok-vm-list .distro-icon.icon-ubuntu {
-  background-image: url("/images/theme-default/icon-ubuntu.png");
+  background-image: url("../../../images/theme-default/icon-ubuntu.png");
 }
 
 #templates-root-container .wok-vm-list .distro-icon.icon-gentoo {
-  background-image: url("/images/theme-default/icon-gentoo.png");
+  background-image: url("../../../images/theme-default/icon-gentoo.png");
 }
 
 #templates-root-container .wok-vm-list .distro-icon.icon-unknown {
-  background-image: url("/images/theme-default/icon-unknown.png");
+  background-image: url("../../../images/theme-default/icon-unknown.png");
 }
 
 #templates-root-container .wok-vm-gallery {
@@ -2152,31 +2182,31 @@ body.wok-gallery {
 }
 
 #templates-root-container .wok-vm-gallery .name-distro-icon.icon-centos {
-  background-image: url("/images/theme-default/icon-centos.png");
+  background-image: url("../../../images/theme-default/icon-centos.png");
 }
 
 #templates-root-container .wok-vm-gallery .name-distro-icon.icon-debian {
-  background-image: url("/images/theme-default/icon-debian.png");
+  background-image: url("../../../images/theme-default/icon-debian.png");
 }
 
 #templates-root-container .wok-vm-gallery .name-distro-icon.icon-fedora {
-  background-image: url("/images/theme-default/icon-fedora.png");
+  background-image: url("../../../images/theme-default/icon-fedora.png");
 }
 
 #templates-root-container .wok-vm-gallery .name-distro-icon.icon-opensuse {
-  background-image: url("/images/theme-default/icon-opensuse.png");
+  background-image: url("../../../images/theme-default/icon-opensuse.png");
 }
 
 #templates-root-container .wok-vm-gallery .name-distro-icon.icon-ubuntu {
-  background-image: url("/images/theme-default/icon-ubuntu.png");
+  background-image: url("../../../images/theme-default/icon-ubuntu.png");
 }
 
 #templates-root-container .wok-vm-gallery .name-distro-icon.icon-gentoo {
-  background-image: url("/images/theme-default/icon-gentoo.png");
+  background-image: url("../../../images/theme-default/icon-gentoo.png");
 }
 
 #templates-root-container .wok-vm-gallery .name-distro-icon.icon-unknown {
-  background-image: url("/images/theme-default/icon-unknown.png");
+  background-image: url("../../../images/theme-default/icon-unknown.png");
 }
 
 #templates-root-container span.template-status {
@@ -2230,7 +2260,7 @@ body.wok-gallery {
 }
 
 #network-root-container .wok-nw-loading-icon {
-  background: transparent url("/images/theme-default/spin5.svg") no-repeat 50% 50%;
+  background: transparent url("../../../images/theme-default/spin5.svg") no-repeat 50% 50%;
   -webkit-animation: spin 3s infinite linear;
   -o-animation: spin 3s infinite linear;
   animation: spin 3s infinite linear;
@@ -2337,15 +2367,15 @@ body.wok-gallery {
 }
 
 #storage-root-container .wok-datagrid-body .inactive .usage-icon.icon-high {
-  background-image: url("/images/theme-default/high_disabled.png") !important;
+  background-image: url("../../../images/theme-default/high_disabled.png") !important;
 }
 
 #storage-root-container .wok-datagrid-body .inactive .usage-icon.icon-med {
-  background-image: url("/images/theme-default/med_disabled.png") !important;
+  background-image: url("../../../images/theme-default/med_disabled.png") !important;
 }
 
 #storage-root-container .wok-datagrid-body .inactive .usage-icon.icon-low {
-  background-image: url("/images/theme-default/low_disabled.png") !important;
+  background-image: url("../../../images/theme-default/low_disabled.png") !important;
 }
 
 #storage-root-container .volumes {
@@ -2417,15 +2447,15 @@ body.wok-gallery {
 }
 
 #storage-root-container .volumes .volume-icon.icon-high {
-  background-image: url("/images/theme-default/high.png");
+  background-image: url("../../../images/theme-default/high.png");
 }
 
 #storage-root-container .volumes .volume-icon.icon-med {
-  background-image: url("/images/theme-default/med.png");
+  background-image: url("../../../images/theme-default/med.png");
 }
 
 #storage-root-container .volumes .volume-icon.icon-low {
-  background-image: url("/images/theme-default/low.png");
+  background-image: url("../../../images/theme-default/low.png");
 }
 
 #storage-root-container .volumes .volume-progress {
@@ -2866,17 +2896,17 @@ body.wok-gallery {
 
 #storage-root-container .wok-datagrid > .wok-datagrid-header > span.column-usage .usage-icon.icon-high,
 #storage-root-container .wok-datagrid > .wok-datagrid-body > .wok-datagrid-row > span.column-usage .usage-icon.icon-high {
-  background-image: url("/images/theme-default/high.png");
+  background-image: url("../../../images/theme-default/high.png");
 }
 
 #storage-root-container .wok-datagrid > .wok-datagrid-header > span.column-usage .usage-icon.icon-med,
 #storage-root-container .wok-datagrid > .wok-datagrid-body > .wok-datagrid-row > span.column-usage .usage-icon.icon-med {
-  background-image: url("/images/theme-default/med.png");
+  background-image: url("../../../images/theme-default/med.png");
 }
 
 #storage-root-container .wok-datagrid > .wok-datagrid-header > span.column-usage .usage-icon.icon-low,
 #storage-root-container .wok-datagrid > .wok-datagrid-body > .wok-datagrid-row > span.column-usage .usage-icon.icon-low {
-  background-image: url("/images/theme-default/low.png");
+  background-image: url("../../../images/theme-default/low.png");
 }
 
 #storage-root-container .wok-datagrid > .wok-datagrid-header > span.column-capacity,

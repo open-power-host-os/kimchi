@@ -158,7 +158,16 @@ $kimchi-icon-path: '../images';
         height: selectpicker height - 2px;
     }
     .template-storage-cell.storage-pool {
-        width: 220px !important;
+        width: 180px !important;
+    }
+    .template-storage-cell.storage {
+        width: 180px !important;
+    }
+    .template-storage-cell.storage-path {
+        width: 180px !important;
+    }
+    .template-storage-cell.source {
+        width: 180px !important;
     }
     .template-storage-cell.type {
         width: 100px;
@@ -167,7 +176,7 @@ $kimchi-icon-path: '../images';
         width: 100px;
     }
     .template-storage-cell.format {
-        width: 320px;
+        width: 250px;
     }
     .template-interface-cell.network {
         width: 220px;
@@ -455,25 +464,25 @@ $kimchi-icon-path: '../images';
             background-repeat: no-repeat;
             background-position: 8px 50%;
             &.icon-centos {
-                background-image: url('#{$wok-icon-path}/icon-centos.png');
+                background-image: url('../../#{$wok-icon-path}/icon-centos.png');
             }
             &.icon-debian {
-                background-image: url('#{$wok-icon-path}/icon-debian.png');
+                background-image: url('../../#{$wok-icon-path}/icon-debian.png');
             }
             &.icon-fedora {
-                background-image: url('#{$wok-icon-path}/icon-fedora.png');
+                background-image: url('../../#{$wok-icon-path}/icon-fedora.png');
             }
             &.icon-opensuse {
-                background-image: url('#{$wok-icon-path}/icon-opensuse.png');
+                background-image: url('../../#{$wok-icon-path}/icon-opensuse.png');
             }
             &.icon-ubuntu {
-                background-image: url('#{$wok-icon-path}/icon-ubuntu.png');
+                background-image: url('../../#{$wok-icon-path}/icon-ubuntu.png');
             }
             &.icon-gentoo {
-                background-image: url('#{$wok-icon-path}/icon-gentoo.png');
+                background-image: url('../../#{$wok-icon-path}/icon-gentoo.png');
             }
             &.icon-unknown {
-                background-image: url('#{$wok-icon-path}/icon-unknown.png');
+                background-image: url('../../#{$wok-icon-path}/icon-unknown.png');
             }
         }
     }
@@ -570,25 +579,25 @@ $kimchi-icon-path: '../images';
             background-repeat: no-repeat;
             background-position: 100% 50%;
             &.icon-centos {
-                background-image: url('#{$wok-icon-path}/icon-centos.png');
+                background-image: url('../../#{$wok-icon-path}/icon-centos.png');
             }
             &.icon-debian {
-                background-image: url('#{$wok-icon-path}/icon-debian.png');
+                background-image: url('../../#{$wok-icon-path}/icon-debian.png');
             }
             &.icon-fedora {
-                background-image: url('#{$wok-icon-path}/icon-fedora.png');
+                background-image: url('../../#{$wok-icon-path}/icon-fedora.png');
             }
             &.icon-opensuse {
-                background-image: url('#{$wok-icon-path}/icon-opensuse.png');
+                background-image: url('../../#{$wok-icon-path}/icon-opensuse.png');
             }
             &.icon-ubuntu {
-                background-image: url('#{$wok-icon-path}/icon-ubuntu.png');
+                background-image: url('../../#{$wok-icon-path}/icon-ubuntu.png');
             }
             &.icon-gentoo {
-                background-image: url('#{$wok-icon-path}/icon-gentoo.png');
+                background-image: url('../../#{$wok-icon-path}/icon-gentoo.png');
             }
             &.icon-unknown {
-                background-image: url('#{$wok-icon-path}/icon-unknown.png');
+                background-image: url('../../#{$wok-icon-path}/icon-unknown.png');
             }
         }
     }
