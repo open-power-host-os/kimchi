@@ -278,19 +278,17 @@ kimchi.template_edit_main = function() {
                 $('.template-tab-body', '#form-template-storage').append(nodeStorage);
                 var storageRow = '#storageRow' + storageData.storageIndex;
 
-                var storageOptions = '';
+                var storageOptions = '<option disabled="disabled" selected="selected" value=""></option>';
                 $.each(storagePoolsInfo, function(poolName, value) {
                     storageOptions += '<option value="' + poolName + '">' + poolName + '</option>';
                 });
 
                 $(storageRow + ' .selectStorageName').append(storageOptions);
                 if (storageData.storageSource == 'pool') {
-                    if (!$(storageRow + ' .selectStorageName option[value="' + storageData.storageName + '"]').length) {
-                        var invalidOption = '<option disabled="disabled" selected="selected" value="' + storageData.storageName + '">' + storageData.storageName + '</option>';
-                        $(storageRow + ' .selectStorageName').prepend(invalidOption);
-                        $(storageRow + ' .selectStorageName').parent().addClass('has-error')
-                    }
                     $(storageRow + ' .selectStorageName').val(storageData.storageName);
+                    if(!storageData.storageName){
+                        $(storageRow + ' .selectStorageName').parent().addClass('has-error');
+                    }
                     $(storageRow + ' span.storage-pool').show();
                     $(storageRow + ' span.storage-path').hide();
                 } else {
@@ -339,7 +337,8 @@ kimchi.template_edit_main = function() {
                 });
 
                 $(storageRow + ' input.storage-path').on('change input keyup',function(){
-                    if($(storageRow + ' input.storage-path').val()){
+                    var storagepath = $(storageRow + ' input.storage-path').val();
+                    if( storagepath && storagepath.charAt(0) == '/'){
                         $(storageRow + ' span.storage-path').removeClass('has-error');
                     }else{
                         $(storageRow + ' span.storage-path').addClass('has-error');
@@ -427,7 +426,7 @@ kimchi.template_edit_main = function() {
                 storageID = storageID + 1;
                 var storageNodeData = {
                     storageSource: 'pool',
-                    storageName: 'default',
+                    storageName: '',
                     storageType: 'dir',
                     storageDisk: '10',
                     storageDiskFormat: 'qcow2',
@@ -560,8 +559,9 @@ kimchi.template_edit_main = function() {
                         for (var i = 0; i < origmacvtapNetworks.length; i++) {
                             if (networkName === origmacvtapNetworks[i].name) {
                                 networkOptions += '<option selected="selected">' + origmacvtapNetworks[i].name + '</option>';
+                            }else{
+                                networkOptions += '<option>' + origmacvtapNetworks[i].name + '</option>';
                             }
-                            networkOptions += '<option>' + origmacvtapNetworks[i].name + '</option>';
                         }
                         $('select', '#form-template-interface-s390x #networkID' + networkItemNum + ' span.network').append(networkOptions);
 
@@ -578,8 +578,9 @@ kimchi.template_edit_main = function() {
                         for (var i = 0; i < origovsNetworks.length; i++) {
                             if (networkName === origovsNetworks[i]) {
                                 networkOptions += '<option selected="selected">' + origovsNetworks[i] + '</option>';
+                            }else{
+                                networkOptions += '<option>' + origovsNetworks[i] + '</option>';
                             }
-                            networkOptions += '<option>' + origovsNetworks[i] + '</option>';
                         }
                         $('select', '#form-template-interface-s390x #networkID' + networkItemNum + ' span.network').append(networkOptions);
 
@@ -593,8 +594,7 @@ kimchi.template_edit_main = function() {
                         for (var i = 0; i < result.length; i++) {
                             if (networkName === result[i].name) {
                                 networkOptions += '<option selected="selected">' + result[i].name + '</option>';
-                            }
-                            if (result[i].state === "active" && networkName !== result[i].name) {
+                            }else if (result[i].state === "active") {
                                 networkOptions += '<option>' + result[i].name + '</option>';
                             }
                         }
