@@ -151,16 +151,23 @@
                     </form>
                 </div>
                 <div role="tabpanel" class="tab-pane" id="processor">
-                    <form id="form-template-processor">
+                    <form id="form-edit-processor">
                         <div class="form-group">
                             <div id="guest-processor">
                                 <label for="vcpus">$_("Current CPU Number")</label>
                                 <input id="vcpus" class="form-control" name="processor" type="number" min="1" />
-                                <button id="guest-show-max-processor" class="btn btn-primary" type="button"><i class="fa fa-plus-circle"></i> <span class="text">$_("More")</span></button>
+                                <p class="help-block">
+                                    <i class="fa fa-info-circle"></i>
+                                    $_("Current CPU must be equal or lower than the Maximum CPU value. If a topology is set, it must be also be a multiple of the 'threads' value.")
+                                </p>
                             </div>
                             <div id="guest-max-processor-panel" class="form-group">
                                 <label for="guest-edit-max-processor-textbox">$_("Max CPU")</label>
                                 <input id="guest-edit-max-processor-textbox" class="form-control" name="max-processor" type="number" min="1" />
+                                <p class="help-block">
+                                    <i class="fa fa-info-circle"></i>
+                                    $_("If a topology is set, this value will be the product of sockets * times * cores.")
+                                </p>
                             </div>
                         </div>
                         <div class="manual form-group">
@@ -169,14 +176,20 @@
                         </div>
                         <div class="topology">
                             <div class="form-group">
+                                <label for="sockets">$_("Sockets")</label>
+                                <input type="text" class="form-control" value="1" id="sockets" />
+                            </div>
+                            <div class="form-group">
                                 <label for="cores">$_("Cores")</label>
                                 <input type="text" class="form-control" value="1" id="cores" />
                             </div>
-                            <div>
-                                <div class="form-group">
-                                    <label for="threads">$_("Threads")</label>
-                                    <select id="threads" class="selectpicker col-md-12 col-lg-12"></select>
-                                </div>
+                            <div class="form-group">
+                                <label for="threads">$_("Threads")</label>
+                                <input type="text" class="form-control" value="1" id="threads" />
+                                <p class="help-block">
+                                    <i class="fa fa-info-circle"></i>
+                                    <spam class="text" id="threads-recommended-values" />
+                                </p>
                             </div>
                         </div>
                     </form>

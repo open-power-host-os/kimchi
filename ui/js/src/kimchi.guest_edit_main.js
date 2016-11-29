@@ -48,7 +48,8 @@ kimchi.guest_edit_main = function() {
         // tap map, "general": 0, "storage": 1, "interface": 2, "permission": 3, "password": 4
         var submit_map = {
             0: generalSubmit,
-            3: permissionSubmit
+            3: permissionSubmit,
+            6: processorSubmit
         };
         var currentTab = $('#guest-edit-window li.active a[data-toggle="tab"]').data('id');
         var toSubmit = parseInt($('#'+currentTab).index());
@@ -59,7 +60,6 @@ kimchi.guest_edit_main = function() {
 
     $(guestEditForm).on('submit', submitForm);
     $(saveButton).on('click', submitForm);
-
 
     $('#guest-edit-window a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
         var target = $(this).attr('href');
@@ -968,8 +968,6 @@ kimchi.guest_edit_main = function() {
     };
 
     var initContent = function(guest) {
-        guest['vcpus'] = guest.cpu_info['vcpus'];
-        guest['max-processor'] = guest.cpu_info['maxvcpus'];
         guest['icon'] = guest['icon'] || 'plugins/kimchi/images/icon-vm.png';
         $('#form-guest-edit-general').fillWithObject(guest);
         $('#guest-edit-memory-textbox').val(parseInt(guest.memory.current));
@@ -998,14 +996,6 @@ kimchi.guest_edit_main = function() {
             var text = $('#guest-show-max-memory span.text').text();
             $('#guest-show-max-memory span.text').text(text == i18n['KCHVMED6008M'] ? i18n['KCHVMED6009M'] : i18n['KCHVMED6008M']);
             $('#guest-show-max-memory i.fa').toggleClass('fa-plus-circle fa-minus-circle');
-        });
-
-        $('#guest-show-max-processor').on('click', function(e) {
-            e.preventDefault;
-            $('#guest-max-processor-panel').slideToggle();
-            var cputext = $('#guest-show-max-processor span.cputext').text();
-            $('#guest-show-max-processor span.cputext').text(cputext == i18n['KCHVMED6008M'] ? i18n['KCHVMED6009M'] : i18n['KCHVMED6008M']);
-            $('#guest-show-max-processor i.fa').toggleClass('fa-plus-circle fa-minus-circle');
         });
 
         if ((kimchi.thisVMState !== "running") && (kimchi.thisVMState !== "paused")) {
@@ -1043,6 +1033,17 @@ kimchi.guest_edit_main = function() {
         setupPCIDevice();
         setupSnapshot();
 
+        kimchi.init_processor_tab(guest.cpu_info, $(saveButton));
+        if ((kimchi.thisVMState === "running") || (kimchi.thisVMState === "paused")) {
+            $('#guest-edit-max-processor-textbox').attr("disabled", true);
+            $('#sockets').attr("disabled", true);
+            $('#cores').attr("disabled", true);
+            $('#threads').attr("disabled", true);
+
+            $("#topology-checkbox").hide();
+            $("#settings-readonly-help").removeClass('hidden');
+        }
+
         wok.topic('kimchi/vmCDROMAttached').subscribe(onAttached);
         wok.topic('kimchi/vmCDROMReplaced').subscribe(onReplaced);
         wok.topic('kimchi/vmCDROMDetached').subscribe(onDetached);
@@ -1061,18 +1062,15 @@ kimchi.guest_edit_main = function() {
             $(saveButton).prop('disabled', true);
             var data = $('#form-guest-edit-general').serializeObject();
             data['memory'] = {current: Number(data['memory-ui']), maxmemory: Number(data['max-memory'])};
-            data['cpu_info'] = {maxvcpus: Number(data['max-processor']), vcpus: Number(data['vcpus']), topology: org['cpu_info']['topology']};
+
             var changedFields = {};
             for (var key in data) {
                 valueFromUI = data[key];
                 if (valueFromUI instanceof Object) {
                     // Compare if Objects of original and data are identical
                     // Handle special case when key is memory and guest is running as valueFromUI will return a null for max mem
-                    // since it is disabled; for cpu_info, when guest is running, just skip it since no processing is required
+                    // since it is disabled;
                     if (kimchi.thisVMState === 'running' || kimchi.thisVMState === 'paused') {
-                        if (key === 'cpu_info') {
-                            continue;
-                        }
                         if (key === 'memory') {
                             // Replace valueFromUI of max mem with one from original as otherwise the value is undefined
                             data['memory']['maxmemory'] = org.memory.maxmemory;
@@ -1092,12 +1090,8 @@ kimchi.guest_edit_main = function() {
             }
             var origMem = Number(org.memory.current);
             var origMaxMem = Number(org.memory.maxmemory);
-            var origCpu = Number(org.cpu_info.vcpus);
-            var origMaxCpu = Number(org.cpu_info.maxvcpus);
             var currentMem = data['memory-ui'];
             var currentMaxMem = data['max-memory'];
-            var currentCpu = data['vcpus'];
-            var currentMaxCpu = data['max-processor'];
 
             if ('memory' in changedFields) {
                 if (currentMaxMem !== undefined) {
@@ -1125,34 +1119,7 @@ kimchi.guest_edit_main = function() {
                     delete changedFields.memory.current;
                 }
             }
-            if ('cpu_info' in changedFields) {
-                if (currentMaxCpu !== undefined) {
-                    currentMaxCpu = Number(currentMaxCpu);
-                    if (currentMaxCpu === origMaxCpu) {
-                        delete changedFields.cpu_info.maxvcpus;
-                    }
-                } else {
-                    delete changedFields.cpu_info.maxvcpus;
-                }
-                if (currentCpu !== undefined) {
-                    currentCpu = Number(currentCpu);
-                    if (currentMaxCpu !== undefined && currentCpu > currentMaxCpu) {
-                        wok.message.error(i18n['KCHVM0003E'], '#alert-modal-container');
-                        $(saveButton).prop('disabled', false);
-                        return;
-                    }
-                    if (currentCpu === origCpu) {
-                        delete changedFields.cpu_info.vcpus;
-                    }
-                    if (currentMaxCpu === origMaxCpu) {
-                        delete changedFields.cpu_info.maxvcpus;
-                    }
-                } else {
-                    delete changedFields.cpu_info.vcpus;
-                }
-                // Delete this as it is not applicable regardless
-                delete changedFields.cpu_info.topology;
-            }
+
             kimchi.updateVM(kimchi.selectedGuest, changedFields, function() {
                 kimchi.listVmsAuto();
                 wok.window.close();
@@ -1206,6 +1173,49 @@ kimchi.guest_edit_main = function() {
                 $(saveButton).prop('disabled', false);
             }
         }
+    };
+
+    var processorSubmit = function(event) {
+        kimchi.retrieveVM(kimchi.selectedGuest, function(org) {
+            $(saveButton).prop('disabled', true);
+            var data = {};
+
+            var cpu = parseInt($('#vcpus').val());
+            var maxCpu = parseInt($('#guest-edit-max-processor-textbox').val());
+            var maxCpuFinal = cpu;
+            if (maxCpu >= cpu) {
+                maxCpuFinal = maxCpu;
+            }
+            if (kimchi.thisVMState === 'running' || kimchi.thisVMState === 'paused') {
+                data['cpu_info'] = {vcpus: cpu};
+            } else {
+                if ($("input:checkbox", "#form-edit-processor").prop("checked")) {
+                    data['cpu_info'] = {
+                        vcpus: cpu,
+                        maxvcpus: maxCpuFinal,
+                        topology: {
+                            sockets: parseInt($("#sockets").val()),
+                            cores: parseInt($("#cores").val()),
+                            threads: parseInt($("#threads").val())
+                        }
+                    };
+                } else {
+                    data['cpu_info'] = {
+                        vcpus: cpu,
+                        maxvcpus: maxCpuFinal,
+                        topology: {}
+                    };
+                }
+            }
+
+            kimchi.updateVM(kimchi.selectedGuest, data, function() {
+                kimchi.listVmsAuto();
+                wok.window.close();
+            }, function(err) {
+                wok.message.error(err.responseJSON.reason, '#alert-modal-container');
+                $(saveButton).prop('disabled', false);
+            });
+        });
     };
 
     if(kimchi.hostarch === s390xArch){

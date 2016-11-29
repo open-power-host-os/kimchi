@@ -134,11 +134,9 @@ class CPUInfoModel(object):
 
             if not self.guest_threads_enabled:
                 raise InvalidOperation("KCHCPUINF0003E")
-            if threads > self.threads_per_core:
-                raise InvalidParameter("KCHCPUINF0006E")
             if maxvcpus != sockets * cores * threads:
                 raise InvalidParameter("KCHCPUINF0002E")
-            if vcpus % (cores * threads) != 0:
+            if vcpus % threads != 0:
                 raise InvalidParameter("KCHCPUINF0005E")
 
         if maxvcpus > self.get_host_max_vcpus():

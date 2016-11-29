@@ -357,11 +357,13 @@ messages = {
     "KCHCPUINF0002E": _("When CPU topology is defined, maximum number of vCPUs must be a product of sockets, cores, and threads."),
     "KCHCPUINF0003E": _("This host (or current configuration) does not allow CPU topology."),
     "KCHCPUINF0004E": _("The maximum number of vCPUs is too large for this system."),
-    "KCHCPUINF0005E": _("When CPU topology is defined, vCPUs must be a multiple of a product of cores and threads."),
-    "KCHCPUINF0006E": _("The number of threads is too large for this system."),
+    "KCHCPUINF0005E": _("When CPU topology is defined, CPUs must be a multiple of the 'threads' number defined."),
     "KCHCPUINF0007E": _("When CPU topology is specified, sockets, cores and threads are required paramaters."),
     "KCHCPUINF0008E": _("Parameter 'cpu_info' expects an object with fields among: 'vcpus', 'maxvcpus', 'topology'."),
     "KCHCPUINF0009E": _("Parameter 'topology' expects an object with fields among: 'sockets', 'cores', 'threads'."),
+
+    "KCHCPUHOTP0001E": _("Unable to update Max CPU or CPU topology when guest is running."),
+    "KCHCPUHOTP0002E": _("Unable to hot plug/unplug CPUs. Details: %(err)s"),
 
     "KCHLVMS0001E": _("Invalid volume group name parameter: %(name)s."),
 

@@ -22,6 +22,7 @@ import __builtin__ as builtins
 
 import base64
 import grp
+import libvirt
 import json
 import lxml.etree as ET
 import mock
@@ -1316,23 +1317,23 @@ class ModelTests(unittest.TestCase):
 
             # define CPU topology
             inst.vm_update(u'kimchi-vm1', {'cpu_info': {'topology': {
-                           'sockets': 4, 'cores': 2, 'threads': 1}}})
+                           'sockets': 2, 'cores': 2, 'threads': 2}}})
             vm_info = inst.vm_lookup(u'kimchi-vm1')
-            self.assertEquals({'sockets': 4, 'cores': 2, 'threads': 1},
+            self.assertEquals({'sockets': 2, 'cores': 2, 'threads': 2},
                               vm_info['cpu_info']['topology'])
 
-            # vcpus not a multiple of (cores * threads)
+            # vcpus not a multiple of threads
             self.assertRaises(InvalidParameter, inst.vm_update, u'kimchi-vm1',
-                              {'cpu_info': {'vcpus': 1}})
+                              {'cpu_info': {'vcpus': 5}})
 
             # maxvcpus different of (sockets * cores * threads)
             self.assertRaises(InvalidParameter, inst.vm_update, u'kimchi-vm1',
                               {'cpu_info': {'maxvcpus': 4}})
 
-            # topology does not match maxvcpus (8 != 2 * 2 * 1)
+            # topology does not match maxvcpus (8 != 3 * 2 * 2)
             self.assertRaises(InvalidParameter, inst.vm_update, u'kimchi-vm1',
                               {'cpu_info': {'topology': {
-                               'sockets': 2, 'cores': 2, 'threads': 1}}})
+                               'sockets': 3, 'cores': 2, 'threads': 2}}})
 
             # undefine CPU topology
             inst.vm_update(u'kimchi-vm1', {'cpu_info': {'topology': {}}})
@@ -1414,6 +1415,117 @@ class ModelTests(unittest.TestCase):
             self.assertEquals("yes", inst.vm_lookup(u'пeω-∨м')['bootmenu'])
             inst.vm_update(u'пeω-∨м', {"bootmenu": False})
             self.assertEquals("no", inst.vm_lookup(u'пeω-∨м')['bootmenu'])
+
+    def test_get_vm_cpu_cores(self):
+        xml = """<domain type='kvm'>\
+<cpu><topology sockets='3' cores='2' threads='8'/></cpu>\
+</domain>"""
+        inst = model.Model(None, objstore_loc=self.tmp_store)
+        self.assertEqual('2', inst.vm_get_vm_cpu_cores(xml))
+
+    def test_get_vm_cpu_sockets(self):
+        xml = """<domain type='kvm'>\
+<cpu><topology sockets='3' cores='2' threads='8'/></cpu>\
+</domain>"""
+        inst = model.Model(None, objstore_loc=self.tmp_store)
+        self.assertEqual('3', inst.vm_get_vm_cpu_sockets(xml))
+
+    def test_get_vm_cpu_threads(self):
+        xml = """<domain type='kvm'>\
+<cpu><topology sockets='3' cores='2' threads='8'/></cpu>\
+</domain>"""
+        inst = model.Model(None, objstore_loc=self.tmp_store)
+        self.assertEqual('8', inst.vm_get_vm_cpu_threads(xml))
+
+    @mock.patch('wok.plugins.kimchi.model.vms.VMModel.has_topology')
+    def test_get_vm_cpu_topology(self, mock_has_topology):
+        class FakeDom():
+            def XMLDesc(self, flag):
+                return """<domain type='kvm'>\
+<cpu><topology sockets='3' cores='2' threads='8'/></cpu>\
+</domain>"""
+
+            def name(self):
+                return 'fakedom'
+
+        mock_has_topology.return_value = True
+        expected_topology = {'sockets': 3, 'cores': 2, 'threads': 8}
+
+        inst = model.Model(None, objstore_loc=self.tmp_store)
+        self.assertEqual(expected_topology,
+                         inst.vm_get_vm_cpu_topology(FakeDom()))
+
+    @mock.patch('wok.plugins.kimchi.model.vms.VMModel.has_topology')
+    def test_get_vm_cpu_topology_blank(self, mock_has_topology):
+        class FakeDom():
+            def XMLDesc(self, flag):
+                return """<domain type='kvm'></domain>"""
+
+            def name(self):
+                return 'fakedom'
+
+        mock_has_topology.return_value = False
+        expected_topology = {}
+
+        inst = model.Model(None, objstore_loc=self.tmp_store)
+        self.assertEqual(expected_topology,
+                         inst.vm_get_vm_cpu_topology(FakeDom()))
+
+    def test_vm_cpu_hotplug_invalidparam_fail(self):
+        inst = model.Model(None, objstore_loc=self.tmp_store)
+
+        with self.assertRaisesRegexp(InvalidParameter, 'KCHCPUHOTP0001E'):
+            params = {"cpu_info": {"vcpus": 1, 'maxvcpus': 4}}
+            inst.vm_cpu_hotplug_precheck('', params)
+
+    @mock.patch('wok.plugins.kimchi.model.vms.VMModel.has_topology')
+    def test_vm_cpu_hotplug_abovemax_fail(self, mock_has_topology):
+        class FakeDom():
+            def XMLDesc(self, flag):
+                return """<domain type='kvm'>\
+<vcpu placement='static' current='1'>8</vcpu><\
+/domain>"""
+
+            def name(self):
+                return 'fakedom'
+
+        mock_has_topology.return_value = False
+        inst = model.Model(None, objstore_loc=self.tmp_store)
+
+        with self.assertRaisesRegexp(InvalidParameter, 'KCHCPUINF0001E'):
+            params = {"cpu_info": {"vcpus": 16}}
+            inst.vm_cpu_hotplug_precheck(FakeDom(), params)
+
+    @mock.patch('wok.plugins.kimchi.model.vms.VMModel.has_topology')
+    @mock.patch('wok.plugins.kimchi.model.vms.VMModel.get_vm_cpu_topology')
+    def test_vm_cpu_hotplug_topology_mismatch_fail(self, mock_topology,
+                                                   mock_has_topology):
+        class FakeDom():
+            def XMLDesc(self, flag):
+                return """<domain type='kvm'>\
+<vcpu placement='static' current='8'>48</vcpu><\
+/domain>"""
+
+            def name(self):
+                return 'fakedom'
+
+        mock_has_topology.return_value = True
+        mock_topology.return_value = {'sockets': 3, 'cores': 2, 'threads': 8}
+
+        inst = model.Model(None, objstore_loc=self.tmp_store)
+
+        with self.assertRaisesRegexp(InvalidParameter, 'KCHCPUINF0005E'):
+            params = {"cpu_info": {"vcpus": 10}}
+            inst.vm_cpu_hotplug_precheck(FakeDom(), params)
+
+    def test_vm_cpu_hotplug_error(self):
+        class FakeDom():
+            def setVcpusFlags(self, vcpu, flags):
+                raise libvirt.libvirtError('')
+
+        inst = model.Model(None, objstore_loc=self.tmp_store)
+        with self.assertRaisesRegexp(OperationFailed, 'KCHCPUHOTP0002E'):
+            inst.vm_update_cpu_live(FakeDom(), '')
 
     def test_get_interfaces(self):
         inst = model.Model('test:///default',
