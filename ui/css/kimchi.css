@@ -506,7 +506,7 @@
 
 #guest-content-container .wok-guest-gallery .wok-guest-list-item {
   padding: 0;
-  width: 240px;
+  width: 290px;
   height: 435px;
   display: inline-block;
   border: 0;
@@ -620,7 +620,7 @@
   padding-left: 20px;
   margin-right: 20px;
   display: block;
-  width: 220px;
+  width: 290px;
   white-space: nowrap;
   cursor: default;
 }
@@ -671,7 +671,7 @@
 }
 
 #guest-content-container .wok-guest-gallery .wok-guest-list-item .menu-flat {
-  width: 240px;
+  width: 290px;
 }
 
 #guest-content-container .wok-guest-gallery .wok-guest-list-item .btn {
@@ -1094,10 +1094,6 @@ body.wok-gallery {
   display: inline-block;
 }
 
-#guest-edit-window #form-guest-edit-interface .column-actions {
-  width: 20%;
-}
-
 #guest-edit-window #form-guest-edit-storage .column-actions {
   width: 26%;
 }
@@ -1147,31 +1143,40 @@ body.wok-gallery {
   margin: 15px 0 0;
 }
 
-#guest-edit-window form .header .column-actions,
+#guest-edit-window form .header .cell.column-network,
+#guest-edit-window form .header .cell.column-mac {
+  display: inline-block;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#guest-edit-window form .column-actions,
 #guest-edit-window form .task .column-actions,
 #guest-edit-window form .body .column-actions {
   text-align: right;
 }
 
-#guest-edit-window form .header .column-device,
+#guest-edit-window form .column-device,
 #guest-edit-window form .task .column-device,
 #guest-edit-window form .body .column-device {
   width: 12.7%;
 }
 
-#guest-edit-window form .header .column-path,
+#guest-edit-window form .column-path,
 #guest-edit-window form .task .column-path,
 #guest-edit-window form .body .column-path {
   width: 60.25%;
 }
 
-#guest-edit-window form .header .cell.column-network,
+#guest-edit-window form .cell.column-network,
 #guest-edit-window form .task .cell.column-network,
 #guest-edit-window form .body .cell.column-network {
-  width: 18%;
+  width: 184px;
 }
 
-#guest-edit-window form .header .cell.column-network > span,
+#guest-edit-window form .cell.column-network > span,
 #guest-edit-window form .task .cell.column-network > span,
 #guest-edit-window form .body .cell.column-network > span {
   width: 100%;
@@ -1180,74 +1185,77 @@ body.wok-gallery {
   overflow: hidden;
 }
 
-#guest-edit-window form .header .cell.column-type,
+#guest-edit-window form .cell.column-type,
 #guest-edit-window form .task .cell.column-type,
 #guest-edit-window form .body .cell.column-type {
-  width: 18%;
+  width: 184px;
 }
 
-#guest-edit-window form .header .cell.column-mode,
+#guest-edit-window form .cell.column-mode,
 #guest-edit-window form .task .cell.column-mode,
 #guest-edit-window form .body .cell.column-mode {
-  width: 16%;
+  width: 164px;
 }
 
-#guest-edit-window form .header .cell.column-mac,
+#guest-edit-window form .cell.column-mac,
 #guest-edit-window form .task .cell.column-mac,
 #guest-edit-window form .body .cell.column-mac {
-  width: 14%;
+  width: 174px;
 }
 
-#guest-edit-window form .header .cell.column-ip,
+#guest-edit-window form .cell.column-ip,
 #guest-edit-window form .task .cell.column-ip,
 #guest-edit-window form .body .cell.column-ip {
-  width: 12%;
+  width: 150px;
+  display: inline-block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-#guest-edit-window form .header .cell.column-sel,
+#guest-edit-window form .cell.column-sel,
 #guest-edit-window form .task .cell.column-sel,
 #guest-edit-window form .body .cell.column-sel {
   width: 1.77%;
 }
 
-#guest-edit-window form .header .cell.column-snapshot-name,
+#guest-edit-window form .cell.column-snapshot-name,
 #guest-edit-window form .task .cell.column-snapshot-name,
 #guest-edit-window form .body .cell.column-snapshot-name {
   width: 58%;
 }
 
-#guest-edit-window form .header .cell.column-snapshot-created,
+#guest-edit-window form .cell.column-snapshot-created,
 #guest-edit-window form .task .cell.column-snapshot-created,
 #guest-edit-window form .body .cell.column-snapshot-created {
   width: 16.5%;
 }
 
-#guest-edit-window form .header .cell.column-pci-status,
+#guest-edit-window form .cell.column-pci-status,
 #guest-edit-window form .task .cell.column-pci-status,
 #guest-edit-window form .body .cell.column-pci-status {
   width: 3.7%;
 }
 
-#guest-edit-window form .header .cell.column-pci-status .fa,
+#guest-edit-window form .cell.column-pci-status .fa,
 #guest-edit-window form .task .cell.column-pci-status .fa,
 #guest-edit-window form .body .cell.column-pci-status .fa {
   color: #8cc63f;
   font-size: 24px;
 }
 
-#guest-edit-window form .header .cell.column-pci-name,
+#guest-edit-window form .cell.column-pci-name,
 #guest-edit-window form .task .cell.column-pci-name,
 #guest-edit-window form .body .cell.column-pci-name {
   width: 21%;
 }
 
-#guest-edit-window form .header .cell.column-product,
+#guest-edit-window form .cell.column-product,
 #guest-edit-window form .task .cell.column-product,
 #guest-edit-window form .body .cell.column-product {
   width: 45%;
 }
 
-#guest-edit-window form .header .cell.column-vendor,
+#guest-edit-window form .cell.column-vendor,
 #guest-edit-window form .task .cell.column-vendor,
 #guest-edit-window form .body .cell.column-vendor {
   width: 24.1%;
@@ -1612,7 +1620,7 @@ body.wok-gallery {
 
 #template-edit-window .template-edit-wrapper-controls {
   vertical-align: top;
-  width: 400px;
+  width: 480px;
   height: 35px;
   line-height: 35px;
   margin: 7px 0 8px;
@@ -1722,15 +1730,15 @@ body.wok-gallery {
 }
 
 #template-edit-window .template-storage-cell.type {
-  width: 100px;
+  width: 110px;
 }
 
 #template-edit-window .template-storage-cell.disk {
-  width: 100px;
+  width: 133px;
 }
 
 #template-edit-window .template-storage-cell.format {
-  width: 250px;
+  width: 162px;
 }
 
 #template-edit-window .template-interface-cell.network {
@@ -1899,6 +1907,10 @@ body.wok-gallery {
 }
 
 /* VM List View classes*/
+#templatestatusselect {
+  width: 240px !important;
+}
+
 #templates-root-container .grid-control input[type="text"] {
   height: 38px;
   display: inline-block;
@@ -1985,6 +1997,10 @@ body.wok-gallery {
   border-bottom: none;
   border-top: 0;
   background-color: #fff;
+  width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 #templates-root-container .wok-vm-list .wok-vm-body {
@@ -2004,6 +2020,7 @@ body.wok-gallery {
   font-size: 12.5pt;
   line-height: 2.42857;
   font-weight: 400;
+  width: 200px;
 }
 
 #templates-root-container .wok-vm-list .wok-vm-body .column-type {
@@ -2058,7 +2075,7 @@ body.wok-gallery {
 }
 
 #templates-root-container .wok-vm-list .column-action {
-  width: 33.8000%;
+  width: 232px;
 }
 
 #templates-root-container .wok-vm-list .item-hidden {
@@ -2279,6 +2296,10 @@ body.wok-gallery {
 
 #add-network-window #vlan-enabled label, #add-network-window #vlan-enabled input[type="text"] {
   display: block;
+}
+
+#networkConfig .alert-dismissable .close, .alert-dismissible .close {
+  right: -2px !important;
 }
 
 #network-root-container .wok-nw-loading-icon {
@@ -2595,7 +2616,7 @@ body.wok-gallery {
 #storage-root-container .volumes .wok-gallery .volume-box-inner {
   padding: 0 16px;
   width: 409px;
-  height: 110px;
+  height: 150px;
   display: flex;
   flex-flow: row wrap;
   justify-content: space-around;
@@ -2657,13 +2678,17 @@ body.wok-gallery {
 #storage-root-container .volumes .wok-gallery span.column-format,
 #storage-root-container .volumes .wok-gallery span.column-type {
   order: 3;
-  width: 72px;
+  width: 142px;
   margin-top: -5px;
 }
 
 #storage-root-container .volumes .wok-gallery span.gallery-header {
   font-weight: 600;
   display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 90px;
 }
 
 #storage-root-container .volumes .wok-gallery span.column-progress {
@@ -2754,7 +2779,7 @@ body.wok-gallery {
 @media (min-width: 992px) {
   #storage-root-container .volumes .wok-list.wok-datagrid > .wok-datagrid-header > span.column-format,
   #storage-root-container .volumes .wok-list.wok-datagrid > .wok-datagrid-body > .wok-datagrid-row > div > div > div > span.column-format {
-    width: 95px;
+    width: 127px;
   }
 }
 
@@ -2790,7 +2815,7 @@ body.wok-gallery {
   #storage-root-container .volumes .wok-list.wok-datagrid > .wok-datagrid-body > .wok-datagrid-row > div > div > div > span.column-capacity,
   #storage-root-container .volumes .wok-list.wok-datagrid > .wok-datagrid-body > .wok-datagrid-row > div > div > div > span.column-allocated,
   #storage-root-container .volumes .wok-list.wok-datagrid > .wok-datagrid-body > .wok-datagrid-row > div > div > div > span.column-progress {
-    width: 95px;
+    width: 142px;
   }
 }
 
@@ -2845,14 +2870,14 @@ body.wok-gallery {
 @media (min-width: 992px) {
   #storage-root-container .volumes .wok-list.wok-datagrid > .wok-datagrid-header > span.column-name,
   #storage-root-container .volumes .wok-list.wok-datagrid > .wok-datagrid-body > .wok-datagrid-row > div > div > div > span.column-name {
-    width: 333px;
+    width: 250px;
   }
 }
 
 @media (min-width: 1200px) {
   #storage-root-container .volumes .wok-list.wok-datagrid > .wok-datagrid-header > span.column-name,
   #storage-root-container .volumes .wok-list.wok-datagrid > .wok-datagrid-body > .wok-datagrid-row > div > div > div > span.column-name {
-    width: 444px;
+    width: 300px;
   }
 }
 
@@ -2882,29 +2907,44 @@ body.wok-gallery {
 
 #storage-root-container .wok-datagrid > .wok-datagrid-header > span.column-state,
 #storage-root-container .wok-datagrid > .wok-datagrid-body > .wok-datagrid-row > span.column-state {
-  width: 3.0519%;
+  width: 2.0519%;
   text-align: center;
 }
 
 #storage-root-container .wok-datagrid > .wok-datagrid-header > span.column-name,
 #storage-root-container .wok-datagrid > .wok-datagrid-body > .wok-datagrid-row > span.column-name {
-  width: 12.7272%;
+  width: 126px;
   text-overflow: ellipsis;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden !important;
 }
 
 #storage-root-container .wok-datagrid > .wok-datagrid-header > span.column-type,
 #storage-root-container .wok-datagrid > .wok-datagrid-body > .wok-datagrid-row > span.column-type {
-  width: 11.6883%;
+  width: 101px;
+  text-overflow: ellipsis;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden !important;
 }
 
 #storage-root-container .wok-datagrid > .wok-datagrid-header > span.column-location,
 #storage-root-container .wok-datagrid > .wok-datagrid-body > .wok-datagrid-row > span.column-location {
-  width: 21.4285%;
+  width: 171px;
+  text-overflow: ellipsis;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden !important;
 }
 
 #storage-root-container .wok-datagrid > .wok-datagrid-header > span.column-usage,
 #storage-root-container .wok-datagrid > .wok-datagrid-body > .wok-datagrid-row > span.column-usage {
-  width: 9.41558%;
+  width: 152px;
+  text-overflow: ellipsis;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden !important;
 }
 
 #storage-root-container .wok-datagrid > .wok-datagrid-header > span.column-usage .usage-icon,
@@ -2933,23 +2973,35 @@ body.wok-gallery {
 
 #storage-root-container .wok-datagrid > .wok-datagrid-header > span.column-capacity,
 #storage-root-container .wok-datagrid > .wok-datagrid-body > .wok-datagrid-row > span.column-capacity {
-  width: 8.701298%;
+  width: 129px;
+  text-overflow: ellipsis;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden !important;
 }
 
 #storage-root-container .wok-datagrid > .wok-datagrid-header > span.column-allocated,
 #storage-root-container .wok-datagrid > .wok-datagrid-body > .wok-datagrid-row > span.column-allocated {
-  width: 9.35064%;
+  width: 134px;
+  text-overflow: ellipsis;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden !important;
 }
 
 #storage-root-container .wok-datagrid > .wok-datagrid-header > span.column-disks,
 #storage-root-container .wok-datagrid > .wok-datagrid-body > .wok-datagrid-row > span.column-disks {
   text-align: center;
-  width: 2.9870%;
+  width: 105px;
+  text-overflow: ellipsis;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden !important;
 }
 
 #storage-root-container .wok-datagrid > .wok-datagrid-header > span.column-action,
 #storage-root-container .wok-datagrid > .wok-datagrid-body > .wok-datagrid-row > span.column-action {
-  width: 20.64%;
+  width: 254px;
   text-align: right;
 }
 

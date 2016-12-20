@@ -105,6 +105,7 @@ XPATH_BOOT = 'os/boot/@dev'
 XPATH_BOOTMENU = 'os/bootmenu/@enable'
 XPATH_CPU = './cpu'
 XPATH_DESCRIPTION = './description'
+XPATH_MEMORY = './memory'
 XPATH_NAME = './name'
 XPATH_NUMA_CELL = './cpu/numa/cell'
 XPATH_SNAP_VM_NAME = './domain/name'
@@ -481,11 +482,6 @@ class VMModel(object):
         all_paths = xpath_get_text(xml, XPATH_DOMAIN_DISK)
 
         vir_conn = self.conn.get()
-
-        def _delete_disk_from_objstore(path):
-            with self.objstore as session:
-                session.delete('storagevolume', path)
-
         domain_name = xpath_get_text(xml, XPATH_DOMAIN_NAME)[0]
 
         for i, path in enumerate(all_paths):
@@ -555,13 +551,6 @@ class VMModel(object):
             new_vol = self.storagevolume.lookup(new_pool_name, new_vol_name)
             xml = xml_item_update(xml, XPATH_DOMAIN_DISK_BY_FILE % path,
                                   new_vol['path'], 'file')
-
-            # set the new disk's used_by
-            with self.objstore as session:
-                session.store('storagevolume', new_vol['path'],
-                              {'used_by': [domain_name]},
-                              get_kimchi_version())
-            rollback.prependDefer(_delete_disk_from_objstore, new_vol['path'])
 
             # remove the new volume should an error occur later
             rollback.prependDefer(self.storagevolume.delete, new_pool_name,
@@ -1108,7 +1097,7 @@ class VMModel(object):
 
     def update_cpu_live(self, dom, vcpus):
         flags = libvirt.VIR_DOMAIN_AFFECT_LIVE | \
-                libvirt.VIR_DOMAIN_AFFECT_CONFIG
+            libvirt.VIR_DOMAIN_AFFECT_CONFIG
         try:
             dom.setVcpusFlags(vcpus, flags)
         except libvirt.libvirtError as e:
@@ -1354,6 +1343,12 @@ class VMModel(object):
         # Case VM changed currentMemory outside Kimchi, sum mem devs
         memory = dom.maxMemory() >> 10
         curr_mem = (info[2] >> 10)
+
+        # On CentOS, dom.info does not retrieve memory. So, if machine does
+        # not have memory hotplug, parse memory from xml
+        if curr_mem == 0:
+            curr_mem = int(xpath_get_text(xml, XPATH_MEMORY)[0]) >> 10
+
         if memory != curr_mem:
             memory = curr_mem + (self._get_mem_dev_total_size(xml) >> 10)
 
@@ -1476,10 +1471,6 @@ class VMModel(object):
                 pool_type = xpath_get_text(xml, "/pool/@type")[0]
                 if pool_type not in READONLY_POOL_TYPE:
                     vol.delete(0)
-                    # Update objstore to remove the volume
-                    with self.objstore as session:
-                        session.delete('storagevolume', path,
-                                       ignore_missing=True)
             except libvirt.libvirtError as e:
                 wok_log.error('Unable to get storage volume by path: %s' %
                               e.message)
