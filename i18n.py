@@ -1,7 +1,7 @@
 #
 # Project Kimchi
 #
-# Copyright IBM Corp, 2015-2016
+# Copyright IBM Corp, 2015-2017
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -141,6 +141,7 @@ messages = {
     "KCHVM0088E": _("invalid console type, supported types are sclp/virtio."),
     "KCHVM0089E": _("Unable to setup password-less login at remote host %(host)s using user %(user)s: remote directory %(sshdir)s does not exist."),
     "KCHVM0090E": _("Unable to create a password-less libvirt connection to the remote libvirt daemon at host %(host)s with the user %(user)s. Please verify the remote server libvirt configuration. More information: http://libvirt.org/auth.html ."),
+    "KCHVM0091E": _("'enable_rdma' must be of type boolean (true or false)."),
 
     "KCHVMHDEV0001E": _("VM %(vmid)s does not contain directly assigned host device %(dev_name)s."),
     "KCHVMHDEV0002E": _("The host device %(dev_name)s is not allowed to directly assign to VM."),
@@ -343,7 +344,6 @@ messages = {
     "KCHVMSTOR0020E": _("On s390x arch 'format' must be specified while attaching disk to virtual machine"),
     "KCHVMSTOR0021E": _("Virtual disk already exists on the system: %(disk_path)s"),
 
-    "KCHSNAP0001E": _("Virtual machine '%(vm)s' must be stopped before creating a snapshot of it."),
     "KCHSNAP0002E": _("Unable to create snapshot '%(name)s' on virtual machine '%(vm)s'. Details: %(err)s"),
     "KCHSNAP0003E": _("Snapshot '%(name)s' does not exist on virtual machine '%(vm)s'."),
     "KCHSNAP0004E": _("Unable to retrieve snapshot '%(name)s' on virtual machine '%(vm)s'. Details: %(err)s"),
