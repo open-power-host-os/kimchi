@@ -1,7 +1,7 @@
 /*
  * Project Kimchi
  *
- * Copyright IBM Corp, 2015-2016
+ * Copyright IBM Corp, 2015-2017
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1070,7 +1070,7 @@ body.wok-gallery {
 
 #guest-edit-window .tab-content {
   overflow: hidden;
-  height: 559px;
+  height: auto;
 }
 
 #guest-edit-window .tab-content .tab-pane {
@@ -2377,6 +2377,10 @@ body.wok-gallery {
 #network-root-container .wok-datagrid > .wok-datagrid-body > .wok-datagrid-row > span.column-state {
   height: 53px;
   vertical-align: middle;
+}
+
+#add-network-window #networkConfig #alert-modal-container .alert {
+  padding: 8px 34px 8px 16px;
 }
 
 #storage-root-container .wok-datagrid-body span > .fa {
