@@ -1,7 +1,7 @@
 #
 # Project Kimchi
 #
-# Copyright IBM Corp, 2015-2016
+# Copyright IBM Corp, 2015-2017
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -72,6 +72,8 @@ class Kimchi(WokRoot):
                 "host-dashboard.html": "/plugins/kimchi/js/kimchi.peers.js"
             }
         }
+
+        self.depends = ['gingerbase']
 
         # Some paths or URI's present in the objectstore have changed after
         # Kimchi 2.0.0 release. Check here if an upgrade in the schema and data
