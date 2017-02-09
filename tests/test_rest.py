@@ -18,6 +18,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 
+import cherrypy
 import json
 import os
 import re
@@ -32,7 +33,6 @@ from tests.utils import patch_auth, request, run_server, wait_task
 from wok.asynctask import AsyncTask
 from wok.rollbackcontext import RollbackContext
 
-from wok.plugins.kimchi import mockmodel
 from wok.plugins.kimchi.osinfo import get_template_default
 
 import iso_gen
@@ -50,8 +50,8 @@ def setUpModule():
     global test_server, model
 
     patch_auth()
-    model = mockmodel.MockModel('/tmp/obj-store-test')
-    test_server = run_server(test_mode=True, model=model)
+    test_server = run_server(test_mode=True)
+    model = cherrypy.tree.apps['/plugins/kimchi'].root.model
 
     # Create fake ISO to do the tests
     iso_gen.construct_fake_iso(fake_iso, True, '12.04', 'ubuntu')
@@ -61,7 +61,6 @@ def setUpModule():
 
 def tearDownModule():
     test_server.stop()
-    os.unlink('/tmp/obj-store-test')
     os.unlink(fake_iso)
     os.unlink("/var/lib/libvirt/images/fedora.iso")
 
@@ -180,7 +179,10 @@ class RestTests(unittest.TestCase):
         resp = self.request('/plugins/kimchi/vms/vm-1', req, 'PUT')
         self.assertEquals(400, resp.status)
 
-        if not os.uname()[4] == "s390x":
+        # Check if there is support to memory hotplug
+        resp = self.request('/plugins/kimchi/config/capabilities').read()
+        conf = json.loads(resp)
+        if os.uname()[4] != "s390x" and conf['mem_hotplug_support']:
             req = json.dumps({'memory': {'maxmemory': 3072}})
             resp = self.request('/plugins/kimchi/vms/vm-1', req, 'PUT')
             self.assertEquals(200, resp.status)
@@ -196,9 +198,7 @@ class RestTests(unittest.TestCase):
         resp = self.request('/plugins/kimchi/vms/vm-1', req, 'PUT')
         self.assertEquals(400, resp.status)
 
-        # Check if there is support to memory hotplug, once vm is running
-        resp = self.request('/plugins/kimchi/config/capabilities').read()
-        conf = json.loads(resp)
+        # Test memory hotplug
         req = json.dumps({'memory': {'current': 2048}})
         resp = self.request('/plugins/kimchi/vms/vm-1', req, 'PUT')
         if conf['mem_hotplug_support']:
@@ -255,6 +255,9 @@ class RestTests(unittest.TestCase):
         vm = json.loads(
             self.request('/plugins/kimchi/vms/vm-1', req).read()
         )
+
+        # The maxmemory will be automatically increased when the amount of
+        # memory value is greater than the current maxmemory value
         params = {'name': u'∨м-црdαtеd', 'cpu_info': {'vcpus': 5},
                   'memory': {'current': 3072}}
         req = json.dumps(params)
@@ -266,11 +269,9 @@ class RestTests(unittest.TestCase):
         # Memory was hot plugged
         vm['name'] = u'∨м-црdαtеd'
         vm['cpu_info'].update(params['cpu_info'])
-        if not os.uname()[4] == "s390x":
-            vm['memory'].update(params['memory'])
-        else:
-            vm['memory']['current'] = 3072
-            vm['memory']['maxmemory'] = 3072
+        vm['memory']['current'] = 3072
+        vm['memory']['maxmemory'] = 3072
+
         for key in params.keys():
             self.assertEquals(vm[key], vm_updated[key])
 
