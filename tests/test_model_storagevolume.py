@@ -26,9 +26,10 @@ import requests
 import tempfile
 import unittest
 from functools import partial
+from requests.exceptions import ConnectionError
 
 from tests.utils import fake_auth_header, HOST
-from tests.utils import patch_auth, PROXY_PORT, request
+from tests.utils import patch_auth, PORT, request
 from tests.utils import rollback_wrapper, run_server, wait_task
 
 from wok.config import paths
@@ -171,10 +172,13 @@ def _do_volume_test(self, model, pool_name):
             self.assertEquals('ready for upload', status['message'])
 
             # Upload volume content
-            url = 'https://%s:%s' % (HOST, PROXY_PORT) + uri + '/' + filename
+            url = 'http://%s:%s' % (HOST, PORT) + uri + '/' + filename
 
             # Create a file with 5M to upload
-            # Max body size is set to 4M so the upload will fail with 413
+            # Max body size is set to 4M so the upload should fail with 413.
+            # Since nginx is not being used for testing anymore, and cherrypy
+            # aborts connection instead of returning a 413 like nginx does,
+            # test case expects for exception raised by cherrypy.
             newfile = '/tmp/5m-file'
             with open(newfile, 'wb') as fd:
                 fd.seek(5*1024*1024-1)
@@ -187,11 +191,12 @@ def _do_volume_test(self, model, pool_name):
                     tmp_fd.write(data)
 
                 with open(newfile + '.tmp', 'rb') as tmp_fd:
-                    r = requests.put(url, data={'chunk_size': len(data)},
+                    error_msg = "Connection aborted"
+                    with self.assertRaisesRegexp(ConnectionError, error_msg):
+                        requests.put(url, data={'chunk_size': len(data)},
                                      files={'chunk': tmp_fd},
                                      verify=False,
                                      headers=fake_auth_header())
-                    self.assertEquals(r.status_code, 413)
 
             # Do upload
             index = 0
